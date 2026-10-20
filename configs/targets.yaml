@@ -1,0 +1,93 @@
+# Declared evaluation targets for PDELab.
+#
+# These are PROPOSED targets, not completed accomplishments and not
+# guaranteed outcomes. Every target is reported with one of:
+#   met | missed | not_run | not_comparable
+# A target that was not executed is reported as "not_run" - never as
+# "met" and never silently omitted.
+
+study:
+  name: pdelab-main
+  author: Atul Pandey
+  protocols: docs/REPRODUCE.md
+  preregistration: configs/prereg.yaml
+
+definitions:
+  nrmse:
+    description: >
+      Per-trajectory relative RMS error over the predicted future
+      snapshots only. The copied initial frame is NOT included.
+    formula: "sqrt( sum((pred-ref)^2) / (sum(ref^2) + eps) )"
+    epsilon: 1.0e-12
+    near_zero_reference_threshold: 1.0e-8
+    aggregation: mean over held-out trajectories; median also reported
+  physics_residual_error:
+    description: >
+      Physical-unit RMS PDE residual over the declared space/time
+      domain, computed with an identical evaluator, grid, time spacing
+      and aggregation for the baseline and the proposed model.
+    formula: "sqrt( mean_over_time( mean_over_space( R^2 ) ) )"
+    units: "dimensionless in the nondimensional units of each system"
+  relative_residual_improvement:
+    description: >
+      100 * (baseline_residual - proposed_residual) / baseline_residual
+      under the physics_residual_error definition.
+    units: percent
+    note: "a zero or near-zero baseline denominator is reported as nan, not as a large percentage"
+  throughput_ratio:
+    description: "optimized samples_per_second / baseline samples_per_second"
+    note: "same checkpoint, grid, rollout horizon, batch size and output contract"
+  memory_reduction_percent:
+    description: "100 * (baseline_peak - optimized_peak) / baseline_peak"
+    note: "peak CUDA allocated memory, model weights resident in the measurement"
+
+targets:
+  - name: burgers_nrmse
+    system: burgers
+    metric: nrmse
+    threshold: 0.05
+    comparison: "<"
+    units: dimensionless
+    protocol: free rollout over the held-out test split
+  - name: allen_cahn_nrmse
+    system: allen_cahn
+    metric: nrmse
+    threshold: 0.20
+    comparison: "<"
+    units: dimensionless
+    protocol: free rollout over the held-out test split
+  - name: burgers_residual_improvement
+    system: burgers
+    metric: relative_residual_improvement
+    threshold: 10.0
+    comparison: ">="
+    units: percent
+    baseline: data-only FNO
+    proposed: physics-regularized FNO
+  - name: allen_cahn_residual_improvement
+    system: allen_cahn
+    metric: relative_residual_improvement
+    threshold: 10.0
+    comparison: ">="
+    units: percent
+    baseline: data-only FNO
+    proposed: physics-regularized FNO
+  - name: inference_throughput_ratio
+    metric: throughput_ratio
+    threshold: 1.3
+    comparison: ">="
+    units: ratio
+    protocol: matched inference benchmark on a quiet device
+  - name: inference_memory_reduction
+    metric: memory_reduction_percent
+    threshold: 20.0
+    comparison: ">="
+    units: percent
+    protocol: matched inference benchmark on a quiet device
+
+training_requirements:
+  independent_seeds_confirmatory: 3
+  note: >
+    Three independent *training* seeds, not three inference repetitions
+    of one checkpoint. With three seeds the uncertainty estimate is
+    limited; narrow resampling intervals are not strong statistical proof.

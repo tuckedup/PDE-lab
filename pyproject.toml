@@ -1,0 +1,30 @@
+[project]
+name = "pdelab"
+version = "0.1.0"
+description = "Physics-Constrained Neural Operator Research Prototype"
+authors = [{ name = "Atul Pandey" }]
+dependencies = [
+    "torch",
+    "torchvision",
+    "numpy",
+    "scipy",
+    "pyyaml",
+    "h5py",
+    "matplotlib",
+    "tqdm",
+    "pytest",
+    "ruff",
+    "psutil",
+]
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

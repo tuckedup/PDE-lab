@@ -1,0 +1,77 @@
+# Pre-registration of the PDELab main study.
+#
+# The protocol below is frozen BEFORE the confirmatory (3-seed) matrix
+# is executed. The confirmatory dataset is sized and frozen before its
+# test results are examined. The prototype profile (1 seed) is
+# exploratory and is reported separately.
+
+frozen_on: "2026-10-19"
+author: Atul Pandey
+
+systems:
+  - name: burgers
+    equation: "u_t + (u^2/2)_x = nu * u_xx"
+    nu: 0.01
+    domain: "periodic [0, 1)"
+    observation_grid: [128]
+    reference_grid: [256]
+    observation_dt: 0.005
+    t_final: 0.5
+  - name: allen_cahn
+    equation: "u_t = D * (u_xx + u_yy) + a * (u - u^3)"
+    D: 0.001
+    a: 1.0
+    domain: "periodic [0, 1) x [0, 1)"
+    observation_grid: [32, 32]
+    reference_grid: [64, 64]
+    observation_dt: 0.05
+    t_final: 1.0
+
+main_conditions:
+  - data-only FNO
+  - physics-regularized FNO
+  - data-only U-Net
+  note: >
+    A physics-regularized U-Net is a controlled optional extension and
+    is additional work beyond the 18-run minimum matrix.
+
+minimum_matrix:
+  formula: "2 PDEs x 3 conditions x 3 training seeds = 18 runs"
+
+shared_settings:
+  optimizer: AdamW
+  lr: 1.0e-3
+  lr_schedule: cosine
+  weight_decay: 0.0
+  grad_clip: 1.0
+  batch_size_1d: 8
+  batch_size_2d: 2
+  selection_criterion: best validation loss (frozen before evaluation)
+  seed_set: [0, 1, 2]
+  note: >
+    Identical trajectory splits, interface, training examples, optimizer
+    family, stopping policy and validation schedule across conditions.
+    Only lambda_pde differs between the data-only and the
+    physics-regularized condition.
+
+lambda_search:
+  grid: [0.0, 0.01, 0.1]
+  selection: validation split only
+  budget: "one bounded search, identical access and budget per method"
+  note: >
+    The physics model is not tuned repeatedly against the test set.
+
+ablations:
+  selected:
+    - no physics penalty vs the selected penalty
+    - residual weight (lambda grid above)
+    - one-step vs rollout horizon
+    - spectral modes / model width at a fixed budget
+    - correctness of residual gradients
+  note: >
+    A small justified subset, not an unbounded combinatorial sweep.
+
+declared_limits:
+  - "The target values in configs/targets.yaml are proposals, not guarantees."
+  - "A failed target is a valid result and is reported as missed."
+  - "The difficulty of a condition is never reduced to make a target pass."

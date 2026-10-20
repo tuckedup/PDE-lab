@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Environment / tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+uv.lock
+
+# Generated datasets (regenerate with `pdelab data generate`)
+data/**/*.h5
+data/**/*.npz
+data/**/*.npy
+
+# Run artifacts
+runs/**/*.pt
+runs/**/*.pth
+runs/**/*.ckpt
+runs/**/optimizer*.pt
+results/**/*.png
+results/**/*.pdf
+results/**/*.gif
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Secrets
+.env
+*.key
+credentials*

@@ -1,0 +1,52 @@
+# System B: 2D diffusion-reaction (Allen-Cahn) (periodic)
+#
+#   u_t = D * (u_xx + u_yy) + a * (u - u^3)
+#
+# This is explicitly the scalar Allen-Cahn system. It is NOT Gray-Scott
+# and involves no two-species dataset.
+#
+# Nondimensional units on a periodic unit square, endpoint not
+# duplicated.
+#
+# Configuration notes (see docs/PDE_SPEC.md):
+#   D = 0.001 and a = 1 are starting configuration choices, not
+#   published benchmark constants. A parameter study
+#   (scripts/linux/study_ac_params.py) measured that this setting gives
+#   grid-converged solutions (32x32 vs 64x64 relative difference
+#   < 1e-3), a strongly non-trivial task (persistence nRMSE ~ 1.66)
+#   and a cheap reference (0.01 s per trajectory).
+name: allen_cahn
+dimension: 2
+solver: spectral_strang_exact_diffusion
+reference_solver: spectral_strang_exact_diffusion
+reference_grid: [64, 64]
+solver_grid: [64, 64]
+observation_grid: [32, 32]
+restriction: spectral_truncate_then_subsample
+params:
+  D: 0.001
+  a: 1.0
+t_final: 1.0
+observation_times: [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45,
+                    0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+initial_condition:
+  kind: fourier
+  n_modes: 3
+  amplitude: 0.8
+  mean: 0.0
+profiles:
+  smoke:
+    n_train: 2
+    n_val: 1
+    n_test: 1
+    seed: 2000
+  prototype:
+    n_train: 64
+    n_val: 16
+    n_test: 16
+    seed: 2000
+  full:
+    n_train: 256
+    n_val: 32
+    n_test: 32
+    seed: 2000

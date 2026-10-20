@@ -1,0 +1,46 @@
+# Main study matrix.
+#
+# The minimum full main matrix is 2 PDEs x 3 model conditions x 3
+# independent training seeds = 18 runs. The optional physics-regularized
+# U-Net is additional work beyond that minimum and is listed separately.
+#
+# Execution is strictly sequential (experiment_concurrency: 1).
+
+matrix:
+  systems: [burgers, allen_cahn]
+  architectures: [fno1d, unet1d, fno2d, unet2d]
+  conditions: [data_only, physics]
+  seeds: [0, 1, 2]
+
+  # Architectures are matched to their system by the sweep runner:
+  # fno1d/unet1d for burgers, fno2d/unet2d for allen_cahn. The full
+  # product above is filtered by the runner to the applicable pairs.
+  applicable_pairs:
+    - [burgers, fno1d]
+    - [burgers, unet1d]
+    - [allen_cahn, fno2d]
+    - [allen_cahn, unet2d]
+
+  base:
+    epochs: 60
+    batch_size: 8
+    lr: 1.0e-3
+
+  profiles:
+    smoke:
+      epochs: 2
+      batch_size: 4
+      estimated_minutes_per_run: 1
+    prototype:
+      epochs: 60
+      batch_size: 8
+      estimated_minutes_per_run: 12
+    full:
+      epochs: 60
+      batch_size: 8
+      estimated_minutes_per_run: 12
+      note: >
+        The full matrix is 18 runs. At the prototype estimate this is
+        roughly 3.6 hours of sequential training, which exceeds the
+        declared sweep budget of 120 minutes. The full matrix must be
+        split across sessions or the budget must be raised explicitly.

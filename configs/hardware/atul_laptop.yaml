@@ -1,0 +1,18 @@
+experiment_concurrency: 1
+cpu_threads: 4
+dataloader_workers: 0
+max_pipeline_ram_gib: 3.5
+max_cuda_allocated_gib: 4.5
+min_cuda_free_before_job_gib: 5.0  # Slightly lowered based on observed 5.8GB free
+min_host_free_disk_gib: 40
+max_new_dataset_storage_gib: 4
+max_new_project_storage_gib: 10
+max_checkpoints_per_run: 2
+initial_batch_size_1d: 8
+initial_batch_size_2d: 2
+initial_trial_walltime_minutes: 20
+max_default_job_walltime_minutes: 45
+max_default_sweep_walltime_minutes: 120
+training_seeds_prototype: [0]
+training_seeds_confirmatory: [0, 1, 2]
+run_full_sweep_by_default: false
