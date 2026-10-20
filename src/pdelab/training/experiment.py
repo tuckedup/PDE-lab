@@ -9,8 +9,6 @@ selection, failures and the exact continuation command.
 from __future__ import annotations
 
 import json
-import os
-import platform
 import resource
 import time
 import traceback
@@ -18,28 +16,20 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import torch
 
 from ..config import config_hash, load_yaml, project_root
 from ..data.dataset import (
-    NormalizationStats,
     TrajectoryDataset,
     compute_normalization_stats,
     load_manifest,
     split_paths,
 )
 from ..data.generate import environment_snapshot, git_revision
-from ..evaluation.metrics import (
-    nrmse_per_snapshot,
-    nrmse_per_trajectory,
-    summarize_nrmse,
-)
-from ..evaluation.rollout import rollout
 from ..models.base import count_parameters
 from ..models.registry import build_model_from_config
 from ..resources.preflight import HardwareProfile, preflight
-from ..training.trainer import TrainConfig, Trainer, load_checkpoint
+from ..training.trainer import TrainConfig, Trainer
 
 
 @dataclass
@@ -120,6 +110,15 @@ def load_experiment_config(path: str | Path) -> tuple[ExperimentConfig, dict]:
 
 
 def run_id_for(cfg: ExperimentConfig) -> str:
+    """Stable run identifier.
+
+    The configuration's own ``name`` wins, so that two configurations
+    of the same (system, architecture, condition, seed) - for example a
+    practical-budget U-Net and a near parameter-matched U-Net - get
+    *different* run directories instead of overwriting one another.
+    """
+    if cfg.name:
+        return cfg.name
     return f"{cfg.system}_{cfg.architecture}_{cfg.condition}_seed{cfg.seed}"
 
 
@@ -135,7 +134,6 @@ class ExperimentRunner:
 
     # ------------------------------------------------------------------
     def _dataset_manifest(self) -> dict[str, Any]:
-        paths = split_paths(self.cfg.dataset_dir, self.cfg.system)
         manifest_path = Path(self.cfg.dataset_dir) / f"{self.cfg.system}_manifest.json"
         manifest_path = (
             manifest_path if manifest_path.is_absolute()
@@ -257,6 +255,7 @@ class ExperimentRunner:
                 "walltime_seconds": result.walltime_seconds,
                 "stopped_reason": result.stopped_reason,
                 "physics_grad_check": result.physics_grad_check,
+                "determinism": result.determinism,
                 "history": result.history,
                 "checkpoint_path": result.checkpoint_path,
             }
@@ -269,7 +268,7 @@ class ExperimentRunner:
                 resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024**2
             )
             manifest["status"] = "completed"
-        except Exception as exc:  # noqa: BLE001 - failures must be recorded
+        except Exception as exc:
             manifest["status"] = "failed"
             manifest["error"] = f"{type(exc).__name__}: {exc}"
             manifest["traceback"] = traceback.format_exc()

@@ -40,7 +40,10 @@ matrix:
       batch_size: 8
       estimated_minutes_per_run: 12
       note: >
-        The full matrix is 18 runs. At the prototype estimate this is
-        roughly 3.6 hours of sequential training, which exceeds the
-        declared sweep budget of 120 minutes. The full matrix must be
-        split across sessions or the budget must be raised explicitly.
+        The required matrix is 18 runs (216 minutes at the prototype
+        estimate) and the optional physics-regularized U-Net adds 6
+        more (288 minutes in total). Both exceed the declared 120-minute
+        sweep budget, so the sweep must be split across sessions or the
+        budget must be raised explicitly first. The sweep plan does not
+        override the per-config batch size: the 2D runs keep their
+        declared batch_size of 2, which is a hardware limit.

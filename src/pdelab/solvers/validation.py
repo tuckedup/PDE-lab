@@ -174,7 +174,6 @@ def validate_burgers(verbose: bool = False) -> dict[str, Any]:
 
     # 3. Mean conservation over a long, shock-forming run.
     sv = Burgers1DWeno5(n=128, nu=0.01)
-    rng = np.random.default_rng(7)
     u0 = 0.8 * np.cos(2 * np.pi * sv.x) + 0.3 * np.cos(4 * np.pi * sv.x + 0.5)
     t_final = 0.3
     dt = sv.stable_dt(1.1, t_final)
@@ -318,6 +317,36 @@ def validate_burgers(verbose: bool = False) -> dict[str, Any]:
                                   "discrete operator and is excluded from the "
                                   "unforced main benchmark"}))
 
+    # 9. Reference-solution accuracy.
+    #     The configuration that actually generates the dataset is
+    #     compared against a much finer configuration. This quantifies
+    #     the reference solution's *own* error, which is what the
+    #     learning targets are measured against.
+    ref_n = 256
+    fine_n = 512
+    t_end = 0.5
+    s_ref = Burgers1DWeno5(n=ref_n, nu=0.01)
+    s_fine = Burgers1DWeno5(n=fine_n, nu=0.01)
+    u0_ref = burgers_ic(s_ref.x)
+    u0_fine = burgers_ic(s_fine.x)
+    dt_ref = s_ref.stable_dt(1.1, t_end)
+    steps_ref = int(round(t_end / dt_ref))
+    out_ref = s_ref.solve(u0_ref, t_end / steps_ref, steps_ref)[-1]
+    dt_fine = s_fine.stable_dt(1.1, t_end) / 2.0
+    steps_fine = int(round(t_end / dt_fine))
+    out_fine = s_fine.solve(u0_fine, t_end / steps_fine, steps_fine)[-1]
+    idx = np.arange(0, fine_n, fine_n // ref_n)
+    rel_ref_err = float(
+        np.linalg.norm(out_ref - out_fine[idx]) / np.linalg.norm(out_fine[idx])
+    )
+    checks.append(_check("burgers.reference_solution_accuracy", rel_ref_err < 5e-3,
+                         {"reference_grid": ref_n, "fine_grid": fine_n,
+                          "relative_l2_error": rel_ref_err, "tolerance": 5e-3,
+                          "t_final": t_end,
+                          "note": "the reference is an approximation of the true "
+                                  "solution, not exact ground truth; this is its "
+                                  "measured own error"}))
+
     return {
         "system": "burgers",
         "checks": checks,
@@ -372,7 +401,6 @@ def validate_allen_cahn(verbose: bool = False) -> dict[str, Any]:
 
     # 4. Energy decreases for a solution heading to the stable manifold.
     se = AllenCahn2DSpectral(nx=32, ny=32, D=0.001, a=1.0)
-    rng = np.random.default_rng(3)
     X, Y = np.meshgrid(se.x, se.x, indexing="ij")
     u0 = 0.5 * np.cos(2 * np.pi * X) * np.cos(2 * np.pi * Y)
     energies = [se.energy(u0)]
@@ -479,6 +507,33 @@ def validate_allen_cahn(verbose: bool = False) -> dict[str, Any]:
                           "note": "forcing is a test artefact derived from the "
                                   "discrete operators and is excluded from the "
                                   "unforced main benchmark"}))
+
+    # 9. Reference-solution accuracy against a finer configuration.
+    ref_n = 64
+    fine_n = 128
+    t_end = 1.0
+    s_ref = AllenCahn2DSpectral(nx=ref_n, ny=ref_n, D=0.001, a=1.0)
+    s_fine = AllenCahn2DSpectral(nx=fine_n, ny=fine_n, D=0.001, a=1.0)
+    Xr, Yr = np.meshgrid(s_ref.x, s_ref.x, indexing="ij")
+    Xf, Yf = np.meshgrid(s_fine.x, s_fine.x, indexing="ij")
+    u0_ref = 0.8 * np.cos(2 * np.pi * Xr) * np.cos(2 * np.pi * Yr)
+    u0_fine = 0.8 * np.cos(2 * np.pi * Xf) * np.cos(2 * np.pi * Yf)
+    dt_ref = s_ref.stable_dt(t_end)
+    out_ref = s_ref.solve(u0_ref, dt_ref, int(round(t_end / dt_ref)))[-1]
+    dt_fine = s_fine.stable_dt(t_end) / 2.0
+    out_fine = s_fine.solve(u0_fine, dt_fine, int(round(t_end / dt_fine)))[-1]
+    idx = np.arange(0, fine_n, fine_n // ref_n)
+    rel_ref_err = float(
+        np.linalg.norm(out_ref - out_fine[np.ix_(idx, idx)])
+        / np.linalg.norm(out_fine[np.ix_(idx, idx)])
+    )
+    checks.append(_check("allen_cahn.reference_solution_accuracy", rel_ref_err < 5e-3,
+                         {"reference_grid": ref_n, "fine_grid": fine_n,
+                          "relative_l2_error": rel_ref_err, "tolerance": 5e-3,
+                          "t_final": t_end,
+                          "note": "the reference is an approximation of the true "
+                                  "solution, not exact ground truth; this is its "
+                                  "measured own error"}))
 
     return {
         "system": "allen_cahn",

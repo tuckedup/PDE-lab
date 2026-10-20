@@ -45,18 +45,18 @@ for D, T, dt_obs in [
     obs_times = np.arange(0.0, T + 1e-9, dt_obs)
     n_snap = len(obs_times)
 
-    def make(n):
+    def make(n, D):
         s = AllenCahn2DSpectral(nx=n, ny=n, D=D, a=1.0)
         X, Y = np.meshgrid(s.x, s.x, indexing="ij")
         u0 = 0.8 * np.cos(2 * np.pi * X) * np.cos(2 * np.pi * Y)
         return s, u0
 
     t0 = time.time()
-    s64, u0_64 = make(64)
+    s64, u0_64 = make(64, D)
     traj = s64.solve_to(u0_64, T, obs_times)
     sec = time.time() - t0
 
-    s32, u0_32 = make(32)
+    s32, u0_32 = make(32, D)
     traj32 = s32.solve_to(u0_32, T, obs_times)
     grid_sens = float(
         np.linalg.norm(traj32[1:] - traj[1:, ::2, ::2])

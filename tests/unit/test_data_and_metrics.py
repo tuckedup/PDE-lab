@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import h5py
@@ -19,6 +18,7 @@ from pdelab.data.generate import restrict_1d, restrict_2d
 from pdelab.evaluation.metrics import (
     nrmse_per_snapshot,
     nrmse_per_trajectory,
+    persistence_forecast,
     relative_residual_improvement,
     residual_rms,
     summarize_nrmse,
@@ -141,6 +141,44 @@ def test_normalization_from_dict_roundtrip():
 # ----------------------------------------------------------------------
 # metric math
 # ----------------------------------------------------------------------
+def test_persistence_forecast_tiles_the_time_axis():
+    """The persistence forecast must repeat the initial frame along the
+    *time* axis.
+
+    Regression test: an inline ``np.repeat(initial[:, None], n, axis=1)``
+    is correct, but the same expression applied to a single trajectory
+    (where axis 1 is a *spatial* axis) tiles the wrong axis and
+    silently produces a meaningless number. The helper removes that
+    possibility.
+    """
+    initial = np.arange(2 * 4 * 4, dtype=np.float64).reshape(2, 4, 4)
+    out = persistence_forecast(initial, 5)
+    assert out.shape == (2, 5, 4, 4)
+    for t in range(5):
+        assert np.array_equal(out[:, t], initial)
+
+
+def test_persistence_forecast_rejects_a_missing_batch_axis():
+    with pytest.raises(ValueError):
+        persistence_forecast(np.zeros(8), 3)
+
+
+def test_persistence_nrmse_uses_the_time_axis():
+    """A trajectory that drifts linearly must give the expected
+    persistence nRMSE; this pins down the axis convention."""
+    n_traj, n_times, n = 2, 6, 4
+    u = np.zeros((n_traj, n_times, n))
+    for t in range(n_times):
+        u[:, t] = t  # constant in space, growing in time
+    ref = u[:, 1:]
+    pred = persistence_forecast(u[:, 0], n_times - 1)
+    per_traj = nrmse_per_trajectory(pred, ref)
+    # error per step k (k=1..5) is k, reference value is k
+    expected = np.sqrt(np.sum([k**2 for k in range(1, n_times)]) /
+                       np.sum([k**2 for k in range(1, n_times)]))
+    assert np.allclose(per_traj, expected)
+
+
 def test_nrmse_is_zero_for_a_perfect_prediction():
     ref = np.random.default_rng(0).standard_normal((4, 10, 8))
     assert np.allclose(nrmse_per_trajectory(ref, ref), 0.0, atol=1e-12)

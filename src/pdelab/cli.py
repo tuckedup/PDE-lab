@@ -25,7 +25,6 @@ import argparse
 import json
 import os
 import sys
-import time
 from pathlib import Path
 
 from .config import load_yaml, project_root, resolve_path
@@ -58,7 +57,7 @@ def cmd_doctor(args) -> int:
         try:
             m = importlib.import_module(mod)
             report["packages"][mod] = getattr(m, "__version__", "present")
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             report["packages"][mod] = f"MISSING ({exc})"
 
     try:
@@ -76,7 +75,7 @@ def cmd_doctor(args) -> int:
             report["cuda"]["forward_backward_ok"] = bool(
                 torch.isfinite(x.grad).all().item()
             )
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         report["cuda"] = {"error": str(exc)}
 
     report["layout"] = {
@@ -116,7 +115,6 @@ def cmd_data_generate(args) -> int:
     n_test = int(sizes.get("n_test", args.n_test or 16))
     seed = int(sizes.get("seed", args.seed if args.seed is not None else 0))
 
-    hw = HardwareProfile.load(_profile_path(args))
     out_dir = resolve_path(args.out or f"data/{system.name}")
     gen = DatasetGenerator(
         system=system,
@@ -160,7 +158,7 @@ def cmd_train(args) -> int:
         for key in ("epochs", "batch_size", "lr", "max_walltime_minutes"):
             if key in prof:
                 setattr(cfg, key, prof[key])
-        cfg.tags = list(cfg.tags) + [f"profile:{args.profile}"]
+        cfg.tags = [*list(cfg.tags), f"profile:{args.profile}"]
 
     hw = HardwareProfile.load(_profile_path(args))
     runner = ExperimentRunner(cfg, raw, hw)

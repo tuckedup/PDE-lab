@@ -46,6 +46,19 @@ def _crop_to(x: torch.Tensor, spatial: tuple[int, ...]) -> torch.Tensor:
     return out
 
 
+def _num_groups(channels: int, max_groups: int = 8) -> int:
+    """Largest group count <= ``max_groups`` that divides ``channels``.
+
+    ``nn.GroupNorm`` requires the number of groups to divide the number
+    of channels, so ``min(8, channels)`` is not safe for every width
+    (a width of 6 gives 12 channels, which is not divisible by 8).
+    """
+    for g in range(min(max_groups, channels), 0, -1):
+        if channels % g == 0:
+            return g
+    return 1
+
+
 class ConvBlock1d(nn.Module):
     def __init__(self, in_ch: int, out_ch: int, kernel_size: int = 3) -> None:
         super().__init__()
@@ -56,8 +69,8 @@ class ConvBlock1d(nn.Module):
         self.conv2 = nn.Conv1d(
             out_ch, out_ch, kernel_size, padding=pad, padding_mode="circular"
         )
-        self.norm1 = nn.GroupNorm(min(8, out_ch), out_ch)
-        self.norm2 = nn.GroupNorm(min(8, out_ch), out_ch)
+        self.norm1 = nn.GroupNorm(_num_groups(out_ch), out_ch)
+        self.norm2 = nn.GroupNorm(_num_groups(out_ch), out_ch)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = F.gelu(self.norm1(self.conv1(x)))
@@ -74,8 +87,8 @@ class ConvBlock2d(nn.Module):
         self.conv2 = nn.Conv2d(
             out_ch, out_ch, kernel_size, padding=pad, padding_mode="circular"
         )
-        self.norm1 = nn.GroupNorm(min(8, out_ch), out_ch)
-        self.norm2 = nn.GroupNorm(min(8, out_ch), out_ch)
+        self.norm1 = nn.GroupNorm(_num_groups(out_ch), out_ch)
+        self.norm2 = nn.GroupNorm(_num_groups(out_ch), out_ch)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = F.gelu(self.norm1(self.conv1(x)))

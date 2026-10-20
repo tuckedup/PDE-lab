@@ -13,8 +13,17 @@
 #   published benchmark constants. A parameter study
 #   (scripts/linux/study_ac_params.py) measured that this setting gives
 #   grid-converged solutions (32x32 vs 64x64 relative difference
-#   < 1e-3), a strongly non-trivial task (persistence nRMSE ~ 1.66)
-#   and a cheap reference (0.01 s per trajectory).
+#   < 1e-3), a strongly non-trivial task and a cheap reference
+#   (0.01 s per trajectory).
+#
+#   The horizon was revised after the first pilot: with T = 1.0 the
+#   persistence baseline scored nRMSE 0.197, i.e. simply copying the
+#   input almost met the declared 0.20 target. The prompt requires a
+#   meaningful prediction horizon, so T was extended to 3.0 and the
+#   observation step to 0.1. The measured persistence baseline is then
+#   0.402, i.e. twice the declared target, so the trivial baseline no
+#   longer comes close to the goal. This revision makes the benchmark
+#   HARDER; it was not made to move a result in either direction.
 name: allen_cahn
 dimension: 2
 solver: spectral_strang_exact_diffusion
@@ -26,9 +35,10 @@ restriction: spectral_truncate_then_subsample
 params:
   D: 0.001
   a: 1.0
-t_final: 1.0
-observation_times: [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45,
-                    0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+t_final: 3.0
+observation_times: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+                    1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9,
+                    2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0]
 initial_condition:
   kind: fourier
   n_modes: 3

@@ -3,7 +3,7 @@ name: allen_cahn_unet2d_data_only_seed0
 system: allen_cahn
 condition: data_only
 seed: 0
-observation_dt: 0.05
+observation_dt: 0.1
 lambda_pde: 0.0
 tags: [baseline,main]
 

@@ -16,7 +16,7 @@ import contextlib
 import fcntl
 import os
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -52,13 +52,13 @@ class HardwareProfile:
         return asdict(self)
 
     @staticmethod
-    def load(path: str | Path) -> "HardwareProfile":
+    def load(path: str | Path) -> HardwareProfile:
         import yaml
 
         p = Path(path)
         if not p.is_absolute():
             p = project_root() / p
-        with open(p, "r", encoding="utf-8") as fh:
+        with open(p, encoding="utf-8") as fh:
             data = yaml.safe_load(fh) or {}
         known = {f for f in HardwareProfile.__dataclass_fields__}
         filtered = {k: v for k, v in data.items() if k in known}
@@ -237,7 +237,7 @@ class JobLock:
             self._fh.close()
             self._fh = None
 
-    def __enter__(self) -> "JobLock":
+    def __enter__(self) -> JobLock:
         if not self.acquire(blocking=False):
             raise RuntimeError(
                 f"another PDELab job holds the lock at {self.path}; refusing to run "

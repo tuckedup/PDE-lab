@@ -8,13 +8,12 @@ and is guarded by the project job lock.
 
 from __future__ import annotations
 
-import json
 import time
 from pathlib import Path
 from typing import Any
 
-from .config import config_hash, load_yaml, project_root, resolve_path
-from .resources.preflight import HardwareProfile, JobLock, preflight
+from .config import config_hash, load_yaml, resolve_path
+from .resources.preflight import HardwareProfile, JobLock
 from .training.experiment import ExperimentRunner, load_experiment_config
 
 
@@ -44,12 +43,17 @@ def build_sweep(config_path: str | Path, profile: str = "prototype") -> dict[str
             for condition in conditions:
                 for seed in seeds:
                     name = f"{system}_{arch}_{condition}_seed{seed}"
+                    # The physics-regularized U-Net is a controlled
+                    # *optional* extension: it is additional work beyond
+                    # the 18-run minimum matrix and is reported separately.
+                    optional = condition == "physics" and arch.startswith("unet")
                     entry = {
                         "name": name,
                         "system": system,
                         "architecture": arch,
                         "condition": condition,
                         "seed": seed,
+                        "optional": optional,
                         "epochs": prof.get("epochs", base.get("epochs", 20)),
                         "batch_size": prof.get(
                             "batch_size",
@@ -60,17 +64,23 @@ def build_sweep(config_path: str | Path, profile: str = "prototype") -> dict[str
 
     # Rough wall-clock estimate from the pilot measurement, if available.
     per_run_minutes = prof.get("estimated_minutes_per_run", 10.0)
+    required = [r for r in runs if not r.get("optional")]
+    optional = [r for r in runs if r.get("optional")]
     return {
         "sweep_config": str(cfg_path),
         "sweep_config_hash": config_hash(raw),
         "profile": profile,
         "n_runs": len(runs),
+        "n_required_runs": len(required),
+        "n_optional_runs": len(optional),
+        "required_minimum_matrix": "2 PDEs x 3 conditions x 3 seeds = 18 runs",
         "systems": systems,
         "architectures": architectures,
         "conditions": conditions,
         "seeds": seeds,
         "estimated_minutes_per_run": per_run_minutes,
         "estimated_total_minutes": round(len(runs) * per_run_minutes, 1),
+        "estimated_required_minutes": round(len(required) * per_run_minutes, 1),
         "runs": runs,
         "note": "dry run only; no training was executed by this command",
     }
@@ -87,7 +97,6 @@ def run_sweep(
 
     hw = HardwareProfile.load(hardware or "configs/hardware/atul_laptop.yaml")
     base_dir = Path(plan["sweep_config"]).parent
-    matrix = load_yaml(plan["sweep_config"]).get("matrix", {})
 
     results: list[dict[str, Any]] = []
     started = time.time()
@@ -106,8 +115,13 @@ def run_sweep(
         try:
             cfg, raw = load_experiment_config(exp_path)
             cfg.seed = entry["seed"]
-            cfg.epochs = entry["epochs"]
-            cfg.batch_size = entry["batch_size"]
+            # The epoch count may be overridden by the sweep profile, but
+            # the batch size is NOT: it is a per-system hardware limit
+            # (8 in 1D, 2 in 2D) that the experiment config already
+            # declares correctly, and overriding it here would silently
+            # change the memory profile of the 2D runs.
+            if "epochs" in entry and entry.get("override_epochs", True):
+                cfg.epochs = entry["epochs"]
             runner = ExperimentRunner(cfg, raw, hw)
             manifest = runner.run()
             results.append({

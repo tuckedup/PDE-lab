@@ -18,7 +18,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import torch
 
 from ..config import project_root

@@ -8,7 +8,6 @@ periodic boundaries and odd/even shape alignment consistently.
 
 from __future__ import annotations
 
-import numpy as np
 import pytest
 import torch
 
@@ -265,6 +264,16 @@ def test_unet_respects_history_and_params():
 # ----------------------------------------------------------------------
 # registry
 # ----------------------------------------------------------------------
+def test_unet_builds_at_several_widths():
+    """GroupNorm requires the group count to divide the channel count, so
+    not every width is valid. These widths must all construct."""
+    for width in [4, 6, 8, 12, 16]:
+        m1 = PeriodicUNet1d(width=width, n_levels=3)
+        assert m1(torch.randn(1, 1, 32)).shape == (1, 1, 32)
+        m2 = PeriodicUNet2d(width=width, n_levels=3)
+        assert m2(torch.randn(1, 1, 16, 16)).shape == (1, 1, 16, 16)
+
+
 def test_registry_builds_every_architecture():
     for arch, dim, shape in [
         ("fno1d", 1, (2, 1, 32)),

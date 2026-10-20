@@ -7,7 +7,6 @@ suitable for CI and do not need a GPU.
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from pdelab.solvers.allen_cahn import AllenCahn2DSpectral
 from pdelab.solvers.burgers import Burgers1DFiniteVolume, ssprk3_step

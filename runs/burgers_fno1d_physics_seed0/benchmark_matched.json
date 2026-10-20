@@ -16,16 +16,16 @@
       "variant": "fp32_eager",
       "description": "model.eval(), inference-only, weights resident on device",
       "timing": {
-        "median_seconds": 0.2904251997000017,
-        "min_seconds": 0.2770723235000048,
-        "max_seconds": 0.30244748829999824,
-        "stdev_seconds": 0.009122997729097398,
+        "median_seconds": 0.24118607540003723,
+        "min_seconds": 0.22468071389994293,
+        "max_seconds": 0.30216848210002356,
+        "stdev_seconds": 0.027076966320078926,
         "blocks": [
-          0.2807302176999997,
-          0.30244748829999824,
-          0.29376274200000124,
-          0.2904251997000017,
-          0.2770723235000048
+          0.30216848210002356,
+          0.266043335699942,
+          0.22468071389994293,
+          0.24118607540003723,
+          0.24054544350001378
         ],
         "iters_per_block": 10,
         "n_blocks": 5
@@ -35,26 +35,26 @@
         "peak_reserved_gib": 0.021484375
       },
       "compile_seconds": 0.0,
-      "throughput_samples_per_second": 344.32273818971714,
+      "throughput_samples_per_second": 414.6176342649032,
       "batch_size": 1,
       "rollout_steps": 100,
-      "output_checksum": 0.6930519452730772,
-      "walltime_seconds": 21.87
+      "output_checksum": 0.32432012517576225,
+      "walltime_seconds": 19.87
     },
     {
       "variant": "autocast_fp16",
       "description": "torch.autocast(cuda, float16) around the same inference graph",
       "timing": {
-        "median_seconds": 0.2942342703000008,
-        "min_seconds": 0.281317279700005,
-        "max_seconds": 0.3035575292999965,
-        "stdev_seconds": 0.007724658719801108,
+        "median_seconds": 0.254521921200103,
+        "min_seconds": 0.24119170869998924,
+        "max_seconds": 0.2640034508998724,
+        "stdev_seconds": 0.008115551326776882,
         "blocks": [
-          0.3035575292999965,
-          0.2942342703000008,
-          0.29508408940000097,
-          0.281317279700005,
-          0.2859868746000018
+          0.24573672170008648,
+          0.2568907590999515,
+          0.2640034508998724,
+          0.24119170869998924,
+          0.254521921200103
         ],
         "iters_per_block": 10,
         "n_blocks": 5
@@ -64,28 +64,28 @@
         "peak_reserved_gib": 0.021484375
       },
       "compile_seconds": 0.0,
-      "throughput_samples_per_second": 339.8652369693039,
+      "throughput_samples_per_second": 392.89346681216057,
       "batch_size": 1,
       "rollout_steps": 100,
-      "output_checksum": 0.692958452613093,
-      "walltime_seconds": 21.99,
-      "accuracy_relative_max_diff": 0.00013489993155913323,
+      "output_checksum": 0.3245205118972808,
+      "walltime_seconds": 20.34,
+      "accuracy_relative_max_diff": 0.0006178670577719044,
       "accuracy_within_tolerance": true
     },
     {
       "variant": "compile_default",
       "description": "torch.compile(model, mode='default')",
       "timing": {
-        "median_seconds": 0.3255849736000016,
-        "min_seconds": 0.3138964206999958,
-        "max_seconds": 0.3482453488000033,
-        "stdev_seconds": 0.013328915374916145,
+        "median_seconds": 0.28061399260004694,
+        "min_seconds": 0.2655399834999116,
+        "max_seconds": 0.2887903393999295,
+        "stdev_seconds": 0.008361930502773427,
         "blocks": [
-          0.3482453488000033,
-          0.3444198474000018,
-          0.3255849736000016,
-          0.32155065809999994,
-          0.3138964206999958
+          0.28061399260004694,
+          0.2745019768999555,
+          0.2887903393999295,
+          0.2860569170999952,
+          0.2655399834999116
         ],
         "iters_per_block": 10,
         "n_blocks": 5
@@ -94,29 +94,29 @@
         "peak_allocated_gib": 0.008250713348388672,
         "peak_reserved_gib": 0.021484375
       },
-      "compile_seconds": 5.071576284999992,
-      "throughput_samples_per_second": 307.1394815746482,
+      "compile_seconds": 4.245284106000327,
+      "throughput_samples_per_second": 356.36141688247113,
       "batch_size": 1,
       "rollout_steps": 100,
-      "output_checksum": 0.6930519201996423,
-      "walltime_seconds": 26.86,
-      "accuracy_relative_max_diff": 3.617829089854697e-08,
+      "output_checksum": 0.32431805011354814,
+      "walltime_seconds": 23.88,
+      "accuracy_relative_max_diff": 6.398191333295956e-06,
       "accuracy_within_tolerance": true
     },
     {
       "variant": "compile_reduce_overhead",
       "description": "torch.compile(model, mode='reduce-overhead')",
       "timing": {
-        "median_seconds": 0.043702756000004686,
-        "min_seconds": 0.04209078619999218,
-        "max_seconds": 0.04643193699999983,
-        "stdev_seconds": 0.0015131772720293865,
+        "median_seconds": 0.04133122650000587,
+        "min_seconds": 0.03229125319994637,
+        "max_seconds": 0.04603315770000336,
+        "stdev_seconds": 0.00453976604560597,
         "blocks": [
-          0.04412355539999453,
-          0.043702756000004686,
-          0.04643193699999983,
-          0.04209078619999218,
-          0.04258062799999607
+          0.03915554779996455,
+          0.04222560880007222,
+          0.04603315770000336,
+          0.03229125319994637,
+          0.04133122650000587
         ],
         "iters_per_block": 10,
         "n_blocks": 5
@@ -125,17 +125,17 @@
         "peak_allocated_gib": 0.00815582275390625,
         "peak_reserved_gib": 0.0234375
       },
-      "compile_seconds": 6.483849122000038,
-      "throughput_samples_per_second": 2288.185211934672,
+      "compile_seconds": 2.75045628999942,
+      "throughput_samples_per_second": 2419.4781638039653,
       "batch_size": 1,
       "rollout_steps": 100,
-      "output_checksum": 0.6930519201996423,
-      "walltime_seconds": 14.7,
-      "accuracy_relative_max_diff": 3.617829089854697e-08,
+      "output_checksum": 0.32431805011354814,
+      "walltime_seconds": 10.02,
+      "accuracy_relative_max_diff": 6.398191333295956e-06,
       "accuracy_within_tolerance": true
     }
   ],
-  "throughput_ratio": 6.645466471267179,
+  "throughput_ratio": 5.8354444284396685,
   "throughput_best_variant": "compile_reduce_overhead",
   "memory_reduction_percent": 1.7180945813940125,
   "memory_best_variant": "compile_reduce_overhead",

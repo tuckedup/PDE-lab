@@ -91,3 +91,16 @@ training_requirements:
     Three independent *training* seeds, not three inference repetitions
     of one checkpoint. With three seeds the uncertainty estimate is
     limited; narrow resampling intervals are not strong statistical proof.
+
+# The inference targets are evaluated on a *declared reference model*
+# rather than on whichever model happens to score best, so that the
+# result cannot be inflated by selecting a favourable checkpoint. The
+# per-run values for every other model are reported alongside.
+inference_reference_model: burgers_fno1d_data_only_seed0
+inference_reference_note: >
+  The 1D FNO is the primary model of the study. The memory target is
+  expected to be much harder at this model size than for a larger one,
+  because fixed costs (the cuFFT workspace and allocator granularity)
+  dominate the peak; the per-run table records the value for every
+  benchmarked model so that this dependence is visible.
+

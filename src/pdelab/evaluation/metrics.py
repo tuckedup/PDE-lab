@@ -158,9 +158,17 @@ def relative_residual_improvement(
 def persistence_forecast(
     initial: np.ndarray, n_steps: int
 ) -> np.ndarray:
-    """Copy the initial state forward for ``n_steps`` future snapshots."""
+    """Copy the initial state forward for ``n_steps`` future snapshots.
+
+    ``initial`` has shape ``(n_traj, *spatial)`` and the result has
+    shape ``(n_traj, n_steps, *spatial)``. The repeat is performed on
+    the *time* axis of the output, which is inserted as axis 1, so the
+    spatial axes are never tiled by mistake.
+    """
     initial = np.asarray(initial)
-    return np.repeat(initial[None, ...], n_steps, axis=0)
+    if initial.ndim < 2:
+        raise ValueError("initial must have a batch axis and at least one spatial axis")
+    return np.repeat(initial[:, None, ...], n_steps, axis=1)
 
 
 def mean_conservation_error(

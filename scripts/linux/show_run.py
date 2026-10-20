@@ -60,6 +60,9 @@ def main() -> int:
         print(f"persistence nRMSE : mean={ev['persistence_baseline_nrmse']['mean']:.6g}")
         print(f"residual rms      : {ev.get('residual_error_physical_rms'):.6g}")
         print(f"reference residual: {ev.get('reference_residual_physical_rms'):.6g}")
+        if ev.get("residual_error_physical_rms_order2") is not None:
+            print(f"residual rms (o2) : {ev.get('residual_error_physical_rms_order2'):.6g}"
+                  f"   (reference {ev.get('reference_residual_physical_rms_order2'):.6g})")
         if full:
             print(f"per_time_nrmse    : "
                   f"{[round(v, 5) for v in ev.get('per_time_nrmse', [])]}")

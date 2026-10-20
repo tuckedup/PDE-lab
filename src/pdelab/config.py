@@ -33,7 +33,7 @@ def load_yaml(path: str | Path) -> dict[str, Any]:
     p = Path(path)
     if not p.is_absolute():
         p = project_root() / p
-    with open(p, "r", encoding="utf-8") as fh:
+    with open(p, encoding="utf-8") as fh:
         data = yaml.safe_load(fh)
     if not isinstance(data, dict):
         raise ValueError(f"config {p} did not parse to a mapping")
@@ -94,7 +94,7 @@ class PDESystemConfig:
     source_hash: str = ""
 
     @staticmethod
-    def from_dict(data: dict[str, Any], source: str = "", source_hash: str = "") -> "PDESystemConfig":
+    def from_dict(data: dict[str, Any], source: str = "", source_hash: str = "") -> PDESystemConfig:
         return PDESystemConfig(
             name=data["name"],
             dimension=int(data["dimension"]),

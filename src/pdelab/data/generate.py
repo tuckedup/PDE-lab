@@ -24,9 +24,10 @@ import json
 import platform
 import subprocess
 import time
-from dataclasses import asdict, dataclass, field
+from collections.abc import Callable
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import h5py
 import numpy as np

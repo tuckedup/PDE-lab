@@ -8,7 +8,6 @@ effect.
 from __future__ import annotations
 
 import numpy as np
-import pytest
 import torch
 
 from pdelab.physics.operators import (

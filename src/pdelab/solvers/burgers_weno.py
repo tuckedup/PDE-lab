@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .burgers import Burgers1DFiniteVolume, ssprk3_step
+from .burgers import ssprk3_step
 
 
 class Burgers1DWeno5:

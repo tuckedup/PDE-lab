@@ -1,0 +1,153 @@
+{
+  "status": "completed",
+  "run_id": "allen_cahn_fno2d_data_only_seed0",
+  "system": "allen_cahn",
+  "architecture": "fno2d",
+  "checkpoint": "/home/atulp/projects/pdelab/runs/allen_cahn_fno2d_data_only_seed0/best.pt",
+  "profile": "matched",
+  "isolation": "each variant measured in a separate process",
+  "device": {
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "torch": "2.14.1+cu130",
+    "cuda": "13.0"
+  },
+  "measurements": [
+    {
+      "variant": "fp32_eager",
+      "description": "model.eval(), inference-only, weights resident on device",
+      "timing": {
+        "median_seconds": 0.08288147269995534,
+        "min_seconds": 0.07491047460007394,
+        "max_seconds": 0.09645153579986072,
+        "stdev_seconds": 0.008022384949235668,
+        "blocks": [
+          0.08288147269995534,
+          0.07664759800009051,
+          0.07491047460007394,
+          0.09645153579986072,
+          0.08937008460015931
+        ],
+        "iters_per_block": 10,
+        "n_blocks": 5
+      },
+      "memory": {
+        "peak_allocated_gib": 0.009709835052490234,
+        "peak_reserved_gib": 0.0234375
+      },
+      "compile_seconds": 0.0,
+      "throughput_samples_per_second": 361.9626802313826,
+      "batch_size": 1,
+      "rollout_steps": 30,
+      "output_checksum": 0.5189881045811906,
+      "walltime_seconds": 11.67
+    },
+    {
+      "variant": "autocast_fp16",
+      "description": "torch.autocast(cuda, float16) around the same inference graph",
+      "timing": {
+        "median_seconds": 0.08159173000003647,
+        "min_seconds": 0.07475296609991347,
+        "max_seconds": 0.08889495499988698,
+        "stdev_seconds": 0.004683130298102907,
+        "blocks": [
+          0.08120345690003887,
+          0.08889495499988698,
+          0.08503923419993953,
+          0.08159173000003647,
+          0.07475296609991347
+        ],
+        "iters_per_block": 10,
+        "n_blocks": 5
+      },
+      "memory": {
+        "peak_allocated_gib": 0.00911712646484375,
+        "peak_reserved_gib": 0.0234375
+      },
+      "compile_seconds": 0.0,
+      "throughput_samples_per_second": 367.6843229085422,
+      "batch_size": 1,
+      "rollout_steps": 30,
+      "output_checksum": 0.5184561672542864,
+      "walltime_seconds": 11.01,
+      "accuracy_relative_max_diff": 0.0010249509039006045,
+      "accuracy_within_tolerance": true
+    },
+    {
+      "variant": "compile_default",
+      "description": "torch.compile(model, mode='default')",
+      "timing": {
+        "median_seconds": 0.10626095850002457,
+        "min_seconds": 0.0965570268999727,
+        "max_seconds": 0.13073772810002993,
+        "stdev_seconds": 0.012080988432779334,
+        "blocks": [
+          0.0965570268999727,
+          0.13073772810002993,
+          0.11285627779998322,
+          0.10626095850002457,
+          0.10003125589992123
+        ],
+        "iters_per_block": 10,
+        "n_blocks": 5
+      },
+      "memory": {
+        "peak_allocated_gib": 0.009220600128173828,
+        "peak_reserved_gib": 0.0234375
+      },
+      "compile_seconds": 15.11998956699972,
+      "throughput_samples_per_second": 282.323822629485,
+      "batch_size": 1,
+      "rollout_steps": 30,
+      "output_checksum": 0.5189801568058214,
+      "walltime_seconds": 26.95,
+      "accuracy_relative_max_diff": 1.531398369058873e-05,
+      "accuracy_within_tolerance": true
+    },
+    {
+      "variant": "compile_reduce_overhead",
+      "description": "torch.compile(model, mode='reduce-overhead')",
+      "timing": {
+        "median_seconds": 0.012222564500007138,
+        "min_seconds": 0.011627226600103313,
+        "max_seconds": 0.014445317599893315,
+        "stdev_seconds": 0.0010117086105164933,
+        "blocks": [
+          0.014445317599893315,
+          0.012222564500007138,
+          0.011627226600103313,
+          0.013269714799935172,
+          0.012089243899936264
+        ],
+        "iters_per_block": 10,
+        "n_blocks": 5
+      },
+      "memory": {
+        "peak_allocated_gib": 0.008995532989501953,
+        "peak_reserved_gib": 0.025390625
+      },
+      "compile_seconds": 6.712366557001587,
+      "throughput_samples_per_second": 2454.4767180392037,
+      "batch_size": 1,
+      "rollout_steps": 30,
+      "output_checksum": 0.5189801568058214,
+      "walltime_seconds": 14.01,
+      "accuracy_relative_max_diff": 1.531398369058873e-05,
+      "accuracy_within_tolerance": true
+    }
+  ],
+  "throughput_ratio": 6.781021503294741,
+  "throughput_best_variant": "compile_reduce_overhead",
+  "memory_reduction_percent": 7.356479889996562,
+  "memory_best_variant": "compile_reduce_overhead",
+  "workload": {
+    "batch_size": 1,
+    "rollout_steps": 30,
+    "grid": [
+      32,
+      32
+    ],
+    "history_length": 1,
+    "note": "identical for every variant; a change here would be a different workload, not an optimization"
+  },
+  "caveat": "Throughput and memory improvements are reported for the same checkpoint, grid, horizon and batch size. They are not a comparison against the numerical solver, and they do not license any claim about model accuracy."
+}

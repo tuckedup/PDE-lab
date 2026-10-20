@@ -12,9 +12,8 @@ PDE term adds compute.
 
 from __future__ import annotations
 
-import json
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +25,6 @@ from torch.utils.data import DataLoader
 from ..config import project_root
 from ..data.dataset import NormalizationStats, TrajectoryDataset
 from ..models.base import TimeAdvanceModel
-from ..physics.losses import PhysicsLossConfig
 
 
 @dataclass
@@ -70,6 +68,7 @@ class TrainResult:
     parameter_counts: dict[str, int]
     physics_grad_check: dict[str, Any] | None = None
     stopped_reason: str = "completed"
+    determinism: dict[str, Any] = field(default_factory=dict)
 
 
 class Trainer:
@@ -104,6 +103,12 @@ class Trainer:
         self.param_vector = param_vector
         self.device = self._resolve_device(config.device)
         self.history: list[dict[str, Any]] = []
+        self.determinism: dict[str, Any] = {}
+        # Bound the numerical-library thread count so that the pipeline
+        # does not oversubscribe the shared CPU (see the hardware
+        # profile: cpu_threads = 4, dataloader_workers = 0).
+        thread_limit = int(config.extra.get("cpu_threads", 4))
+        torch.set_num_threads(max(1, thread_limit))
 
     # ------------------------------------------------------------------
     @staticmethod
@@ -210,7 +215,22 @@ class Trainer:
         np.random.seed(cfg.seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(cfg.seed)
-
+        # Reproducibility: cuDNN autotuning selects different algorithms
+        # from run to run, which makes a seeded run irreproducible (it
+        # was measured here: the same 1D U-Net configuration re-run at
+        # the same seed changed its validation loss by ~20%). Turning
+        # autotuning off and selecting deterministic kernels makes a
+        # seeded run reproducible.
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+        self.determinism = {
+            "cudnn_benchmark": False,
+            "cudnn_deterministic": True,
+            "note": "GPU reductions and FFT kernels are not bitwise "
+                    "deterministic; a seeded run is reproducible in "
+                    "configuration and data order, not necessarily in the "
+                    "last floating-point digits",
+        }
         self.model.to(self.device)
         optimizer = torch.optim.AdamW(
             self.model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay
@@ -300,6 +320,7 @@ class Trainer:
             parameter_counts=self._param_counts(),
             physics_grad_check=physics_check,
             stopped_reason=stop_reason,
+            determinism=self.determinism,
         )
 
     # ------------------------------------------------------------------
@@ -314,7 +335,6 @@ class Trainer:
         """
         x = self.stats.normalize(history)
         pred = self.model(x, params)
-        pred_phys = self.stats.denormalize(pred)
         pde = self._physics_loss(pred, history, params)
         self.model.zero_grad(set_to_none=True)
         pde.backward(retain_graph=True)

@@ -53,7 +53,6 @@ def _run_variant_isolated(
     iters_per_block: int,
 ) -> dict[str, Any]:
     """Measure one variant in a fresh process."""
-    from .variant_runner import run_variant
 
     with tempfile.TemporaryDirectory() as tmp:
         out_path = Path(tmp) / "variant.json"

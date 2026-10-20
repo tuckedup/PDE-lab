@@ -39,7 +39,7 @@ class NormalizationStats:
         return {"mean": self.mean, "std": self.std, "source": self.source}
 
     @staticmethod
-    def from_dict(d: dict[str, Any]) -> "NormalizationStats":
+    def from_dict(d: dict[str, Any]) -> NormalizationStats:
         return NormalizationStats(
             mean=float(d["mean"]), std=float(d["std"]), source=d.get("source", "train")
         )
@@ -127,7 +127,7 @@ def load_manifest(path: str | Path) -> dict[str, Any]:
     p = Path(path)
     if not p.is_absolute():
         p = project_root() / p
-    with open(p, "r", encoding="utf-8") as fh:
+    with open(p, encoding="utf-8") as fh:
         return json.load(fh)
 
 

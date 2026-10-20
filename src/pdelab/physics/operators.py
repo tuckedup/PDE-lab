@@ -180,7 +180,6 @@ def energy_1d(u: torch.Tensor) -> torch.Tensor:
 
 def mass_1d(u: torch.Tensor) -> torch.Tensor:
     """Mean of u over a unit periodic domain (per sample)."""
-    n = u.shape[-1]
     return torch.mean(u, dim=-1)
 
 
