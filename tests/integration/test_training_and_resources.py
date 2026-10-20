@@ -139,6 +139,36 @@ def test_resume_restores_the_same_weights(tmp_path):
         assert torch.allclose(p, q)
 
 
+def test_seeded_initialisation_is_deterministic():
+    """The model initialisation must be a deterministic function of the
+    seed.
+
+    Regression test: the seed used to be applied inside the trainer,
+    which runs *after* the model is constructed, so the initialisation
+    was at the mercy of the process-level RNG and a seeded run was not
+    reproducible.
+    """
+    from pdelab.utils import init_fingerprint, seed_everything
+
+    def fingerprint(seed: int) -> str:
+        seed_everything(seed)
+        model = FNO1d(modes=4, width=4)
+        return init_fingerprint(model)
+
+    assert fingerprint(0) == fingerprint(0)
+    assert fingerprint(0) != fingerprint(1)
+
+
+def test_seed_everything_is_idempotent():
+    from pdelab.utils import seed_everything
+
+    seed_everything(3)
+    a = torch.randn(5)
+    seed_everything(3)
+    b = torch.randn(5)
+    assert torch.equal(a, b)
+
+
 def test_training_is_reproducible_for_a_fixed_seed(tmp_path):
     path = _make_dataset(tmp_path / "train.h5")
     stats = NormalizationStats(mean=0.0, std=1.0)

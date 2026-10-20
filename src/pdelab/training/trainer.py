@@ -25,6 +25,7 @@ from torch.utils.data import DataLoader
 from ..config import project_root
 from ..data.dataset import NormalizationStats, TrajectoryDataset
 from ..models.base import TimeAdvanceModel
+from ..utils import seed_everything
 
 
 @dataclass
@@ -211,25 +212,18 @@ class Trainer:
 
     def train(self) -> TrainResult:
         cfg = self.config
-        torch.manual_seed(cfg.seed)
-        np.random.seed(cfg.seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(cfg.seed)
-        # Reproducibility: cuDNN autotuning selects different algorithms
-        # from run to run, which makes a seeded run irreproducible (it
-        # was measured here: the same 1D U-Net configuration re-run at
-        # the same seed changed its validation loss by ~20%). Turning
-        # autotuning off and selecting deterministic kernels makes a
-        # seeded run reproducible.
-        torch.backends.cudnn.benchmark = False
-        torch.backends.cudnn.deterministic = True
+        # Re-seed with the same value the experiment runner used before
+        # constructing the model, so the data order and any stochastic
+        # layer are deterministic as well.
+        seed_everything(cfg.seed)
         self.determinism = {
             "cudnn_benchmark": False,
             "cudnn_deterministic": True,
+            "seeded_before_model_construction": True,
             "note": "GPU reductions and FFT kernels are not bitwise "
                     "deterministic; a seeded run is reproducible in "
-                    "configuration and data order, not necessarily in the "
-                    "last floating-point digits",
+                    "configuration, initialisation and data order, but not "
+                    "necessarily in the last floating-point digits",
         }
         self.model.to(self.device)
         optimizer = torch.optim.AdamW(

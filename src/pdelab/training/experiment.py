@@ -30,6 +30,7 @@ from ..models.base import count_parameters
 from ..models.registry import build_model_from_config
 from ..resources.preflight import HardwareProfile, preflight
 from ..training.trainer import TrainConfig, Trainer
+from ..utils import init_fingerprint, seed_everything
 
 
 @dataclass
@@ -198,6 +199,9 @@ class ExperimentRunner:
                 paths["val"], stats, history=self.cfg.history, stride=1
             )
 
+            # Seed BEFORE the model is constructed so that the parameter
+            # initialisation is a deterministic function of the seed.
+            seed_everything(self.cfg.seed)
             model = build_model_from_config(
                 {
                     "architecture": self.cfg.architecture,
@@ -207,6 +211,7 @@ class ExperimentRunner:
                 dimension=self._dimension(),
             )
             manifest["parameter_counts"] = count_parameters(model)
+            manifest["init_fingerprint"] = init_fingerprint(model)
 
             train_cfg = TrainConfig(
                 epochs=self.cfg.epochs,
