@@ -129,15 +129,28 @@ def _pair_residuals(
     raise ValueError(f"unknown residual order {order!r}")
 
 
-def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
-    """Evaluate a trained run and write ``evaluation.json`` next to it."""
+def evaluate_run(
+    run_dir: str | Path,
+    device: str = "auto",
+    split: str = "test",
+) -> dict[str, Any]:
+    """Evaluate a trained run on the held-out test split.
+
+    Parameters
+    ----------
+    split:
+        ``"test"`` (default) for the reported held-out metric, or
+        ``"val"`` for the validation metric. The validation split is
+        used for model selection (for example the physics-penalty
+        weight) so that the test split is never used to make a choice.
+    """
     run_dir = Path(run_dir)
     if not run_dir.is_absolute():
         run_dir = project_root() / run_dir
     manifest_path = run_dir / "manifest.json"
     if not manifest_path.exists():
         return {"status": "failed", "error": f"no manifest at {manifest_path}"}
-    with open(manifest_path, encoding="utf-8") as fh:
+    with open(manifest_path, "r", encoding="utf-8") as fh:
         manifest = json.load(fh)
 
     if manifest.get("status") != "completed":
@@ -151,6 +164,9 @@ def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
     system = cfg["system"]
     dataset_dir = cfg["dataset_dir"]
     paths = split_paths(dataset_dir, system)
+    if split not in paths:
+        return {"status": "failed", "error": f"unknown split {split!r}"}
+    split_path = paths[split]
 
     dev = torch.device(
         "cuda" if (device == "auto" and torch.cuda.is_available()) else
@@ -176,7 +192,7 @@ def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
 
     stats = NormalizationStats.from_dict(ckpt["normalization"])
     history_len = int(cfg.get("history", 1))
-    test_set = TrajectoryDataset(paths["test"], stats, history=history_len, stride=1)
+    eval_set = TrajectoryDataset(split_path, stats, history=history_len, stride=1)
 
     obs_times = manifest["dataset_manifest"]["system"]["observation_times"]
     dt = float(obs_times[1] - obs_times[0])
@@ -186,17 +202,17 @@ def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
     n_steps = len(obs_times) - history_len
 
     # ---- free rollout (primary protocol) ----
-    spatial = test_set.u.shape[2:]
-    preds = np.zeros((test_set.n_traj, n_steps, *spatial), dtype=np.float32)
-    hist_arr = np.zeros((test_set.n_traj, history_len, *spatial), dtype=np.float32)
-    for t in range(test_set.n_traj):
-        h = torch.from_numpy(test_set.u[t, :history_len]).unsqueeze(0)
+    spatial = eval_set.u.shape[2:]
+    preds = np.zeros((eval_set.n_traj, n_steps, *spatial), dtype=np.float32)
+    hist_arr = np.zeros((eval_set.n_traj, history_len, *spatial), dtype=np.float32)
+    for t in range(eval_set.n_traj):
+        h = torch.from_numpy(eval_set.u[t, :history_len]).unsqueeze(0)
         out = rollout(model, h, n_steps, stats, params=None, device=dev)
         # The model emits (B, 1, *spatial); drop the singleton channel.
         preds[t] = out[0, :, 0].cpu().numpy()
-        hist_arr[t] = test_set.u[t, :history_len]
+        hist_arr[t] = eval_set.u[t, :history_len]
 
-    reference = test_set.u[:, history_len : history_len + n_steps].astype(np.float32)
+    reference = eval_set.u[:, history_len : history_len + n_steps].astype(np.float32)
 
     per_traj = nrmse_per_trajectory(preds, reference)
     energy = np.sum(reference**2, axis=tuple(range(1, reference.ndim)))
@@ -212,7 +228,7 @@ def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
     persistence_summary = summarize_nrmse(persistence_per_traj, energy)
 
     # ---- teacher-forced one-step ----
-    tf_pred, tf_ref = teacher_forced_one_step(model, test_set, stats, device=dev)
+    tf_pred, tf_ref = teacher_forced_one_step(model, eval_set, stats, device=dev)
     tf_per_traj = nrmse_per_trajectory(tf_pred, tf_ref)
     tf_summary = summarize_nrmse(tf_per_traj)
 
@@ -231,6 +247,7 @@ def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
     result = {
         "status": "completed",
         "run_id": manifest["run_id"],
+        "split": split,
         "system": system,
         "architecture": cfg["architecture"],
         "condition": cfg["condition"],
@@ -239,11 +256,13 @@ def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
         "checkpoint": str(ckpt_path),
         "checkpoint_epoch": ckpt.get("epoch"),
         "test_dataset_sha256": manifest["dataset_manifest"]["files"]["test"]["sha256"],
+        "eval_split_sha256": manifest["dataset_manifest"]["files"][split]["sha256"],
         "protocol": {
             "type": "free_rollout",
+            "split": split,
             "observation_dt": dt,
             "n_rollout_steps": n_steps,
-            "n_test_trajectories": int(test_set.n_traj),
+            "n_test_trajectories": int(eval_set.n_traj),
             "history_length": history_len,
             "copied_initial_frame_included_in_error": False,
             "epsilon": 1e-12,
@@ -259,7 +278,7 @@ def evaluate_run(run_dir: str | Path, device: str = "auto") -> dict[str, Any]:
         "per_trajectory_nrmse": per_traj.tolist(),
         "evaluation_walltime_seconds": round(time.time() - started, 3),
     }
-    out_path = run_dir / "evaluation.json"
+    out_path = run_dir / (f"evaluation_{split}.json" if split != "test" else "evaluation.json")
     with open(out_path, "w", encoding="utf-8") as fh:
         json.dump(result, fh, indent=2)
     result["evaluation_path"] = str(out_path)

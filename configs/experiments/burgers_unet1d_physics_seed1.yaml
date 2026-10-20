@@ -1,0 +1,35 @@
+# burgers / unet1d / physics (seed 1, lambda=0.01)
+name: burgers_unet1d_physics_seed1
+system: burgers
+condition: physics
+seed: 1
+observation_dt: 0.005
+lambda_pde: 0.01
+tags: [main,optional_extension]
+
+model:
+  architecture: unet1d
+  history: 1
+  width: 16
+  n_levels: 3
+
+train:
+  epochs: 60
+  batch_size: 8
+  lr: 1.0e-3
+  lr_schedule: cosine
+  warmup_steps: 100
+  grad_clip: 1.0
+  weight_decay: 0.0
+  device: auto
+  max_walltime_minutes: 45
+
+profiles:
+  smoke:
+    epochs: 2
+    batch_size: 8
+    max_walltime_minutes: 5
+  prototype:
+    epochs: 60
+    batch_size: 8
+    max_walltime_minutes: 45

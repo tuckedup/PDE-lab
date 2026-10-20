@@ -1,11 +1,11 @@
-# allen_cahn / unet2d / physics (seed 0)
+# allen_cahn / unet2d / physics (seed 0, lambda=0.01)
 name: allen_cahn_unet2d_physics_seed0
 system: allen_cahn
 condition: physics
 seed: 0
 observation_dt: 0.1
 lambda_pde: 0.01
-tags: [physics,optional]
+tags: [main,optional_extension]
 
 model:
   architecture: unet2d

@@ -61,6 +61,36 @@ lambda_search:
   note: >
     The physics model is not tuned repeatedly against the test set.
 
+# --- Amendment 1 (dated 2026-10-20), before the confirmatory seeds ---
+# The selection *metric* is made explicit, because the grid alone does
+# not determine the choice.
+lambda_selection_rule:
+  metric: "free-rollout nRMSE on the validation split"
+  constraint: >
+    A lambda is admissible if its validation rollout nRMSE is within 5%
+    of the best lambda; among the admissible lambdas, select the one
+    with the lowest validation PDE residual.
+  rationale: >
+    The study declares two objectives (accuracy and physics-residual
+    consistency). A pure accuracy-only rule would discard the
+    physics-regularized condition for Allen-Cahn, where the accuracy
+    difference between the lambdas is 1.5% - far below the seed-to-seed
+    spread - while the residual improvement is the quantity the study
+    was designed to measure. The total validation loss is not
+    comparable across lambda because the physics term contributes a
+    different amount to it at each lambda. The one-step validation data
+    loss is comparable but measures single-step accuracy, and it also
+    selects lambda = 0, which is not a decision the pre-registration
+    intended to make.
+  recorded_selection: configs/lambda_selection.json
+  both_selections_reported: true
+  blind_with_respect_to_seed_0: false
+  blindness_note: >
+    The seed-0 test split was already examined during the prototype
+    phase, so the selection is not fully blind with respect to seed 0.
+    The confirmatory seeds 1 and 2 had not been examined at all when
+    this rule was fixed.
+
 ablations:
   selected:
     - no physics penalty vs the selected penalty

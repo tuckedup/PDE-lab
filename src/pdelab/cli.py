@@ -191,7 +191,7 @@ def cmd_evaluate(args) -> int:
     run_dir = resolve_path(args.run_id) if os.sep in args.run_id else (
         project_root() / "runs" / args.run_id
     )
-    result = evaluate_run(run_dir, device=args.device)
+    result = evaluate_run(run_dir, device=args.device, split=args.split)
     _print_json({k: v for k, v in result.items() if k != "per_trajectory"})
     return 0 if result.get("status") == "completed" else 1
 
@@ -275,9 +275,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--epochs", type=int, default=None)
     p.set_defaults(func=cmd_train)
 
-    p = sub.add_parser("evaluate", help="evaluate a run on the test split")
+    p = sub.add_parser("evaluate", help="evaluate a run on the test or validation split")
     p.add_argument("--run-id", required=True)
     p.add_argument("--device", default="auto")
+    p.add_argument("--split", default="test", choices=["test", "val"],
+                   help="the test split is the reported held-out metric; the "
+                        "validation split is for model selection only")
     p.set_defaults(func=cmd_evaluate)
 
     p = sub.add_parser("sweep", help="plan or run a matrix of experiments")
