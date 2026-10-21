@@ -8,7 +8,6 @@ selection, failures and the exact continuation command.
 
 from __future__ import annotations
 
-import json
 import resource
 import time
 import traceback
@@ -26,10 +25,16 @@ from ..data.dataset import (
     split_paths,
 )
 from ..data.generate import environment_snapshot, git_revision
+from ..evaluation.metrics import (
+    canonical_json_sha256,
+    normalization_identity,
+    sha256_file,
+    write_json_atomic,
+)
 from ..models.base import count_parameters
 from ..models.registry import build_model_from_config
 from ..resources.preflight import HardwareProfile, preflight
-from ..training.trainer import TrainConfig, Trainer
+from ..training.trainer import PhysicsGradientCheckError, TrainConfig, Trainer
 from ..utils import init_fingerprint, seed_everything
 
 
@@ -191,6 +196,10 @@ class ExperimentRunner:
             paths = split_paths(self.cfg.dataset_dir, self.cfg.system)
             stats = compute_normalization_stats(paths["train"])
             manifest["normalization"] = stats.to_dict()
+            manifest["normalization_sha256"] = normalization_identity(stats)["sha256"]
+            data_identity = self._data_identity()
+            manifest["data_identity"] = data_identity
+            manifest["data_identity_sha256"] = canonical_json_sha256(data_identity)
 
             train_set = TrajectoryDataset(
                 paths["train"], stats, history=self.cfg.history, stride=1
@@ -247,6 +256,7 @@ class ExperimentRunner:
                 pde_kind=self.cfg.system,
                 pde_params=self._pde_params(manifest),
                 param_vector=self._param_vector(manifest["dataset_manifest"]),
+                data_identity=data_identity,
             )
 
             if torch.cuda.is_available():
@@ -257,6 +267,12 @@ class ExperimentRunner:
             manifest["training"] = {
                 "best_val_loss": result.best_val_loss,
                 "best_epoch": result.best_epoch,
+                # The *current* position of the training loop, which is
+                # not the best epoch.
+                "last_epoch": result.last_epoch,
+                "epochs_completed": result.epochs_completed,
+                "global_step": result.global_step,
+                "resumed_from": result.resumed_from,
                 "walltime_seconds": result.walltime_seconds,
                 "stopped_reason": result.stopped_reason,
                 "physics_grad_check": result.physics_grad_check,
@@ -277,6 +293,13 @@ class ExperimentRunner:
             manifest["status"] = "failed"
             manifest["error"] = f"{type(exc).__name__}: {exc}"
             manifest["traceback"] = traceback.format_exc()
+            if isinstance(exc, PhysicsGradientCheckError):
+                # The physics-gradient gate is a hard failure: the run
+                # stopped because the PDE term constrained nothing.
+                manifest["failed_reason"] = "physics_gradient_gate"
+                manifest["physics_grad_check"] = getattr(
+                    exc, "physics_grad_check", None
+                )
         finally:
             manifest["walltime_seconds"] = round(time.time() - started, 3)
             manifest["finished_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -293,8 +316,25 @@ class ExperimentRunner:
         )
         return {k: float(v) for k, v in (params or {}).items()}
 
+    def _data_identity(self) -> dict[str, Any]:
+        """Content identity of the data the run trains on.
+
+        The digests are of the split files themselves, so a dataset that
+        is regenerated under the same path is detected as a different
+        dataset.
+        """
+        paths = split_paths(self.cfg.dataset_dir, self.cfg.system)
+        splits: dict[str, Any] = {}
+        for name, path in paths.items():
+            if path.exists():
+                splits[name] = {"path": str(path), "sha256": sha256_file(path)}
+        return {
+            "dataset_dir": str(self.cfg.dataset_dir),
+            "system": self.cfg.system,
+            "splits": splits,
+        }
+
     def _write_manifest(self, manifest: dict) -> None:
         self.run_dir.mkdir(parents=True, exist_ok=True)
         path = self.run_dir / "manifest.json"
-        with open(path, "w", encoding="utf-8") as fh:
-            json.dump(manifest, fh, indent=2, default=str)
+        write_json_atomic(path, manifest)

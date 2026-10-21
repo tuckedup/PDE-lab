@@ -1,0 +1,120 @@
+# PDELab protocol v2 (amended)
+#
+# Date: 2026-10-21. This document supersedes the prototype protocol for
+# every claim made after this date. The ORIGINAL preregistration is
+# preserved unchanged in `configs/prereg.yaml`; the changes below are
+# listed explicitly and are NOT backdated.
+
+## Why v2 exists
+
+An independent audit of 2026-10-21 (with reproduction evidence) found
+defects in the prototype that invalidate its scientific claims:
+
+1. **Observation-time scheduling.** `solve_to` appended the first
+   internal step as though it were the first positive observation, so
+   requesting `[0, .1, .2, .3]` returned frames at
+   `[0, .005, .1, .2]`. Every generated dataset was mis-timed and the
+   physics residual used the wrong `dt`. REPAIRED; the data is
+   regenerated.
+2. **The "second-order" residual diagnostic computed `u_tt`**, not
+   `u_t`. Every previously reported "order2" residual value is
+   WITHDRAWN.
+3. **The Burgers flux split was sign-blind** (`f = u^2/2 >= 0`, so
+   `f_minus` was identically zero), producing antidiffusion for
+   negative background velocities. REPAIRED.
+4. **The FNO2D spectral operator retained only the positive-kx
+   low-frequency block**; an identity-weight operator had 93.6% error
+   against its own input. REPAIRED; the FNO2D architecture changed
+   (68,993 -> 126,337 parameters) and every 2D FNO run is retrained.
+5. **The report selected the best test run** to decide a target, and
+   artifacts were not bound to a checkpoint identity (some evaluations
+   were older than the checkpoint they claimed to evaluate). REPAIRED;
+   the target table is now cohort-based and every artifact carries a
+   content identity.
+6. **The inference benchmark compared a scalar checksum**, so a sign
+   flip or a spatial permutation would have passed. REPAIRED.
+
+## The v2 changes
+
+| item | prototype | v2 | reason |
+|---|---|---|---|
+| observation times | mis-timed | exact (repaired `solve_to`) | defect 1 |
+| final test IC set | seeds 1000/2000 (inspected during development) | **fresh seeds 7001/7002** | three training seeds do not restore test blindness on an already-inspected IC set |
+| FNO2D architecture | single retained block | two Hermitian-symmetric blocks | defect 4 |
+| physics residual | forward difference + a broken "order2" | forward difference (declared primary) + a **corrected centred first derivative** (declared independent) | defect 2 |
+| target aggregation | best test run per condition | frozen **cohort** (2 PDEs x 3 conditions x 3 seeds), mean of the per-seed means, every seed listed | defect 5 |
+| benchmark correctness | scalar checksum | full-tensor comparison on identical inputs, tolerance frozen before selection | defect 6 |
+| lambda selection | developed after seeing test results | declared **prospectively** as a two-arm rule (below) | protocol hygiene |
+
+## Unchanged (deliberately)
+
+* Burgers: `nu = 0.01`, observation grid 128, `T = 0.5`, `dt_obs = 0.005`.
+* Allen-Cahn: `D = 0.001`, `a = 1`, observation grid 32x32, `T = 3.0`,
+  `dt_obs = 0.1`.
+* The persistence baseline and the nRMSE definition (future frames
+  only, the copied initial frame excluded, `epsilon = 1e-12`).
+* The training seed set `[0, 1, 2]`.
+
+No horizon was shortened, no initial-condition distribution was
+smoothed, no viscosity was changed and no denominator was loosened.
+
+## The lambda-selection rule (fixed prospectively)
+
+Two separate questions are answered separately.
+
+**Arm A - the required physics comparison.** Among the predeclared
+non-zero candidates `[0.01, 0.1]`, select the candidate whose mean
+*validation* free-rollout nRMSE is within 5% of the best non-zero
+candidate, breaking ties by the lowest mean *validation* primary
+residual and then by the smaller lambda. This arm is the prespecified
+scientific comparison. It is reported whatever it selects.
+
+**Arm B - the overall method recommendation.** Compare Arm A's selected
+non-zero candidate against `lambda = 0` under the same global 5%
+accuracy constraint and the same residual tie-break, and report the
+pure-accuracy winner as well. If the selected non-zero candidate does
+*not* satisfy the global 5% constraint, that failure is reported and the
+overall recommendation may be data-only.
+
+`lambda = 0` is never duplicated and counted as a distinct physics
+condition.
+
+**Honest provenance:** the 5% accuracy constraint and the residual
+tie-break were first written down while looking at prototype results, so
+they are *not* a pristine pre-registration. They are adopted
+prospectively for v2 and their origin is recorded here. The v2
+selection uses the **validation** split only.
+
+## Fresh-test access procedure
+
+1. The final test set is generated from seeds 7001/7002 and is
+   **not** used for any design, tuning, lambda selection or stopping
+   decision.
+2. The main matrix is run and frozen first.
+3. The test set is evaluated **once**, as a batch, after the matrix is
+   frozen.
+4. A test failure does not reopen tuning on that test set; it is
+   reported and a future protocol is reserved.
+
+## Required main matrix (18 rows)
+
+2 PDEs x 3 conditions x seeds [0, 1, 2]:
+
+* data-only FNO
+* FNO + the Arm-A selected non-zero physics regulariser
+* data-only periodic U-Net
+
+The physics-regularised U-Net is **optional** and cannot displace
+required rows. It is run only if the budget allows after the 18
+required rows are complete.
+
+## Reporting rules
+
+* Target status derives only from *valid*, explicitly expected evidence.
+* Every seed is listed with its mean and sample SD; with three seeds no
+  strong statistical significance is claimed.
+* Paired residual changes are reported per identical seed; the
+  predeclared aggregate is the **ratio of seed means**, and
+  mean-of-ratios and ratio-of-means are never interchanged.
+* The two PDEs are never averaged together.
+* A missed target is reported as missed.

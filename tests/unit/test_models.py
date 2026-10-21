@@ -61,8 +61,13 @@ def test_spectral_conv1d_respects_nyquist_limit():
 
 def test_spectral_conv2d_shapes_and_complexity():
     conv = SpectralConv2d(3, 4, modes_x=4, modes_y=4)
-    assert conv.weights.is_complex()
-    assert conv.weights.shape == (3, 4, 4, 4)
+    assert conv.weights_nonnegative.is_complex()
+    assert conv.weights_nonnegative.shape == (3, 4, 4, 4)
+    # The negative wave numbers of the first axis have their own block
+    # of weights: slot s carries kx = -(s+1), so there is one slot
+    # fewer than in the non-negative block (the DC mode has no mirror).
+    assert conv.weights_negative.is_complex()
+    assert conv.weights_negative.shape == (3, 4, 3, 4)
     x = torch.randn(2, 3, 16, 16)
     assert conv(x).shape == (2, 4, 16, 16)
 
@@ -75,6 +80,241 @@ def test_spectral_conv2d_handles_both_mode_signs():
     out = conv(x)
     assert out.shape == (1, 1, n, n)
     assert torch.isfinite(out).all()
+
+
+# ----------------------------------------------------------------------
+# FNO2D spectral coverage: the first (non-halved) axis keeps BOTH signs
+# ----------------------------------------------------------------------
+def _identity_spectral_weights(conv, nx: int, ny: int, *, block: str = "both"):
+    """Set the spectral weights to the identity on the retained band.
+
+    ``block`` selects the non-negative wave numbers, the negative ones
+    or both.  Only meaningful for ``in_channels == out_channels == 1``.
+    """
+    my = min(conv.modes_y, ny // 2 + 1)
+    n_nonneg, n_neg = conv.band_rows(nx)
+    with torch.no_grad():
+        conv.weights_nonnegative.zero_()
+        conv.weights_negative.zero_()
+        if block in ("both", "nonnegative"):
+            conv.weights_nonnegative[0, 0, :n_nonneg, :my] = 1.0 + 0.0j
+        if block in ("both", "negative"):
+            conv.weights_negative[0, 0, :n_neg, :my] = 1.0 + 0.0j
+    return n_nonneg, n_neg
+
+
+def _cosine_field(nx: int, ny: int, kx: int, ky: int = 0) -> torch.Tensor:
+    """A single real Fourier mode: ``cos(2 pi (kx x + ky y))``."""
+    x = torch.arange(nx, dtype=torch.float64).reshape(nx, 1) / nx
+    y = torch.arange(ny, dtype=torch.float64).reshape(1, ny) / ny
+    field = torch.cos(2.0 * torch.pi * (kx * x + ky * y))
+    return field.reshape(1, 1, nx, ny).to(torch.float32)
+
+
+def _band_limited_field(
+    nx: int, ny: int, modes_x: int, modes_y: int, seed: int = 0
+) -> torch.Tensor:
+    """A real field whose spectrum lies inside the retained band."""
+    my = min(modes_y, ny // 2 + 1)
+    x = torch.arange(nx, dtype=torch.float64).reshape(nx, 1) / nx
+    y = torch.arange(ny, dtype=torch.float64).reshape(1, ny) / ny
+    field = torch.zeros(nx, ny, dtype=torch.float64)
+    gen = torch.Generator().manual_seed(seed)
+    for kx in range(min(modes_x, nx // 2 + 1)):
+        for ky in range(my):
+            amp = float(torch.rand(1, generator=gen))
+            field += amp * torch.cos(2.0 * torch.pi * (kx * x + ky * y))
+    return field.reshape(1, 1, nx, ny).to(torch.float32)
+
+
+def test_spectral_conv2d_retains_both_wave_number_blocks():
+    """The retained band must cover the positive AND the negative half.
+
+    ``rfft2`` halves the last axis only: the first axis keeps every
+    frequency, so each low wave number appears twice.  The retained
+    band has to be closed under the Hermitian involution
+    ``kx -> -kx``, otherwise one half of every pair is mixed and the
+    other half is thrown away.
+    """
+    conv = SpectralConv2d(1, 1, modes_x=4, modes_y=4)
+    for nx in (16, 17, 32, 33, 8, 5):
+        rows = conv.retained_row_indices(nx)
+        assert rows == sorted(rows)
+        assert len(rows) == len(set(rows)), "the two blocks must not overlap"
+        # closed under the Hermitian involution
+        for j in rows:
+            assert (-j) % nx in rows, f"row {j} has no partner in the retained band"
+        # both signs are present
+        kx = conv.retained_wave_numbers(nx)
+        assert any(k > 0 for k in kx)
+        assert any(k < 0 for k in kx)
+        assert 0 in kx
+        # the Nyquist mode of an even grid is counted exactly once
+        if nx % 2 == 0:
+            assert rows.count(nx // 2) <= 1
+
+
+def test_spectral_conv2d_nyquist_mode_is_retained_once_and_not_twice():
+    """An even grid has one Nyquist mode; it must not be doubled."""
+    nx = 16
+    conv = SpectralConv2d(1, 1, modes_x=16, modes_y=4)
+    n_nonneg, n_neg = conv.band_rows(nx)
+    rows = conv.retained_row_indices(nx)
+    assert rows.count(nx // 2) == 1
+    # every row of the grid is retained, none twice
+    assert len(rows) == nx == len(set(rows))
+    assert n_nonneg + n_neg == nx
+    # the retained band is closed under kx -> -kx (modulo the grid)
+    kx = conv.retained_wave_numbers(nx)
+    assert {k % nx for k in kx} == {(-k) % nx for k in kx}
+
+
+def test_spectral_conv2d_identity_weights_reproduce_a_band_limited_input():
+    """An identity-weight operator must reproduce its own input.
+
+    This is the sharp test of the band: the retained spectrum has to be
+    the Hermitian-symmetric band-limited spectrum of the input, so the
+    inverse transform gives the input back to round-off.
+    """
+    for nx, ny in [(16, 16), (15, 15), (17, 17), (32, 32)]:
+        conv = SpectralConv2d(1, 1, modes_x=8, modes_y=8)
+        x = _band_limited_field(nx, ny, 8, 8, seed=nx)
+        _identity_spectral_weights(conv, nx, ny)
+        with torch.no_grad():
+            out = conv(x)
+        assert out.shape == x.shape
+        tol = 1e-5 * max(1.0, float(x.abs().max()))
+        err = float((out - x).abs().max())
+        assert err < tol, (
+            f"identity action failed on a {nx}x{ny} grid: "
+            f"max error {err} (tolerance {tol})"
+        )
+
+
+def test_spectral_conv2d_identity_action_keeps_the_spectrum_hermitian():
+    """The retained spectrum of the identity action must be Hermitian.
+
+    ``rfft2(irfft2(X)) == X`` holds exactly when ``X`` is the Hermitian
+    spectrum of a real field, i.e. when the retained band is closed
+    under ``kx -> -kx``.
+    """
+    nx, ny = 16, 16
+    conv = SpectralConv2d(1, 1, modes_x=6, modes_y=6)
+    x = _band_limited_field(nx, ny, 6, 6, seed=3)
+    _identity_spectral_weights(conv, nx, ny)
+    with torch.no_grad():
+        out = conv(x)
+    ft = torch.fft.rfft2(out.double())
+    ft_ref = torch.fft.rfft2(x.double())
+    my = min(6, ny // 2 + 1)
+    n_nonneg, n_neg = conv.band_rows(nx)
+    expected = torch.zeros_like(ft_ref)
+    expected[:, :, :n_nonneg, :my] = ft_ref[:, :, :n_nonneg, :my]
+    expected[:, :, nx - n_neg :, :my] = ft_ref[:, :, nx - n_neg :, :my]
+    scale = max(1.0, float(ft_ref.abs().max()))
+    assert float((ft - expected).abs().max()) < 1e-6 * scale
+
+
+def test_spectral_conv2d_mixes_a_single_mode_in_each_block():
+    """A single Fourier mode must be mixed from *both* sides.
+
+    With only one block mixed, the mode survives at half its amplitude
+    (the other half of the Hermitian pair is discarded).  With both
+    blocks mixed, the mode is reproduced exactly.
+    """
+    nx, ny = 32, 32
+    x = _cosine_field(nx, ny, 2)
+
+    conv = SpectralConv2d(1, 1, modes_x=8, modes_y=8)
+    with torch.no_grad():
+        _identity_spectral_weights(conv, nx, ny, block="nonnegative")
+        only_pos = conv(x)
+        assert float((only_pos - 0.5 * x).abs().max()) < 1e-6
+
+        _identity_spectral_weights(conv, nx, ny, block="negative")
+        only_neg = conv(x)
+        assert float((only_neg - 0.5 * x).abs().max()) < 1e-6
+
+        _identity_spectral_weights(conv, nx, ny, block="both")
+        both = conv(x)
+        assert float((both - x).abs().max()) < 1e-6
+
+
+def test_spectral_conv2d_mixes_the_negative_block_for_a_negative_mode():
+    """The negative block must act on the negative wave numbers."""
+    nx, ny = 32, 32
+    x = _cosine_field(nx, ny, -3)
+    conv = SpectralConv2d(1, 1, modes_x=8, modes_y=8)
+    with torch.no_grad():
+        _identity_spectral_weights(conv, nx, ny, block="negative")
+        only_neg = conv(x)
+        assert float((only_neg - 0.5 * x).abs().max()) < 1e-6
+        _identity_spectral_weights(conv, nx, ny, block="both")
+        both = conv(x)
+        assert float((both - x).abs().max()) < 1e-6
+
+
+def test_spectral_conv2d_gradients_are_complex_and_reach_both_blocks():
+    """The complex weights of both blocks must receive a gradient."""
+    conv = SpectralConv2d(2, 2, modes_x=4, modes_y=4)
+    x = torch.randn(2, 2, 16, 16, requires_grad=True)
+    conv(x).pow(2).sum().backward()
+    for name in ("weights_nonnegative", "weights_negative"):
+        grad = getattr(conv, name).grad
+        assert grad is not None, f"{name} received no gradient"
+        assert grad.is_complex()
+        assert torch.isfinite(grad).all()
+        assert float(grad.abs().sum()) > 0
+    assert x.grad is not None and torch.isfinite(x.grad).all()
+
+
+def test_spectral_conv2d_complex_gradient_has_a_non_zero_imaginary_part():
+    """The complex path must be real: the imaginary part is not zero."""
+    conv = SpectralConv2d(1, 1, modes_x=4, modes_y=4)
+    x = torch.randn(1, 1, 16, 16)
+    conv(x).pow(2).sum().backward()
+    grad = conv.weights_negative.grad
+    assert grad is not None and grad.is_complex()
+    assert float(grad.imag.abs().sum()) > 0
+
+
+def test_spectral_conv2d_handles_odd_and_even_grids():
+    """Odd and even grids, and grids smaller than the requested modes."""
+    for nx, ny in [(15, 15), (16, 16), (17, 17), (8, 8), (5, 5), (32, 31)]:
+        conv = SpectralConv2d(2, 3, modes_x=16, modes_y=16)
+        x = torch.randn(2, 2, nx, ny)
+        out = conv(x)
+        assert out.shape == (2, 3, nx, ny)
+        assert torch.isfinite(out).all()
+        assert not out.is_complex()
+
+
+def test_fno2d_forward_path_is_real_and_finite():
+    """The real forward path of the repaired operator."""
+    model = FNO2d(modes_x=4, modes_y=4, width=8, history=1)
+    x = torch.randn(2, 1, 16, 16)
+    out = model(x)
+    assert out.shape == (2, 1, 16, 16)
+    assert not out.is_complex()
+    assert torch.isfinite(out).all()
+
+
+def test_fno2d_spectral_parameter_count_covers_both_blocks():
+    """The spectral parameters of the repaired architecture.
+
+    The repaired operator keeps one complex matrix per retained mode
+    *block*: ``modes_x`` slots for the non-negative wave numbers and
+    ``modes_x - 1`` for their negative mirrors.  The old architecture
+    (positive block only) had ``modes_x`` slots in total.
+    """
+    width, modes_x, modes_y, n_layers = 8, 4, 4, 2
+    model = FNO2d(modes_x=modes_x, modes_y=modes_y, width=width, n_layers=n_layers)
+    counts = count_parameters(model)
+    expected_spectral = (
+        n_layers * width * width * (modes_x + modes_x - 1) * modes_y
+    )
+    assert counts["complex"] == expected_spectral
+    assert counts["total"] == counts["real"] + counts["complex"]
 
 
 def test_spectral_convs_are_differentiable():

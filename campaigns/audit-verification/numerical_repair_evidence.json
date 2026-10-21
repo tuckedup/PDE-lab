@@ -1,0 +1,137 @@
+{
+  "note": "Before/after evidence for the 2026-10-21 numerical audit repair (numerical-data specialist). The 'before' column is measured against the pre-repair source (git HEAD 96fd61c, extracted to /home/atulp/pdelab_old_head); the 'after' column against the repaired tree. Reproduce with: .venv/bin/python campaigns/audit-verification/before_evidence.py",
+  "A_observation_time_scheduling": {
+    "requested": [0.0, 0.1, 0.2, 0.3],
+    "before": {
+      "burgers_returned_clock": [0.0, 0.005, 0.1, 0.2],
+      "allen_cahn_returned_clock": [0.0, 0.005, 0.1, 0.2],
+      "max_abs_time_error": 0.09999999999999999,
+      "frame_times_helper": null,
+      "terminal_frame_discarded": true
+    },
+    "after": {
+      "burgers_returned_clock": [0.0, 0.1, 0.2, 0.3],
+      "allen_cahn_returned_clock": [0.0, 0.1, 0.2, 0.3],
+      "max_abs_time_error": 1.6653345369377348e-16,
+      "frame_times_helper": "solver.frame_times() -> [0.0, 0.1, 0.2, 0.3]",
+      "n_frames_returned": 4
+    },
+    "policy": "src/pdelab/solvers/observation.py: save_times validated (1-D, finite, non-negative, strictly increasing, first entry 0.0); each gap covered by ceil(gap/dt_max) equal sub-steps so the integrator lands exactly on the observation; exactly len(save_times) frames returned.",
+    "repaired": true
+  },
+  "B_residual_derivative": {
+    "before": {
+      "time_derivative_centered_first_order": null,
+      "time_derivative_forward_first_order": null,
+      "burgers_residual_implicit_euler": null,
+      "burgers_residual_centered_first_derivative": null,
+      "allen_cahn_residual_implicit_euler": null,
+      "allen_cahn_residual_centered_first_derivative": null
+    },
+    "after": {
+      "time_derivative_centered_first_order": "(u_next - u_prev) / (2 dt), interior snapshots only (T-2 entries)",
+      "time_derivative_forward_first_order": "(u_next - u_prev) / dt",
+      "burgers_residual_implicit_euler": "(u_next, u_prev, dt, nu, dealias=True)",
+      "burgers_residual_centered_first_derivative": "(traj, dt, nu, dealias=True) -> (B, T-2, X)",
+      "allen_cahn_residual_implicit_euler": "(u_next, u_prev, dt, D, a, dealias=True)",
+      "allen_cahn_residual_centered_first_derivative": "(traj, dt, D, a, dealias=True) -> (B, T-2, X, Y)"
+    },
+    "measured_order": {
+      "centred_residual_rms": [6.31e-06, 1.58e-06, 3.93e-07],
+      "centred_ratio": 0.0623,
+      "implicit_euler_residual_rms": [1.786e-03, 8.936e-04, 4.470e-04],
+      "implicit_euler_ratio": 0.2503,
+      "dt_series": [0.02, 0.01, 0.005]
+    },
+    "evaluation_handoff_cross_check_relative_difference": {
+      "burgers_centred": 8.3e-17,
+      "burgers_implicit_euler": 7.2e-17,
+      "allen_cahn_centred": 7.5e-17,
+      "allen_cahn_implicit_euler": 9.6e-17
+    },
+    "repaired": true
+  },
+  "C_flux_splitting": {
+    "before": {
+      "split": "f+ = max(f,0), f- = min(f,0) with f = u^2/2 >= 0  => f- identically zero",
+      "background_+1_perturbation_energy_growth_rate": -0.8806259891647183,
+      "background_-1_perturbation_energy_growth_rate": 0.8809059997871849,
+      "negative_background_shows_antidiffusion": true,
+      "split_flux_helper": null
+    },
+    "after": {
+      "split": "global Lax-Friedrichs f+ = 0.5(f + alpha u), f- = 0.5(f - alpha u), alpha = max|u|",
+      "background_+1_perturbation_energy_growth_rate": -0.8807130479415726,
+      "background_-1_perturbation_energy_growth_rate": -0.8807130479415726,
+      "negative_background_shows_antidiffusion": false,
+      "split_residual_abs": 2.7755575615628914e-17,
+      "min_f_plus_characteristic_speed": 0.0,
+      "max_f_minus_characteristic_speed": 0.0
+    },
+    "repaired": true
+  },
+  "D_stability_bound": {
+    "before": "min(cfl*dx/alpha, 0.5*dx^2/nu)  (n=256, nu=0.01, alpha=1.1 -> 7.63e-04)",
+    "after": "min(cfl*dx/alpha, dx^2/(alpha*dx + 2*nu))  -> 6.28e-04 (the combined von Neumann bound)",
+    "derivation": "A = dt*alpha/dx, B = 2*dt*nu/dx^2; the von Neumann condition of the upwind advection + explicit centred diffusion gives A <= 1/(1+B/A), i.e. dt <= dx^2/(alpha*dx + 2*nu).",
+    "repaired": true
+  },
+  "E_manufactured_self_cancel": {
+    "before": {
+      "burgers_max_abs_error": 4.755988602944683e-09,
+      "allen_cahn_max_abs_error": 4.755988602944683e-09,
+      "integrator_calls": [],
+      "driven_through": null,
+      "self_cancelling": true
+    },
+    "after": {
+      "burgers_max_abs_error": 0.001997337633078744,
+      "burgers_observed_order": 3.05,
+      "burgers_integrator_calls": [12, 25, 50],
+      "burgers_solve_to_error": 7.243339666174187e-05,
+      "allen_cahn_max_abs_error": 1.4890707666914693e-08,
+      "allen_cahn_observed_order": 2.0000196521891893,
+      "allen_cahn_integrator_calls": [10, 20, 40],
+      "driven_through": "solve/solve_to -> step (real integrator)",
+      "forcing": "continuum, written in closed form, independent of the code under test"
+    },
+    "repaired": true
+  },
+  "F_dealiasing": {
+    "before": {
+      "burgers_mask_hermitian_symmetric": {"32": false, "64": false, "128": false},
+      "allen_cahn_mask_hermitian_symmetric": {"32": false, "64": false, "128": false},
+      "burgers_spectral_aliasing_error": 0.10483792636514552,
+      "burgers_nonlinear_output_projected": false,
+      "allen_cahn_rule": "2/3 (quadratic rule applied to a cubic product)",
+      "mask_construction": "mask[:keep] = True; mask[-keep:] = True  (keeps 0..keep-1 and -keep..-1: not Hermitian symmetric, and degenerate for n < 3)"
+    },
+    "after": {
+      "burgers_mask_hermitian_symmetric": {"32": true, "64": true, "128": true},
+      "allen_cahn_mask_hermitian_symmetric": {"32": true, "64": true, "128": true},
+      "burgers_spectral_aliasing_error": 3.9778229332455e-16,
+      "burgers_nonlinear_output_projected": true,
+      "allen_cahn_rule": "1/2 (|k| <= n//4): the alias-free rule for a cubic product",
+      "mask_construction": "built from the signed mode numbers: |k| <= n//3 (Burgers) / n//4 (Allen-Cahn), Nyquist excluded explicitly",
+      "aliasing_measured_against": "an independently 2x padded (alias-free) product on the actual dataset initial-condition distribution"
+    },
+    "repaired": true
+  },
+  "G_dataset_manifest": {
+    "before": {
+      "actual_observation_times": false,
+      "observation_scheduler": false,
+      "time_stepping_policy": false
+    },
+    "after": {
+      "actual_observation_times": true,
+      "observation_scheduler": true,
+      "time_stepping_policy": true
+    },
+    "repaired": true
+  },
+  "tests_against_the_pre_repair_tree": {
+    "tests/numerical/test_solvers.py": "18 failed, 20 passed",
+    "tests/unit/test_operators.py": "17 failed, 15 passed (guarded import so the module can be collected)"
+  }
+}

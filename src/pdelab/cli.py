@@ -12,6 +12,15 @@ Commands
 ``pdelab benchmark``                  Matched inference benchmark.
 ``pdelab report``                     Build result tables from artifacts.
 
+Heavy entrypoints
+-----------------
+``train``, ``evaluate`` (a full split), ``sweep``, ``benchmark`` and
+``data generate`` are heavy: they take the **project job lock**
+(``runs/.pdelab.lock``) and run the resource preflight first.  The lock
+is *project scoped*: it excludes cooperating PDELab jobs only.  It is
+not a system-wide GPU scheduler and it does not protect the machine
+against unrelated software that may be using the same GPU.
+
 Execution profiles
 ------------------
 ``smoke``      tiny CPU-compatible checks; no long training.
@@ -22,6 +31,7 @@ Execution profiles
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import sys
@@ -33,12 +43,57 @@ from .resources.preflight import HardwareProfile, JobLock, preflight
 DEFAULT_PROFILE = "configs/hardware/atul_laptop.yaml"
 
 
+class HeavyJobBlocked(RuntimeError):
+    """A heavy entrypoint was refused before it started."""
+
+    def __init__(self, message: str, code: int = 3) -> None:
+        super().__init__(message)
+        self.code = code
+
+
 def _profile_path(args) -> Path:
     return resolve_path(getattr(args, "hardware", None) or DEFAULT_PROFILE)
 
 
 def _print_json(data) -> None:
     print(json.dumps(data, indent=2, default=str))
+
+
+@contextlib.contextmanager
+def _heavy_job(name: str, args, *, require_gpu: bool, abort_on_violation: bool = True):
+    """Take the project lease and run the resource preflight.
+
+    The lease is the project job lock: it excludes cooperating PDELab
+    jobs only.  It is not a system-wide scheduler and it knows nothing
+    about unrelated software that may be using the same GPU.
+
+    ``abort_on_violation=False`` is used where the heavy job itself
+    records the blocked preflight in its own manifest (``train``), so
+    that a refused run leaves an artifact behind.
+    """
+    profile = HardwareProfile.load(_profile_path(args))
+    report = preflight(profile, require_gpu=require_gpu)
+    _print_json(report)
+    if abort_on_violation and not report["ok"]:
+        raise HeavyJobBlocked(
+            f"the resource preflight refused '{name}': "
+            + "; ".join(report["violations"]),
+            code=2,
+        )
+    lock = JobLock(reentrant=True)
+    if not lock.acquire(blocking=False):
+        raise HeavyJobBlocked(
+            f"another PDELab job holds the project lock at {lock.path}; refusing "
+            "to run concurrently (experiment_concurrency=1). The lock excludes "
+            "cooperating PDELab jobs only; it is not a system-wide scheduler and "
+            "it does not protect the machine against unrelated software that may "
+            "be using the same GPU.",
+            code=3,
+        )
+    try:
+        yield report
+    finally:
+        lock.release()
 
 
 # ----------------------------------------------------------------------
@@ -116,18 +171,25 @@ def cmd_data_generate(args) -> int:
     seed = int(sizes.get("seed", args.seed if args.seed is not None else 0))
 
     out_dir = resolve_path(args.out or f"data/{system.name}")
-    gen = DatasetGenerator(
-        system=system,
-        out_dir=out_dir,
-        n_train=n_train,
-        n_val=n_val,
-        n_test=n_test,
-        seed=seed,
-        profile=profile,
-    )
-    print(f"Generating {system.name} dataset ({profile}): "
-          f"train={n_train} val={n_val} test={n_test} seed={seed}")
-    manifest = gen.generate(progress=print)
+    with _heavy_job("data generate", args, require_gpu=False):
+        gen = DatasetGenerator(
+            system=system,
+            out_dir=out_dir,
+            n_train=n_train,
+            n_val=n_val,
+            n_test=n_test,
+            seed=seed,
+            profile=profile,
+            test_seed=(
+                int(sizes["test_seed"])
+                if sizes.get("test_seed") is not None
+                else None
+            ),
+        )
+        print(f"Generating {system.name} dataset ({profile}): "
+              f"train={n_train} val={n_val} test={n_test} seed={seed} "
+              f"test_seed={sizes.get('test_seed')}")
+        manifest = gen.generate(progress=print)
     print(f"Done in {manifest['generation_walltime_seconds']}s -> {manifest['manifest_path']}")
     return 0
 
@@ -162,15 +224,14 @@ def cmd_train(args) -> int:
 
     hw = HardwareProfile.load(_profile_path(args))
     runner = ExperimentRunner(cfg, raw, hw)
-    lock = JobLock()
-    if not lock.acquire(blocking=False):
-        print("ERROR: another PDELab job holds the project lock; refusing to run "
-              "concurrently (experiment_concurrency=1).", file=sys.stderr)
-        return 3
-    try:
+    # The project lease is taken for the whole run.  The preflight is
+    # not aborted here: the runner runs it itself and records a blocked
+    # preflight in the run manifest, so a refused run leaves an
+    # artifact behind.
+    with _heavy_job(
+        "train", args, require_gpu=(cfg.device != "cpu"), abort_on_violation=False
+    ):
         manifest = runner.run()
-    finally:
-        lock.release()
 
     status = manifest.get("status")
     print(f"run {runner.run_id}: {status}")
@@ -191,7 +252,15 @@ def cmd_evaluate(args) -> int:
     run_dir = resolve_path(args.run_id) if os.sep in args.run_id else (
         project_root() / "runs" / args.run_id
     )
-    result = evaluate_run(run_dir, device=args.device, split=args.split)
+    # A full-split evaluation is a heavy entrypoint: it takes the
+    # project lease and runs the preflight.
+    import torch
+
+    require_gpu = args.device == "cuda" or (
+        args.device == "auto" and torch.cuda.is_available()
+    )
+    with _heavy_job("evaluate", args, require_gpu=require_gpu):
+        result = evaluate_run(run_dir, device=args.device, split=args.split)
     _print_json({k: v for k, v in result.items() if k != "per_trajectory"})
     return 0 if result.get("status") == "completed" else 1
 
@@ -205,7 +274,10 @@ def cmd_sweep(args) -> int:
     if args.dry_run:
         _print_json(plan)
         return 0
-    result = run_sweep(plan, dry_run=False, hardware=_profile_path(args))
+    # The lease is taken once for the whole sweep; the per-run locks
+    # inside the sweep join it (they belong to the same job).
+    with _heavy_job("sweep", args, require_gpu=True):
+        result = run_sweep(plan, dry_run=False, hardware=_profile_path(args))
     _print_json(result)
     return 0
 
@@ -215,7 +287,15 @@ def cmd_benchmark(args) -> int:
     from .benchmarks.inference import run_benchmark
 
     run_dir = project_root() / "runs" / args.run_id
-    result = run_benchmark(run_dir, profile=args.profile, device=args.device)
+    with _heavy_job(
+        "benchmark", args, require_gpu=(args.device != "cpu")
+    ) as report:
+        result = run_benchmark(
+            run_dir,
+            profile=args.profile,
+            device=args.device,
+            preflight_report=report,
+        )
     _print_json(result)
     return 0 if result.get("status") == "completed" else 1
 
@@ -308,6 +388,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.func(args))
+    except HeavyJobBlocked as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return int(exc.code)
     except KeyboardInterrupt:
         print("interrupted", file=sys.stderr)
         return 130

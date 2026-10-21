@@ -133,12 +133,18 @@ for system, arch, extra, _ in SYSTEMS:
                 tags = "main,optional_extension"
             name = f"{system}_{arch}_{cond}_seed{seed}"
             write(name, system, arch, cond, seed, lam, extra, tags)
-# ---- 2. lambda grid (lambda = 0.1 at seed 0, FNO only) ----
+# ---- 2. lambda grid (lambda = 0.1, all three seeds, FNO only) ----
+# The grid is run at every seed and the selection uses the 3-seed mean
+# of the validation rollout nRMSE, because a single-seed selection is
+# not reliable: the measured spread between seeds of the same
+# configuration is of the same order as the difference between the two
+# non-zero lambdas.
 for system, arch, extra, _ in SYSTEMS:
     if not arch.startswith("fno"):
         continue
-    name = f"{system}_{arch}_physics_lam0p1_seed0"
-    write(name, system, arch, "physics", 0, 0.1, extra, "ablation,lambda_grid")
+    for seed in (0, 1, 2):
+        name = f"{system}_{arch}_physics_lam0p1_seed{seed}"
+        write(name, system, arch, "physics", seed, 0.1, extra, "ablation,lambda_grid")
 
 # ---- 3. width / spectral-mode ablation (seed 0, data-only FNO) ----
 ABL = [

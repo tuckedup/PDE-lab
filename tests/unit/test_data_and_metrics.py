@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import h5py
@@ -15,13 +16,25 @@ from pdelab.data.dataset import (
     compute_normalization_stats,
 )
 from pdelab.data.generate import restrict_1d, restrict_2d
+from pdelab.evaluation.evaluate import (
+    residual_rms_for_trajectory,
+    residual_tensor_for_trajectory,
+    residual_temporal_refinement_probe,
+)
 from pdelab.evaluation.metrics import (
+    aggregate_windows_per_trajectory,
+    canonical_json_sha256,
+    evaluator_identity,
     nrmse_per_snapshot,
     nrmse_per_trajectory,
+    numerical_stepping_forecast,
     persistence_forecast,
+    read_digest_sidecar,
     relative_residual_improvement,
     residual_rms,
+    sha256_file,
     summarize_nrmse,
+    write_json_atomic,
 )
 
 
@@ -253,3 +266,257 @@ def test_residual_rms_is_scale_invariant_in_shape():
     a = torch.full((1, 2, 4), 3.0)
     b = torch.full((1, 2, 16), 3.0)
     assert residual_rms(a) == pytest.approx(residual_rms(b))
+
+
+# ----------------------------------------------------------------------
+# residual evaluators (defect B)
+# ----------------------------------------------------------------------
+def _exact_uniform_allen_cahn(times: np.ndarray, a: float = 1.0, u0: float = 0.2):
+    """The exact spatially uniform Allen-Cahn reaction solution.
+
+    ``u_t = a (u - u^3)`` with ``u(0) = u0``; the Laplacian of a uniform
+    field vanishes, so this is an exact solution of the full equation.
+    """
+    return 1.0 / np.sqrt(1.0 + (1.0 / u0**2 - 1.0) * np.exp(-2.0 * a * times))
+
+
+def _uniform_trajectory(dt: float) -> np.ndarray:
+    times = np.arange(1, int(round(0.2 / dt)) + 1) * dt
+    return np.broadcast_to(
+        _exact_uniform_allen_cahn(times)[None, :, None, None], (1, len(times), 4, 4)
+    ).copy()
+
+
+def test_centred_first_derivative_residual_converges_at_second_order():
+    """The centred *first* derivative must converge at O(dt^2).
+
+    The withdrawn diagnostic used ``(nxt - 2*centre + prv)/dt**2``, which
+    is a second time derivative (``u_tt``); it did not converge at all.
+    """
+    values = []
+    for dt in (0.02, 0.01, 0.005):
+        value, _info = residual_rms_for_trajectory(
+            "allen_cahn",
+            _uniform_trajectory(dt),
+            dt,
+            {"D": 0.001, "a": 1.0},
+            "centred_first_derivative",
+        )
+        values.append(value)
+    # Halving dt must quarter the error.
+    assert values[0] / values[1] == pytest.approx(4.0, rel=0.05)
+    assert values[1] / values[2] == pytest.approx(4.0, rel=0.05)
+
+
+def test_the_withdrawn_second_time_derivative_does_not_converge():
+    """The quantity that used to be reported must not be reportable.
+
+    ``(nxt - 2*centre + prv)/dt**2`` approximates ``u_tt``; on an exact
+    solution it stays at a non-zero constant while dt shrinks.
+    """
+    values = []
+    for dt in (0.02, 0.01, 0.005):
+        traj = _uniform_trajectory(dt)
+        wrong = (traj[:, 2:] - 2 * traj[:, 1:-1] + traj[:, :-2]) / dt**2
+        values.append(float(np.sqrt(np.mean(wrong**2))))
+    assert values[-1] / values[0] > 0.9  # no convergence
+    # ... and it is *not* what the evaluator computes.
+    measured, _info = residual_rms_for_trajectory(
+        "allen_cahn",
+        _uniform_trajectory(0.005),
+        0.005,
+        {"D": 0.001, "a": 1.0},
+        "centred_first_derivative",
+    )
+    assert measured < values[-1] / 10.0
+
+
+def test_primary_residual_is_first_order_in_time():
+    """The primary (implicit Euler) evaluator is first order in time."""
+    values = []
+    for dt in (0.02, 0.01, 0.005):
+        value, _info = residual_rms_for_trajectory(
+            "allen_cahn",
+            _uniform_trajectory(dt),
+            dt,
+            {"D": 0.001, "a": 1.0},
+            "implicit_euler_first_order",
+        )
+        values.append(value)
+    assert values[0] / values[1] == pytest.approx(2.0, rel=0.05)
+    assert values[1] / values[2] == pytest.approx(2.0, rel=0.05)
+
+
+def test_both_residual_evaluators_share_the_interior_support():
+    """Both evaluators must produce one residual per interior snapshot."""
+    traj = np.random.default_rng(0).standard_normal((2, 9, 8)).astype(np.float32)
+    for evaluator in ("implicit_euler_first_order", "centred_first_derivative"):
+        tensor = residual_tensor_for_trajectory(
+            "burgers", traj, 0.01, {"nu": 0.01}, evaluator
+        )
+        assert tensor.shape == (2, 7, 8)  # T - 2 interior snapshots
+
+
+def test_temporal_refinement_probe_measures_the_first_order_floor():
+    """The floor of the primary evaluator is measured, not asserted."""
+    probe = residual_temporal_refinement_probe(
+        "allen_cahn",
+        {"D": 0.001, "a": 1.0},
+        [0.1, 0.05, 0.025],
+        horizon=1.0,
+        n_spatial=16,
+    )
+    assert probe["observed_order_implicit_euler_first_order"] == pytest.approx(
+        1.0, abs=0.2
+    )
+    assert probe["observed_order_centred_first_derivative"] == pytest.approx(
+        2.0, abs=0.2
+    )
+    # The primary evaluator's floor at the coarsest dt is finite and
+    # reported, so a measured model residual can be compared with it.
+    assert probe["rows"][0]["implicit_euler_first_order_truncation_rms"] > 0.0
+
+
+def test_temporal_refinement_probe_uses_a_fixed_time_window():
+    """The probe must compare the same physical window at every dt."""
+    probe = residual_temporal_refinement_probe(
+        "burgers", {"nu": 0.01}, [0.01, 0.005], horizon=0.5, n_spatial=16
+    )
+    windows = [(row["n_snapshots"] - 1) * row["dt"] for row in probe["rows"]]
+    assert windows[0] == pytest.approx(windows[1], rel=1e-9)
+
+
+# ----------------------------------------------------------------------
+# baselines
+# ----------------------------------------------------------------------
+def test_numerical_stepping_baseline_is_more_accurate_than_persistence():
+    """The numerical stepping baseline must actually solve the task."""
+    x = np.arange(64) / 64
+    u0 = (0.5 * np.sin(2 * np.pi * x))[None, :]
+    dt, n_steps = 1e-3, 10
+    params = {"nu": 0.01}
+    fine = numerical_stepping_forecast(
+        u0, n_steps * 20, dt / 20, "burgers", params, scheme="rk2"
+    )
+    # The fine integration is sampled at the same physical times as the
+    # coarse one (the state after step k+1 is at time (k+1) * dt).
+    reference = fine[:, 19:200:20]
+    stepped = numerical_stepping_forecast(u0, n_steps, dt, "burgers", params, scheme="rk2")
+    persist = persistence_forecast(u0, n_steps)
+
+    err_stepped = nrmse_per_trajectory(stepped, reference)[0]
+    err_persist = nrmse_per_trajectory(persist, reference)[0]
+    assert err_stepped < 1e-3
+    assert err_stepped < err_persist
+
+
+def test_numerical_stepping_baseline_is_parameter_informed():
+    """The interface difference from persistence must be real.
+
+    Persistence needs only the initial frame; the numerical baseline
+    needs the PDE and its parameters, so it is *not* comparable with a
+    learned model in terms of prior knowledge.
+    """
+    x = np.arange(32) / 32
+    u0 = (0.5 * np.sin(2 * np.pi * x))[None, :]
+    a = numerical_stepping_forecast(u0, 5, 1e-3, "burgers", {"nu": 0.01})
+    b = numerical_stepping_forecast(u0, 5, 1e-3, "burgers", {"nu": 0.05})
+    assert not np.allclose(a, b)
+    # The persistence forecast cannot depend on any parameter.
+    assert np.array_equal(
+        persistence_forecast(u0, 5), persistence_forecast(u0, 5)
+    )
+
+
+def test_numerical_stepping_forecast_shares_the_persistence_time_axis():
+    """Both baselines must return ``(n_traj, n_steps, *spatial)``."""
+    u0 = np.zeros((3, 16), dtype=np.float32)
+    stepped = numerical_stepping_forecast(u0, 7, 0.01, "burgers", {"nu": 0.01})
+    persist = persistence_forecast(u0, 7)
+    assert stepped.shape == persist.shape == (3, 7, 16)
+
+
+def test_numerical_stepping_forecast_rejects_an_unknown_system():
+    with pytest.raises(ValueError):
+        numerical_stepping_forecast(np.zeros((2, 8)), 3, 0.01, "not_a_system", {})
+
+
+# ----------------------------------------------------------------------
+# aggregation labels
+# ----------------------------------------------------------------------
+def test_aggregate_windows_per_trajectory_averages_inside_a_trajectory():
+    values = np.array([1.0, 3.0, 10.0, 20.0])
+    ids = np.array([0, 0, 1, 1])
+    per_traj = aggregate_windows_per_trajectory(values, ids)
+    assert np.allclose(per_traj, [2.0, 15.0])
+
+
+def test_aggregate_windows_per_trajectory_rejects_mismatched_lengths():
+    with pytest.raises(ValueError):
+        aggregate_windows_per_trajectory(np.zeros(3), np.zeros(2))
+
+
+def test_error_summary_labels_the_aggregation_unit():
+    per_window = np.array([1.0, 1.0, 5.0, 5.0])
+    per_traj = aggregate_windows_per_trajectory(per_window, np.array([0, 0, 1, 1]))
+    window_summary = summarize_nrmse(
+        per_window, aggregation="per_window", n_windows=per_window.size
+    )
+    traj_summary = summarize_nrmse(
+        per_traj, aggregation="per_trajectory", n_windows=per_window.size
+    )
+    assert window_summary.n_trajectories == 4
+    assert window_summary.aggregation == "per_window"
+    assert traj_summary.n_trajectories == 2
+    assert traj_summary.aggregation == "per_trajectory"
+    # The per-window mean is not the per-trajectory mean.
+    assert window_summary.mean == pytest.approx(3.0)
+    assert traj_summary.mean == pytest.approx(3.0)
+
+
+# ----------------------------------------------------------------------
+# content identity
+# ----------------------------------------------------------------------
+def test_canonical_json_sha256_ignores_key_order():
+    a = canonical_json_sha256({"a": 1, "b": [1, 2]})
+    b = canonical_json_sha256({"b": [1, 2], "a": 1})
+    assert a == b
+    assert a != canonical_json_sha256({"a": 2, "b": [1, 2]})
+
+
+def test_write_json_atomic_hashes_the_finished_bytes(tmp_path):
+    path = tmp_path / "artifact.json"
+    digest = write_json_atomic(path, {"status": "completed", "value": 1.5})
+    assert digest == sha256_file(path)
+    assert read_digest_sidecar(path) == digest
+    assert json.loads(path.read_text())["value"] == 1.5
+    # No temporary file is left behind.
+    assert list(tmp_path.glob("*.tmp")) == []
+
+
+def test_write_json_atomic_replaces_the_previous_content(tmp_path):
+    path = tmp_path / "artifact.json"
+    write_json_atomic(path, {"value": 1})
+    write_json_atomic(path, {"value": 2})
+    assert json.loads(path.read_text())["value"] == 2
+    assert read_digest_sidecar(path) == sha256_file(path)
+
+
+def test_digest_sidecar_detects_a_tampered_artifact(tmp_path):
+    path = tmp_path / "artifact.json"
+    write_json_atomic(path, {"value": 1})
+    path.write_text('{"value": 2}')
+    assert read_digest_sidecar(path) != sha256_file(path)
+
+
+def test_evaluator_identity_covers_the_implementation_files():
+    identity = evaluator_identity()
+    assert identity["id"].startswith("pdelab-evaluation/")
+    for rel in (
+        "src/pdelab/evaluation/evaluate.py",
+        "src/pdelab/evaluation/metrics.py",
+        "src/pdelab/evaluation/rollout.py",
+        "src/pdelab/physics/operators.py",
+    ):
+        assert rel in identity["files"]
+    assert identity["sha256"] == canonical_json_sha256(identity["files"])

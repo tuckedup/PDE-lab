@@ -1,0 +1,27 @@
+{
+  "campaign_active_walltime_hours": 8,
+  "heavy_numerical_job_elapsed_hours_total": 6,
+  "max_new_training_attempts": 30,
+  "tiny_cpu_fixture_elapsed_minutes_total": 30,
+  "max_single_training_job_minutes": 45,
+  "max_contiguous_heavy_batch_minutes": 120,
+  "max_concurrent_heavy_jobs": 1,
+  "max_specialist_agents": 3,
+  "aggregate_numerical_cpu_threads": 4,
+  "dataloader_workers": 0,
+  "max_pipeline_ram_gib": 3.5,
+  "max_cuda_allocated_gib": 4.5,
+  "min_cuda_free_before_job_gib": 6.0,
+  "min_physical_windows_free_disk_gib": 40,
+  "max_new_dataset_storage_gib": 4,
+  "max_new_project_storage_gib": 10,
+  "max_checkpoints_per_attempt": 2,
+  "max_hypothesis_rounds_per_pde": 3,
+  "max_infrastructure_repair_attempts_per_failure": 2,
+  "spent": {
+    "heavy_numerical_job_elapsed_hours": 0.0,
+    "training_attempts": 0,
+    "tiny_cpu_fixture_elapsed_minutes": 0.0,
+    "walltime_hours": 0.0
+  }
+}

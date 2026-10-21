@@ -1,0 +1,51 @@
+{
+  "campaign_id": "v2-recovery",
+  "created_utc": "2026-10-21T22:18:35Z",
+  "objective": "Repair the confirmed numerical/evidence defects, regenerate the data under a corrected protocol with a FRESH unseen test set, run the required 18-row main matrix, and produce an evidence-based report plus a local installable release.",
+  "phase": "gate2",
+  "gates": {
+    "gate0_inventory": "complete",
+    "gate1_bug_reproduction_and_repair": "complete",
+    "gate2_full_horizon_validation_and_dataset": "in_progress",
+    "gate3_freeze_protocol_and_main_matrix": "pending",
+    "gate4_ablations": "pending",
+    "gate5_final_test_and_benchmark": "pending",
+    "gate6_report_and_release": "pending"
+  },
+  "git": {
+    "revision": "96fd61cd5ebfc53b5f1be7e1272e3d39b53b7fab",
+    "branch": "master",
+    "dirty": true
+  },
+  "environment": {
+    "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.11.17",
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "free_gib": 6.931,
+      "total_gib": 7.996,
+      "torch": "2.14.1+cu130",
+      "cuda": "13.0"
+    }
+  },
+  "subagents": [
+    {
+      "role": "numerical/data",
+      "id": "ses_e9fe6ada6ffeJS35c2uvgcmTOs",
+      "status": "complete"
+    },
+    {
+      "role": "training/evidence",
+      "id": "ses_e9fe684d3ffenLTVhIoXwKpqRW",
+      "status": "complete"
+    },
+    {
+      "role": "performance/release",
+      "id": "ses_e9f93337effeMQHPY11Xy0Ecvd",
+      "status": "complete",
+      "note": "first dispatch (ses_e9f99f0e7ffe7GS2Zmei3ogLAz) returned an empty result and made no changes"
+    }
+  ],
+  "last_accepted_result": "All three specialist repairs integrated; 179 tests pass; the observation-time, flux-splitting, residual-derivative, FNO2D coverage, report-selection, benchmark-correctness and lifecycle defects are repaired with before/after evidence.",
+  "blocker": null
+}

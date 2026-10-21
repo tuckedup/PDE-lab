@@ -1,0 +1,265 @@
+{
+  "real_runs": [
+    {
+      "run_id": "allen_cahn_fno2d_physics_lam0p1_seed0",
+      "state": "not_run",
+      "reasons": [
+        "the run allen_cahn_fno2d_physics_lam0p1_seed0 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792511165.5919087
+    },
+    {
+      "run_id": "allen_cahn_fno2d_physics_lam0p1_seed1",
+      "state": "not_run",
+      "reasons": [
+        "the run allen_cahn_fno2d_physics_lam0p1_seed1 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792517222.3582678
+    },
+    {
+      "run_id": "allen_cahn_fno2d_physics_lam0p1_seed2",
+      "state": "not_run",
+      "reasons": [
+        "the run allen_cahn_fno2d_physics_lam0p1_seed2 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792518820.2330673
+    },
+    {
+      "run_id": "allen_cahn_unet2d_data_only_seed1",
+      "state": "not_run",
+      "reasons": [
+        "the run allen_cahn_unet2d_data_only_seed1 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792523956.0244944
+    },
+    {
+      "run_id": "allen_cahn_unet2d_data_only_seed2",
+      "state": "not_run",
+      "reasons": [
+        "the run allen_cahn_unet2d_data_only_seed2 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792526363.3837476
+    },
+    {
+      "run_id": "allen_cahn_unet2d_physics_seed0",
+      "state": "not_run",
+      "reasons": [
+        "the run allen_cahn_unet2d_physics_seed0 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792498041.28022
+    },
+    {
+      "run_id": "burgers_fno1d_physics_lam0p1_seed0",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_fno1d_physics_lam0p1_seed0 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792510448.0095675
+    },
+    {
+      "run_id": "burgers_fno1d_physics_lam0p1_seed1",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_fno1d_physics_lam0p1_seed1 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792516501.9264884
+    },
+    {
+      "run_id": "burgers_fno1d_physics_lam0p1_seed2",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_fno1d_physics_lam0p1_seed2 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792518114.515575
+    },
+    {
+      "run_id": "burgers_fno1d_w24m24_data_only_seed0",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_fno1d_w24m24_data_only_seed0 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792512510.985308
+    },
+    {
+      "run_id": "burgers_fno1d_w8m8_data_only_seed0",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_fno1d_w8m8_data_only_seed0 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792511829.3218243
+    },
+    {
+      "run_id": "burgers_unet1d_data_only_seed1",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_unet1d_data_only_seed1 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792522902.7986693
+    },
+    {
+      "run_id": "burgers_unet1d_data_only_seed2",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_unet1d_data_only_seed2 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792525565.0047004
+    },
+    {
+      "run_id": "burgers_unet1d_physics_seed0",
+      "state": "not_run",
+      "reasons": [
+        "the run burgers_unet1d_physics_seed0 has no evaluation.json"
+      ],
+      "evaluation_mtime": null,
+      "checkpoint_mtime": 1792497950.448857
+    }
+  ],
+  "damaged_set": {
+    "targets": [
+      {
+        "target": "burgers_nrmse",
+        "metric": "nrmse",
+        "threshold": 0.05,
+        "comparison": "<",
+        "units": "dimensionless",
+        "status": "failed",
+        "measured": null,
+        "run_id": null,
+        "checkpoint": null,
+        "test_dataset_sha256": null,
+        "protocol": null,
+        "note": "truncated: evaluation.json is corrupt: not valid JSON (Expecting ':' delimiter: line 1 column 32 (char 31)); stale: evaluation.json is older than the checkpoint it evaluates; foreign: the evaluator implementation has changed since the artifact was produced (recorded 0000000000000000000000000000000000000000000000000000000000000000, current 64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2); foreign: the artifact's evaluator does not match the cohort's declared evaluator; foreign: the artifact's evaluator id does not match the cohort's declared evaluator id",
+        "cohort": "damaged-set",
+        "evidence": [
+          {
+            "run_id": "truncated",
+            "state": "failed",
+            "reason": "evaluation.json is corrupt: not valid JSON (Expecting ':' delimiter: line 1 column 32 (char 31))",
+            "reasons": [
+              "evaluation.json is corrupt: not valid JSON (Expecting ':' delimiter: line 1 column 32 (char 31))"
+            ]
+          },
+          {
+            "run_id": "stale",
+            "state": "stale",
+            "reason": "evaluation.json is older than the checkpoint it evaluates",
+            "reasons": [
+              "evaluation.json is older than the checkpoint it evaluates"
+            ]
+          },
+          {
+            "run_id": "foreign",
+            "state": "invalid_protocol",
+            "reason": "the evaluator implementation has changed since the artifact was produced (recorded 0000000000000000000000000000000000000000000000000000000000000000, current 64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2)",
+            "reasons": [
+              "the evaluator implementation has changed since the artifact was produced (recorded 0000000000000000000000000000000000000000000000000000000000000000, current 64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2)",
+              "the artifact's evaluator does not match the cohort's declared evaluator",
+              "the artifact's evaluator id does not match the cohort's declared evaluator id"
+            ]
+          }
+        ],
+        "values": []
+      },
+      {
+        "target": "allen_cahn_nrmse",
+        "metric": "nrmse",
+        "threshold": 0.2,
+        "comparison": "<",
+        "units": "dimensionless",
+        "status": "not_run",
+        "measured": null,
+        "run_id": null,
+        "checkpoint": null,
+        "test_dataset_sha256": null,
+        "protocol": null,
+        "note": "the target is not bound to a declared cohort, so it cannot be evaluated",
+        "cohort": "damaged-set",
+        "evidence": [],
+        "values": []
+      },
+      {
+        "target": "burgers_residual_improvement",
+        "metric": "relative_residual_improvement",
+        "threshold": 10.0,
+        "comparison": ">=",
+        "units": "percent",
+        "status": "not_run",
+        "measured": null,
+        "run_id": null,
+        "checkpoint": null,
+        "test_dataset_sha256": null,
+        "protocol": null,
+        "note": "the target is not bound to a declared cohort, so it cannot be evaluated",
+        "cohort": "damaged-set",
+        "evidence": [],
+        "values": []
+      },
+      {
+        "target": "allen_cahn_residual_improvement",
+        "metric": "relative_residual_improvement",
+        "threshold": 10.0,
+        "comparison": ">=",
+        "units": "percent",
+        "status": "not_run",
+        "measured": null,
+        "run_id": null,
+        "checkpoint": null,
+        "test_dataset_sha256": null,
+        "protocol": null,
+        "note": "the target is not bound to a declared cohort, so it cannot be evaluated",
+        "cohort": "damaged-set",
+        "evidence": [],
+        "values": []
+      },
+      {
+        "target": "inference_throughput_ratio",
+        "metric": "throughput_ratio",
+        "threshold": 1.3,
+        "comparison": ">=",
+        "units": "ratio",
+        "status": "not_run",
+        "measured": null,
+        "run_id": null,
+        "checkpoint": null,
+        "test_dataset_sha256": null,
+        "protocol": null,
+        "note": "the target is not bound to a declared cohort, so it cannot be evaluated",
+        "cohort": "damaged-set",
+        "evidence": [],
+        "values": []
+      },
+      {
+        "target": "inference_memory_reduction",
+        "metric": "memory_reduction_percent",
+        "threshold": 20.0,
+        "comparison": ">=",
+        "units": "percent",
+        "status": "not_run",
+        "measured": null,
+        "run_id": null,
+        "checkpoint": null,
+        "test_dataset_sha256": null,
+        "protocol": null,
+        "note": "the target is not bound to a declared cohort, so it cannot be evaluated",
+        "cohort": "damaged-set",
+        "evidence": [],
+        "values": []
+      }
+    ],
+    "markdown_excerpt": "# PDELab Results\n\nGenerated from artifacts under `runs/`. Artifact timestamp: 2026-10-21T21:04:16Z\n\n\n## Declared targets\n\nTargets are *proposals* declared in `configs/targets.yaml`, not accomplishments. A target is evaluated only against the **declared cohort**; a run that does not match the cohort identity is excluded with a reason and is never substituted. Status is one of met / missed / incomplete_cohort / valid / stale / invalid_protocol / failed / interrupted / not_run / not_comparable.\n\nCohort `damaged-set` (declared in `campaigns/evidence-cohort/cohort.yaml`).\n\n| target | metric | threshold | status | measured | units | run_id |\n|---|---|---|---|---|---|---|\n| burgers_nrmse | nrmse | < 0.05 | **failed** | n/a | dimensionless | - |\n| allen_cahn_nrmse | nrmse | < 0.2 | **not_run** | n/a | dimensionless | - |\n| burgers_residual_improvement | relative_residual_improvement | >= 10 | **not_run** | n/a | percent | - |\n| allen_cahn_residual_improvement | relative_residual_improvement | >= 10 | **not_run** | n/a | percent | - |\n| inference_throughput_ratio | throughput_ratio | >= 1.3 | **not_run** | n/a | ratio | - |\n| inference_memory_reduction | memory_reduction_percent | >= 20 | **not_run** | n/a | percent | - |\n\n- `burgers_nrmse`: truncated: evaluation.json is corrupt: not valid JSON (Expecting ':' delimiter: line 1 column 32 (char 31)); stale: evaluation.json is older than the checkpoint it evaluates; foreign: the evaluator implementation has changed since the artifact was produced (recorded 0000000000000000000000000000000000000000000000000000000000000000, current 64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2); foreign: the artifact's evaluator does not match the cohort's declared evaluator; foreign: the artifact's evaluator id does not match the cohort's declared evaluator id\n\n- `allen_cahn_nrmse`: the target is not bound to a declared cohort, so it cannot be evaluated\n\n- `burgers_residual_improvement`: the target is not bound to a declared cohort, so it cannot be evaluated\n\n- `allen_cahn_residual_improvement`: the target is not bound to a declared cohort, so it cannot be evaluated\n\n- `inference_throughput_ratio`: the target is not bound to a declared cohort, so it cannot be evaluated\n\n- `inference_memory_reduction`: the target is not bound to a declared cohort, so it cannot be evaluated\n\n\n",
+    "targets_met": 0
+  }
+}

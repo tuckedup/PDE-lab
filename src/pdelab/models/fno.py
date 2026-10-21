@@ -9,10 +9,13 @@ pointwise linear (residual) transformations, as described in that paper.
 Design notes
 ------------
 * ``rfft`` conventions are used, so only non-negative frequencies are
-  stored in the last transformed axis. In 2D, the retained block is
-  ``[:modes_x, :modes_y]`` of the ``rfft2`` output, which retains both
-  signs in the first (transformed-by-rfft2-as-full) axis and non-negative
-  frequencies in the halved axis.
+  stored in the last transformed axis.
+* In 2D, ``rfft2`` halves the **last** axis only; the **first** axis
+  keeps *every* frequency, positive and negative.  The low frequencies
+  of that axis therefore appear twice, once per sign, and the two are
+  the halves of a Hermitian pair.  Both blocks are retained and mixed
+  (see :class:`SpectralConv2d`); retaining only the positive block
+  silently discards one half of every pair.
 * Weights are stored as complex parameters and are **not** cast to real.
 * The number of retained modes is always clipped to the number of
   available Fourier coefficients so Nyquist limits are respected.
@@ -62,7 +65,45 @@ class SpectralConv1d(nn.Module):
 
 
 class SpectralConv2d(nn.Module):
-    """Learned spectral mixing over the retained 2D Fourier modes."""
+    """Learned spectral mixing over the retained 2D Fourier modes.
+
+    ``torch.fft.rfft2`` halves the **last** axis only.  The **first**
+    axis keeps every frequency, both signs: row ``j`` carries
+
+    ``kx = j``       for ``0 <= j <= nx // 2``
+    ``kx = j - nx``  for ``nx // 2 < j < nx``
+
+    so every low wave number appears **twice** - once positive and once
+    negative.  The two are the halves of a Hermitian pair, and the
+    inverse transform of a real field uses them together
+    (``F(-kx, 0) = conj(F(kx, 0))``).  Retaining only the rows
+    ``0 .. modes_x - 1`` therefore mixes the positive half of every
+    pair and throws the negative half away: the amplitude of a single
+    cosine is halved and the operator has a large relative error
+    against its own input.
+
+    This implementation retains **both** blocks:
+
+    * the non-negative block, rows ``0 .. n_nonneg - 1``, with wave
+      numbers ``kx = 0, +1, ...`` (and, on an even grid, the Nyquist
+      mode ``kx = -nx/2`` in its last row), and
+    * the negative block, rows ``nx - n_neg .. nx - 1``, with wave
+      numbers ``kx = -n_neg, ..., -1``,
+
+    with ``n_nonneg + n_neg <= nx``, so the blocks never overlap and
+    the Nyquist mode is counted exactly once.  The retained band is
+    ``{0} u {+-1, ..., +-K}`` (plus the Nyquist mode when it is wide
+    enough) and is therefore closed under the Hermitian involution
+    ``kx -> -kx``: a real input gives a real output, and an
+    identity-weight operator reproduces a band-limited input to
+    round-off.
+
+    The weights of the two blocks are separate parameters: the
+    non-negative block has ``modes_x`` slots (slot ``j`` carries
+    ``kx = +j``) and the negative block has ``modes_x - 1`` slots
+    (slot ``s`` carries ``kx = -(s + 1)``), i.e. the mirror image of
+    the positive block.
+    """
 
     def __init__(self, in_channels: int, out_channels: int, modes_x: int, modes_y: int) -> None:
         super().__init__()
@@ -71,24 +112,89 @@ class SpectralConv2d(nn.Module):
         self.modes_x = modes_x
         self.modes_y = modes_y
         self.scale = 1.0 / (in_channels * out_channels)
-        self.weights = nn.Parameter(
+        # Non-negative wave numbers: slot j carries kx = +j.
+        self.weights_nonnegative = nn.Parameter(
             self.scale
             * torch.rand(in_channels, out_channels, modes_x, modes_y, dtype=torch.cfloat)
         )
+        # Negative wave numbers: slot s carries kx = -(s + 1).  There is
+        # one slot fewer than in the non-negative block because the DC
+        # mode (kx = 0) has no negative mirror.
+        n_negative_slots = max(modes_x - 1, 0)
+        self.weights_negative = nn.Parameter(
+            self.scale
+            * torch.rand(
+                in_channels, out_channels, n_negative_slots, modes_y, dtype=torch.cfloat
+            )
+        )
 
+    # ------------------------------------------------------------------
+    # the retained band
+    # ------------------------------------------------------------------
+    def band_rows(self, nx: int) -> tuple[int, int]:
+        """How many rows of each block are retained on a grid of ``nx``.
+
+        Returns ``(n_nonneg, n_neg)``: the number of retained rows of
+        the non-negative block (wave numbers ``0 .. +``) and of the
+        negative block (wave numbers ``-``).  The two blocks never
+        overlap and the Nyquist mode of an even grid appears in exactly
+        one of them.
+        """
+        n_nonneg = min(self.modes_x, nx // 2 + 1)
+        n_neg = min(n_nonneg - 1, nx - n_nonneg)
+        return max(n_nonneg, 0), max(n_neg, 0)
+
+    def retained_row_indices(self, nx: int) -> list[int]:
+        """The rows of the ``rfft2`` output that this layer retains.
+
+        The list is sorted and free of duplicates, and it is closed
+        under the Hermitian involution ``j -> (-j) mod nx``.
+        """
+        n_nonneg, n_neg = self.band_rows(nx)
+        rows = list(range(n_nonneg))
+        rows += list(range(nx - n_neg, nx))
+        return rows
+
+    def retained_wave_numbers(self, nx: int) -> list[int]:
+        """The retained wave numbers ``kx`` (signed) of the first axis.
+
+        The convention is the one of ``numpy.fft.fftfreq``: row ``j``
+        carries ``kx = j`` for ``j < nx/2``, and the Nyquist mode of an
+        even grid (``j = nx/2``) is reported as ``-nx/2``.
+        """
+        n_nonneg, n_neg = self.band_rows(nx)
+        kx = []
+        for j in range(n_nonneg):
+            kx.append(-j if (nx % 2 == 0 and j == nx // 2) else j)
+        kx += [-(n_neg - j) for j in range(n_neg)]
+        return sorted(kx)
+
+    # ------------------------------------------------------------------
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         b, _, nx, ny = x.shape
         x = _promote_dtype(x)
         x_ft = torch.fft.rfft2(x)
-        mx = min(self.modes_x, x_ft.shape[-2])
+        n_nonneg, n_neg = self.band_rows(nx)
         my = min(self.modes_y, x_ft.shape[-1])
         out_ft = torch.zeros(
             b, self.out_channels, x_ft.shape[-2], x_ft.shape[-1],
             device=x.device, dtype=x_ft.dtype,
         )
-        out_ft[:, :, :mx, :my] = torch.einsum(
-            "bixy,ioxy->boxy", x_ft[:, :, :mx, :my], self.weights[:, :, :mx, :my]
-        )
+        if n_nonneg > 0:
+            out_ft[:, :, :n_nonneg, :my] = torch.einsum(
+                "bixy,ioxy->boxy",
+                x_ft[:, :, :n_nonneg, :my],
+                self.weights_nonnegative[:, :, :n_nonneg, :my],
+            )
+        if n_neg > 0:
+            # Slot s of the negative block carries kx = -(s+1), i.e. row
+            # nx-1-s, so the weight slice is reversed with respect to
+            # the ascending row order of the spectrum.
+            out_ft[:, :, nx - n_neg :, :my] = torch.einsum(
+                "bixy,ioxy->boxy",
+                x_ft[:, :, nx - n_neg :, :my],
+                self.weights_negative[:, :, :n_neg, :my].flip(-2),
+            )
         return torch.fft.irfft2(out_ft, s=(nx, ny))
 
 

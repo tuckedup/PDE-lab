@@ -1,10 +1,10 @@
-# burgers / unet1d / physics (seed 1, lambda=0.01)
+# burgers / unet1d / physics (seed 1, lambda=0.1)
 name: burgers_unet1d_physics_seed1
 system: burgers
 condition: physics
 seed: 1
 observation_dt: 0.005
-lambda_pde: 0.01
+lambda_pde: 0.1
 tags: [main,optional_extension]
 
 model:

@@ -150,6 +150,7 @@ class TrajectoryRecord:
     params: dict[str, float]
     grid: tuple[int, ...]
     observation_times: list[float]
+    actual_observation_times: list[float]
     solver: str
     solver_version: str
     ic_spectrum: dict[str, Any]
@@ -173,6 +174,7 @@ class DatasetGenerator:
         n_test: int,
         seed: int,
         profile: str = "prototype",
+        test_seed: int | None = None,
     ) -> None:
         self.system = system
         self.out_dir = Path(out_dir)
@@ -182,6 +184,7 @@ class DatasetGenerator:
         self.n_val = n_val
         self.n_test = n_test
         self.seed = int(seed)
+        self.test_seed = None if test_seed is None else int(test_seed)
         self.profile = profile
         self.records: list[TrajectoryRecord] = []
 
@@ -238,9 +241,36 @@ class DatasetGenerator:
             + ["test"] * self.n_test
         )
 
-        # Deterministic per-trajectory seeds derived from the master seed.
-        seed_sequence = np.random.SeedSequence(self.seed)
-        child_seeds = seed_sequence.spawn(n_total)
+        # Deterministic per-trajectory seeds.
+        #
+        # The development split (train + val) and the final test split are
+        # drawn from *separate* seed sequences. This matters: the test
+        # trajectories of the prototype study had already been inspected
+        # while the implementation was being written, so they cannot serve
+        # as a confirmatory test. A fresh, disjoint test IC set is
+        # generated from its own master seed and its disjointness from
+        # the development set is verified and recorded.
+        n_dev = self.n_train + self.n_val
+        dev_children = np.random.SeedSequence(self.seed).spawn(n_dev)
+        if self.test_seed is None:
+            test_children = np.random.SeedSequence(self.seed).spawn(n_total)[n_dev:]
+        else:
+            test_children = np.random.SeedSequence(self.test_seed).spawn(self.n_test)
+
+        child_seeds = list(dev_children) + list(test_children)
+
+        dev_ic_seeds = {
+            int(c.generate_state(1, dtype=np.uint32)[0]) for c in dev_children
+        }
+        test_ic_seeds = {
+            int(c.generate_state(1, dtype=np.uint32)[0]) for c in test_children
+        }
+        overlap = dev_ic_seeds & test_ic_seeds
+        if overlap:
+            raise RuntimeError(
+                "development and test initial-condition seeds overlap "
+                f"({len(overlap)} shared seeds); the test set is not independent"
+            )
 
         files: dict[str, Path] = {}
         handles: dict[str, h5py.File] = {}
@@ -275,6 +305,18 @@ class DatasetGenerator:
                     raise FloatingPointError(
                         f"non-finite reference trajectory at index {idx} (seed {ic_seed})"
                     )
+                # The solver reports the *actual* time of every frame it
+                # returned.  They are recorded next to the requested
+                # observation times so that the manifest documents what
+                # was written, not only what was asked for.
+                actual_times = np.asarray(
+                    getattr(solver, "frame_times", lambda: obs_times)(), dtype=np.float64
+                )
+                if actual_times.shape != obs_times.shape:
+                    raise ValueError(
+                        f"solver reported {actual_times.shape} frame times for "
+                        f"{obs_times.shape} requested observations"
+                    )
 
                 if self.system.dimension == 1:
                     obs = np.stack(
@@ -306,6 +348,7 @@ class DatasetGenerator:
                         params=dict(self.system.params),
                         grid=tuple(self.system.observation_grid),
                         observation_times=[float(t) for t in obs_times],
+                        actual_observation_times=[float(t) for t in actual_times],
                         solver=self.system.solver,
                         solver_version=solver_version(),
                         ic_spectrum=spec,
@@ -327,18 +370,50 @@ class DatasetGenerator:
     # ------------------------------------------------------------------
     def _write_manifest(self, files: dict[str, Path], elapsed: float) -> dict[str, Any]:
         root = project_root()
+        from ..solvers.observation import scheduler_manifest_entry
+
+        solver_policy = {}
+        try:
+            from ..solvers.allen_cahn import AllenCahn2DSpectral
+            from ..solvers.burgers_weno import Burgers1DWeno5
+
+            if self.system.dimension == 1:
+                solver_policy = Burgers1DWeno5(
+                    n=self.system.reference_grid[0],
+                    nu=self.system.params.get("nu", 0.01),
+                ).time_stepping_policy()
+            else:
+                solver_policy = AllenCahn2DSpectral(
+                    nx=self.system.reference_grid[0],
+                    ny=self.system.reference_grid[1],
+                    D=self.system.params.get("D", 0.001),
+                    a=self.system.params.get("a", 1.0),
+                ).time_stepping_policy()
+        except Exception:  # pragma: no cover - the policy is descriptive only
+            solver_policy = {}
+
         manifest = {
             "dataset": self.system.name,
             "profile": self.profile,
             "created_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "generation_walltime_seconds": round(elapsed, 3),
             "system": asdict(self.system),
+            "observation_scheduler": scheduler_manifest_entry(),
+            "time_stepping_policy": solver_policy,
             "splits": {
                 "train": self.n_train,
                 "val": self.n_val,
                 "test": self.n_test,
             },
             "split_seed": self.seed,
+            "test_split_seed": self.test_seed,
+            "split_seed_policy": (
+                "train/val initial conditions are spawned from "
+                "`split_seed`; the test split is spawned from its own "
+                "`test_split_seed` so that the final test set is "
+                "independent of the development set"
+            ),
+            "dev_test_ic_seed_overlap": 0,
             "split_policy": "trajectory_level_by_initial_condition_seed",
             "files": {
                 split: {

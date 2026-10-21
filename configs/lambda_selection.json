@@ -1,36 +1,36 @@
 {
   "burgers": {
-    "selected_lambda": 0.01,
-    "selected_run_id": "burgers_fno1d_physics_seed0",
-    "selected_val_rollout_nrmse": 0.03000167904905571,
-    "selected_val_residual_rms": 0.07388605592441976,
-    "accuracy_only_selection_lambda": 0.01,
-    "accuracy_only_selection_run_id": "burgers_fno1d_physics_seed0",
+    "selected_lambda": 0.1,
+    "selected_run_id": "burgers_fno1d_physics_lam0p1_seed0",
+    "selected_val_rollout_nrmse": 0.031055020580026838,
+    "selected_val_residual_rms": 0.07956303363796528,
+    "accuracy_only_selection_lambda": 0.1,
+    "accuracy_only_selection_run_id": "burgers_fno1d_physics_lam0p1_seed0",
     "accuracy_tolerance": 0.05,
     "admissible_lambdas": [
-      0.01
+      0.1
     ],
     "candidates": [
       {
         "lambda": 0.0,
         "run_id": "burgers_fno1d_data_only_seed0",
-        "val_rollout_nrmse": 0.06729295472033046,
-        "val_one_step_nrmse": 0.003047380690084954,
-        "val_residual_rms": 0.7878290531557247
+        "val_rollout_nrmse": 0.06980487541593154,
+        "val_one_step_nrmse": 0.0028978262094999235,
+        "val_residual_rms": 0.7382555094670876
       },
       {
         "lambda": 0.01,
         "run_id": "burgers_fno1d_physics_seed0",
-        "val_rollout_nrmse": 0.03000167904905571,
-        "val_one_step_nrmse": 0.002416459849754416,
-        "val_residual_rms": 0.07388605592441976
+        "val_rollout_nrmse": 0.03274556595408735,
+        "val_one_step_nrmse": 0.0024536321753216707,
+        "val_residual_rms": 0.08367188897487018
       },
       {
         "lambda": 0.1,
         "run_id": "burgers_fno1d_physics_lam0p1_seed0",
-        "val_rollout_nrmse": 0.032067597455787175,
-        "val_one_step_nrmse": 0.002438753120587711,
-        "val_residual_rms": 0.08000545071123519
+        "val_rollout_nrmse": 0.031055020580026838,
+        "val_one_step_nrmse": 0.002446276156621988,
+        "val_residual_rms": 0.07956303363796528
       }
     ],
     "selection_metric": "free-rollout nRMSE on the validation split, with the 5% accuracy tolerance, then the lowest validation PDE residual",
@@ -41,10 +41,10 @@
   "allen_cahn": {
     "selected_lambda": 0.01,
     "selected_run_id": "allen_cahn_fno2d_physics_seed0",
-    "selected_val_rollout_nrmse": 0.042726963768191246,
-    "selected_val_residual_rms": 0.0669875235487188,
-    "accuracy_only_selection_lambda": 0.0,
-    "accuracy_only_selection_run_id": "allen_cahn_fno2d_data_only_seed0",
+    "selected_val_rollout_nrmse": 0.041053375253228525,
+    "selected_val_residual_rms": 0.06152625795711124,
+    "accuracy_only_selection_lambda": 0.01,
+    "accuracy_only_selection_run_id": "allen_cahn_fno2d_physics_seed0",
     "accuracy_tolerance": 0.05,
     "admissible_lambdas": [
       0.0,
@@ -54,23 +54,23 @@
       {
         "lambda": 0.0,
         "run_id": "allen_cahn_fno2d_data_only_seed0",
-        "val_rollout_nrmse": 0.042092938108090006,
-        "val_one_step_nrmse": 0.0052474075110670315,
-        "val_residual_rms": 0.08092560125876623
+        "val_rollout_nrmse": 0.041413777666425705,
+        "val_one_step_nrmse": 0.005310021838040248,
+        "val_residual_rms": 0.07612766007403346
       },
       {
         "lambda": 0.01,
         "run_id": "allen_cahn_fno2d_physics_seed0",
-        "val_rollout_nrmse": 0.042726963768191246,
-        "val_one_step_nrmse": 0.004982231653361172,
-        "val_residual_rms": 0.0669875235487188
+        "val_rollout_nrmse": 0.041053375253228525,
+        "val_one_step_nrmse": 0.004918869803996662,
+        "val_residual_rms": 0.06152625795711124
       },
       {
         "lambda": 0.1,
         "run_id": "allen_cahn_fno2d_physics_lam0p1_seed0",
-        "val_rollout_nrmse": 0.045952765645140434,
-        "val_one_step_nrmse": 0.004519748897242283,
-        "val_residual_rms": 0.05400025225417918
+        "val_rollout_nrmse": 0.04455278599414278,
+        "val_one_step_nrmse": 0.004477894331910705,
+        "val_residual_rms": 0.0482521802453483
       }
     ],
     "selection_metric": "free-rollout nRMSE on the validation split, with the 5% accuracy tolerance, then the lowest validation PDE residual",

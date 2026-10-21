@@ -7,14 +7,20 @@ the same GPU.
 
 The preflight reports what it can measure honestly and states explicitly
 when a value cannot be established (for example GPU free memory when
-another process holds an unaccounted allocation).
+another process holds an unaccounted allocation, or the physical free
+disk space of the Windows volume that backs the WSL filesystem when the
+host cannot be queried).
 """
 
 from __future__ import annotations
 
 import contextlib
 import fcntl
+import json
 import os
+import shutil
+import subprocess
+import threading
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -132,15 +138,132 @@ def _nvidia_smi() -> dict[str, Any]:
     return result
 
 
+def windows_physical_disk() -> dict[str, Any]:
+    """The physical free disk space of the Windows volume behind WSL.
+
+    The WSL root filesystem is a **virtual disk**: its size (and its
+    "free space") is the size of the ext4 image, not the free space of
+    the Windows volume that stores that image.  A WSL filesystem can
+    report hundreds of gigabytes free while the physical volume is
+    nearly full, and only the physical figure says whether the job can
+    still write its artifacts.
+
+    The query goes through the WSL interop (``powershell.exe``).  When
+    the host cannot be queried the result says so explicitly; the WSL
+    figure is **not** substituted for it.
+    """
+    result: dict[str, Any] = {
+        "available": False,
+        "source": None,
+        "backing_drive": None,
+        "free_gib": None,
+        "total_gib": None,
+        "drives": [],
+        "distro_base_path": None,
+        "note": None,
+    }
+    exe = shutil.which("powershell.exe")
+    if exe is None:
+        result["note"] = (
+            "powershell.exe is not reachable from this shell, so the physical "
+            "free disk space of the Windows volumes could not be established"
+        )
+        return result
+
+    distro = (os.environ.get("WSL_DISTRO_NAME") or "").replace("'", "''")
+    script = (
+        "$lxss='HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Lxss';"
+        "$base=$null;"
+        "if (Test-Path $lxss) { Get-ChildItem $lxss | ForEach-Object {"
+        "$p=Get-ItemProperty $_.PSPath;"
+        f"if ($p.DistributionName -eq '{distro}') {{ $base=$p.BasePath }} }} }};"
+        "$drives=Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3' | "
+        "Select-Object DeviceID,VolumeName,Size,FreeSpace;"
+        "[PSCustomObject]@{distro_base_path=$base; drives=$drives} | "
+        "ConvertTo-Json -Depth 4 -Compress"
+    )
+    try:
+        proc = subprocess.run(
+            [exe, "-NoProfile", "-Command", script],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    except Exception as exc:  # pragma: no cover - depends on the host
+        result["note"] = f"the Windows disk query failed: {exc}"
+        return result
+    if proc.returncode != 0:
+        result["note"] = (
+            "the Windows disk query failed: "
+            f"{(proc.stderr or proc.stdout).strip()[:200]}"
+        )
+        return result
+    try:
+        payload = json.loads(proc.stdout.strip() or "{}")
+    except json.JSONDecodeError as exc:
+        result["note"] = f"the Windows disk query returned unreadable output: {exc}"
+        return result
+
+    base_path = payload.get("distro_base_path")
+    result["distro_base_path"] = base_path
+    drives = payload.get("drives") or []
+    if isinstance(drives, dict):
+        drives = [drives]
+    for d in drives:
+        free = d.get("FreeSpace")
+        total = d.get("Size")
+        result["drives"].append({
+            "device": d.get("DeviceID"),
+            "label": d.get("VolumeName"),
+            "total_gib": round(total / 1024**3, 3) if total else None,
+            "free_gib": round(free / 1024**3, 3) if free else None,
+        })
+
+    backing = None
+    if isinstance(base_path, str) and len(base_path) > 1 and base_path[1] == ":":
+        backing = base_path[:2].upper()
+    result["backing_drive"] = backing
+    match = next((d for d in result["drives"] if d["device"] == backing), None)
+    if match is None and len(result["drives"]) == 1:
+        match = result["drives"][0]
+        result["backing_drive"] = match["device"]
+    if match is None:
+        result["note"] = (
+            "the Windows volumes were listed but the volume that stores this "
+            "WSL filesystem could not be identified"
+        )
+        return result
+    result["available"] = True
+    result["source"] = "powershell.exe Win32_LogicalDisk (physical Windows volume)"
+    result["free_gib"] = match["free_gib"]
+    result["total_gib"] = match["total_gib"]
+    return result
+
+
 def host_info() -> dict[str, Any]:
     vm = psutil.virtual_memory()
-    disk = psutil.disk_usage(str(project_root()))
+    root = project_root()
+    disk = psutil.disk_usage(str(root))
     return {
         "total_ram_gib": round(vm.total / 1024**3, 3),
         "available_ram_gib": round(vm.available / 1024**3, 3),
         "used_ram_percent": vm.percent,
+        # The WSL filesystem figure: the size of the ext4 image of the
+        # distribution.  It is *not* the physical free space.
         "disk_total_gib": round(disk.total / 1024**3, 3),
         "disk_free_gib": round(disk.free / 1024**3, 3),
+        "wsl_filesystem": {
+            "path": str(root),
+            "total_gib": round(disk.total / 1024**3, 3),
+            "free_gib": round(disk.free / 1024**3, 3),
+            "scope": (
+                "the WSL root filesystem (a virtual disk). Its free space is "
+                "NOT the physical free space of the Windows volume that backs "
+                "it; the physical figure is reported separately."
+            ),
+        },
+        "windows_physical_disk": windows_physical_disk(),
         "cpu_count_logical": psutil.cpu_count(logical=True),
         "cpu_count_physical": psutil.cpu_count(logical=False),
         "rss_gib": round(psutil.Process(os.getpid()).memory_info().rss / 1024**3, 4),
@@ -166,11 +289,36 @@ def preflight(profile: HardwareProfile, require_gpu: bool = True) -> dict[str, A
             f"GPU free memory {gpu['free_gib']} GiB is below the required "
             f"{profile.min_cuda_free_before_job_gib} GiB"
         )
-    if host["disk_free_gib"] < profile.min_host_free_disk_gib:
+
+    # ---- disk space: the physical Windows volume and the WSL filesystem ----
+    physical = host["windows_physical_disk"]
+    if physical.get("available") and physical.get("free_gib") is not None:
+        if physical["free_gib"] < profile.min_host_free_disk_gib:
+            violations.append(
+                f"the physical free disk space of the Windows volume "
+                f"{physical.get('backing_drive')} ({physical['free_gib']} GiB) is "
+                f"below the required {profile.min_host_free_disk_gib} GiB"
+            )
+    else:
+        # The requirement could not be checked.  That is stated
+        # explicitly; the WSL figure is NOT substituted for the
+        # physical one.
+        warnings.append(
+            "the physical free disk space of the Windows volume that backs this "
+            f"WSL filesystem could not be established "
+            f"({physical.get('note') or 'unknown reason'}); the requirement of "
+            f"{profile.min_host_free_disk_gib} GiB was therefore NOT verified. The "
+            f"WSL filesystem figure of {host['wsl_filesystem']['free_gib']} GiB is "
+            "recorded separately and is NOT the physical free space."
+        )
+    wsl_free = host["wsl_filesystem"]["free_gib"]
+    if wsl_free < profile.min_host_free_disk_gib:
         violations.append(
-            f"host free disk {host['disk_free_gib']} GiB is below the required "
+            f"the WSL filesystem free space {wsl_free} GiB is below the required "
             f"{profile.min_host_free_disk_gib} GiB"
         )
+
+    # ---- free memory: the requirement is not relaxed ----
     if host["available_ram_gib"] < profile.max_pipeline_ram_gib:
         warnings.append(
             f"available RAM {host['available_ram_gib']} GiB is close to the pipeline "
@@ -195,47 +343,111 @@ def preflight(profile: HardwareProfile, require_gpu: bool = True) -> dict[str, A
         "violations": violations,
         "warnings": warnings,
         "ok": not violations,
+        "disk_scope_note": (
+            "the WSL filesystem figure is the size of the distribution's virtual "
+            "disk; the physical free space of the Windows volume that backs it "
+            "is reported separately under host.windows_physical_disk"
+        ),
+        "lock_scope_note": (
+            "the project job lock excludes cooperating PDELab jobs only. It is "
+            "not a system-wide scheduler and it does not protect the GPU "
+            "against unrelated software."
+        ),
     }
 
 
 # ----------------------------------------------------------------------
 # job lock
 # ----------------------------------------------------------------------
+#: The locks held by this process, keyed by the resolved lock path.
+#:
+#: A *project lease* (``JobLock(..., reentrant=True)``) may be joined
+#: by a nested plain lock: the nested lock belongs to the same job (a
+#: sweep takes the lease once and then locks per run), not to a second
+#: one.  Two plain locks in the same process stay mutually exclusive.
+_HELD_LOCKS: dict[str, dict[str, Any]] = {}
+_HELD_LOCKS_GUARD = threading.Lock()
+
+
 class JobLock:
     """Cooperative, project-scoped exclusive lock.
 
     Prevents two PDELab jobs from running concurrently. It says nothing
     about unrelated software using the GPU.
+
+    Parameters
+    ----------
+    path:
+        The lock file.  The default is the project lock
+        ``runs/.pdelab.lock``.
+    reentrant:
+        Take the lock as a *project lease*: a nested lock of the same
+        process joins the lease instead of conflicting with it.  The
+        lease is then held until the outermost holder releases it.
     """
 
-    def __init__(self, path: str | Path | None = None) -> None:
+    def __init__(self, path: str | Path | None = None, *, reentrant: bool = False) -> None:
         if path is None:
             path = project_root() / "runs" / ".pdelab.lock"
         self.path = Path(path)
         if not self.path.is_absolute():
             self.path = project_root() / self.path
+        self.reentrant = bool(reentrant)
         self._fh = None
+        self._joined = False
 
     def acquire(self, blocking: bool = False) -> bool:
+        key = str(self.path)
+        with _HELD_LOCKS_GUARD:
+            held = _HELD_LOCKS.get(key)
+            if held is not None:
+                if not held["reentrant"]:
+                    # A plain lock of this process already holds it.
+                    return False
+                held["depth"] += 1
+                self._joined = True
+                return True
+
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._fh = open(self.path, "w")
+        fh = open(self.path, "w")
         flags = fcntl.LOCK_EX | (0 if blocking else fcntl.LOCK_NB)
         try:
-            fcntl.flock(self._fh.fileno(), flags)
+            fcntl.flock(fh.fileno(), flags)
         except OSError:
-            self._fh.close()
-            self._fh = None
+            fh.close()
             return False
-        self._fh.write(f"{os.getpid()} {time.time()}\n")
-        self._fh.flush()
+        fh.write(f"{os.getpid()} {time.time()}\n")
+        fh.flush()
+        self._fh = fh
+        with _HELD_LOCKS_GUARD:
+            _HELD_LOCKS[key] = {
+                "reentrant": self.reentrant,
+                "depth": 1,
+                "fh": fh,
+            }
         return True
 
     def release(self) -> None:
-        if self._fh is not None:
+        key = str(self.path)
+        fh = None
+        with _HELD_LOCKS_GUARD:
+            held = _HELD_LOCKS.get(key)
+            if held is None:
+                self._fh = None
+                self._joined = False
+                return
+            held["depth"] -= 1
+            if held["depth"] > 0:
+                self._joined = False
+                return
+            _HELD_LOCKS.pop(key, None)
+            fh = held["fh"]
+        if fh is not None:
             with contextlib.suppress(OSError):
-                fcntl.flock(self._fh.fileno(), fcntl.LOCK_UN)
-            self._fh.close()
-            self._fh = None
+                fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+            fh.close()
+        self._fh = None
+        self._joined = False
 
     def __enter__(self) -> JobLock:
         if not self.acquire(blocking=False):

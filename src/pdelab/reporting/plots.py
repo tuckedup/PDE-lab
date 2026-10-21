@@ -30,8 +30,27 @@ RESULTS = project_root() / "results"
 def _load(path: Path) -> dict[str, Any] | None:
     if not path.exists():
         return None
-    with open(path, encoding="utf-8") as fh:
-        return json.load(fh)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _usable_evaluation(path: Path) -> dict[str, Any] | None:
+    """The evaluation of a run, if it is usable for a figure.
+
+    A figure must not draw a stale or protocol-invalid number, so an
+    artifact that does not carry a content identity (the pre-identity
+    protocol) is not plotted.
+    """
+    ev = _load(path)
+    if not ev or ev.get("status") != "completed":
+        return None
+    identity = ev.get("identity")
+    if not isinstance(identity, dict):
+        return None
+    return ev
 
 
 def _model_for(run_dir: Path, manifest: dict, device="cpu"):
@@ -62,7 +81,7 @@ def plot_1d_space_time(run_id: str, out_dir: Path | None = None) -> list[str]:
 
     run_dir = RUNS / run_id
     manifest = _load(run_dir / "manifest.json")
-    evaluation = _load(run_dir / "evaluation.json")
+    evaluation = _usable_evaluation(run_dir / "evaluation.json")
     if manifest is None or evaluation is None:
         return []
     if manifest["experiment"]["system"] != "burgers":
@@ -118,7 +137,7 @@ def plot_2d_snapshots(run_id: str, out_dir: Path | None = None) -> list[str]:
 
     run_dir = RUNS / run_id
     manifest = _load(run_dir / "manifest.json")
-    evaluation = _load(run_dir / "evaluation.json")
+    evaluation = _usable_evaluation(run_dir / "evaluation.json")
     if manifest is None or evaluation is None:
         return []
     if manifest["experiment"]["system"] != "allen_cahn":
@@ -206,8 +225,8 @@ def plot_rollout_error(out_dir: Path | None = None) -> list[str]:
     fig, ax = plt.subplots(figsize=(9, 5), constrained_layout=True)
     found = False
     for d in sorted(RUNS.iterdir()):
-        ev = _load(d / "evaluation.json")
-        if not ev or ev.get("status") != "completed":
+        ev = _usable_evaluation(d / "evaluation.json")
+        if ev is None:
             continue
         man = _load(d / "manifest.json")
         times = np.asarray(
@@ -236,18 +255,20 @@ def plot_residual_accuracy_tradeoff(out_dir: Path | None = None) -> list[str]:
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
     found = False
     for d in sorted(RUNS.iterdir()):
-        ev = _load(d / "evaluation.json")
-        if not ev or ev.get("status") != "completed":
+        ev = _usable_evaluation(d / "evaluation.json")
+        if ev is None:
             continue
         man = _load(d / "manifest.json")
         system = man["experiment"]["system"]
         ax = axes[0] if system == "burgers" else axes[1]
         ax.scatter(
-            ev["nrmse"]["mean"], ev["residual_error_physical_rms"],
+            ev["nrmse"]["mean"], ev["residual_rms_implicit_euler_first_order"],
             s=60, label=d.name,
         )
-        ax.axhline(ev["reference_residual_physical_rms"], ls="--", lw=0.8, color="k",
-                   alpha=0.5)
+        ax.axhline(
+            ev["reference_residual_rms_implicit_euler_first_order"],
+            ls="--", lw=0.8, color="k", alpha=0.5,
+        )
         ax.set_xlabel("rollout nRMSE (lower is better)")
         ax.set_ylabel("PDE residual RMS (lower is better)")
         ax.set_title(f"{system}: accuracy vs physics residual")
@@ -258,7 +279,8 @@ def plot_residual_accuracy_tradeoff(out_dir: Path | None = None) -> list[str]:
             ax.legend(fontsize=6)
         fig.suptitle(
             "Accuracy / residual trade-off (dashed line = reference solution's "
-            "own residual under the identical evaluator)"
+            "own residual under the identical evaluator, implicit Euler, "
+            "interior support)"
         )
     path = out_dir / "residual_accuracy_tradeoff.png"
     fig.savefig(path, dpi=120)

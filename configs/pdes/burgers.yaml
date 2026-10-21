@@ -38,13 +38,16 @@ profiles:
     n_val: 2
     n_test: 2
     seed: 1000
+    test_seed: 7001
   prototype:
     n_train: 64
     n_val: 16
     n_test: 16
     seed: 1000
+    test_seed: 7001
   full:
     n_train: 512
     n_val: 64
     n_test: 64
     seed: 1000
+    test_seed: 7001

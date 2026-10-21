@@ -8,6 +8,15 @@ separately and never conflated:
   previous state and predicts one step ahead.
 * **free rollout**: the model consumes its own predictions for the whole
   horizon. This is the protocol used for the primary held-out metric.
+
+History window
+--------------
+A model with ``history = H`` expects ``H`` past snapshots as input.
+The rollout therefore keeps a *sliding window* of ``H`` frames: after
+each step the oldest frame is dropped and the model's own prediction is
+appended. Replacing the whole window by a single predicted frame is
+only correct for ``H == 1`` and silently breaks every ``H > 1``
+condition.
 """
 
 from __future__ import annotations
@@ -60,9 +69,21 @@ def rollout(
         Initial history, shape ``(B, H, *spatial)``, physical units.
     n_steps:
         Number of future snapshots to predict.
+
+    Notes
+    -----
+    The model consumes a *window* of ``H`` frames.  After every step the
+    window is shifted by one frame and the model's own prediction is
+    appended, so the last frame of the window is always the most recent
+    prediction.  For ``H == 1`` this is identical to feeding the
+    prediction straight back in.
     """
     model.eval()
+    h = int(getattr(model, "history", history.shape[1]) or history.shape[1])
+    h = max(1, min(h, history.shape[1]))
     x = stats.normalize(history.to(device))
+    # One frame per history slot; the window is rebuilt every step.
+    window = [x[:, i] for i in range(h)]
     outputs = []
     for _ in range(n_steps):
         # Marks a boundary for CUDA-graph capture (torch.compile
@@ -75,10 +96,12 @@ def rollout(
                 mark()
             except Exception:  # pragma: no cover - depends on torch build
                 pass
-        pred = model(x, params)
+        inp = torch.stack(window[-h:], dim=1)
+        pred = model(inp, params)
         outputs.append(stats.denormalize(pred))
-        # Feed the model's own normalised prediction back in.
-        x = pred
+        # Feed the model's own normalised prediction back in as the most
+        # recent frame of the window.
+        window.append(pred[:, 0])
     return torch.stack(outputs, dim=1)
 
 
@@ -89,10 +112,18 @@ def teacher_forced_one_step(
     stats: NormalizationStats,
     params: torch.Tensor | None = None,
     device: torch.device | str = "cpu",
-) -> tuple[np.ndarray, np.ndarray]:
-    """One-step predictions with ground-truth inputs."""
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """One-step predictions with ground-truth inputs.
+
+    Returns ``(predictions, references, trajectory_ids)``.  The values
+    are **per window**: one value per dataset window, not per
+    trajectory.  ``trajectory_ids`` says which trajectory each window
+    belongs to, so that a caller can aggregate the windows into
+    per-trajectory values instead of reporting a per-window mean under a
+    per-trajectory label.
+    """
     model.eval()
-    preds, refs = [], []
+    preds, refs, traj_ids = [], [], []
     for i in range(len(dataset)):
         item = dataset[i]
         hist = item["history"].unsqueeze(0).to(device)
@@ -100,4 +131,5 @@ def teacher_forced_one_step(
         pred = model(stats.normalize(hist), params)
         preds.append(stats.denormalize(pred).squeeze(0).cpu().numpy())
         refs.append(target.squeeze(0).cpu().numpy())
-    return np.stack(preds), np.stack(refs)
+        traj_ids.append(int(item["traj"]))
+    return np.stack(preds), np.stack(refs), np.asarray(traj_ids, dtype=np.int64)

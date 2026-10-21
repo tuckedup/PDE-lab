@@ -7,6 +7,26 @@ memory measurement.
 Usage:
     python -m pdelab.benchmarks.variant_runner \
         --variant fp32_eager --run-dir runs/<id> --out /tmp/v.json
+
+Outputs of the variant
+----------------------
+Besides the timing/memory report (written to ``--out``), the runner
+writes the **full rollout tensors** so that the parent process can
+compare the variants element by element:
+
+``<tensor-dir>/timed_<variant>.npy``
+    the rollout of the timed workload (the reported workload),
+``<tensor-dir>/correctness_<variant>.npz``
+    the rollouts of the correctness workload (several development
+    batches, the entire rollout), computed on inputs that are written
+    once by the parent and therefore *identical* for every variant.
+
+The scalar ``output_checksum`` is kept only as a supplementary
+*identity* diagnostic (it says "this process produced the same numbers
+as the reference process").  It is **not** an accuracy measure: a sign
+flip or a spatial permutation has exactly the same mean absolute
+value.  The accuracy verdict is computed by the parent from the full
+tensors.
 """
 
 from __future__ import annotations
@@ -18,6 +38,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 
 from ..config import project_root
@@ -83,6 +104,37 @@ def load_model_and_workload(run_dir: Path, device: torch.device, batch_size: int
     return manifest, model, stats, hist, n_steps, n_traj
 
 
+def _drop_channel(out: torch.Tensor) -> torch.Tensor:
+    """``(B, T, 1, *spatial)`` -> ``(B, T, *spatial)``."""
+    if out.dim() >= 3 and out.shape[2] == 1:
+        return out[:, :, 0]
+    return out
+
+
+def _correctness_rollouts(
+    run,
+    inputs: dict[str, np.ndarray],
+    n_steps: int,
+    device: torch.device,
+) -> np.ndarray:
+    """Roll out the correctness workload, batch by batch.
+
+    The inputs are the *same file* for every variant, so the variants
+    are compared on identical inputs.  The rollout goes through the
+    **same** variant wrapper as the timed workload (autocast context,
+    compiled model, ...), otherwise the accuracy check would compare
+    the baseline against itself.
+    """
+    history = inputs["history"]
+    outputs = []
+    with torch.no_grad():
+        for b in range(history.shape[0]):
+            hist = torch.from_numpy(np.ascontiguousarray(history[b])).to(device)
+            out = run(hist)
+            outputs.append(_drop_channel(out).detach().cpu().numpy())
+    return np.stack(outputs, axis=0)
+
+
 def run_variant(
     variant: str,
     run_dir: Path,
@@ -91,6 +143,8 @@ def run_variant(
     n_blocks: int = 5,
     iters_per_block: int = 10,
     warmup: int = 3,
+    tensor_dir: Path | None = None,
+    correctness_inputs: Path | None = None,
 ) -> dict[str, Any]:
     device = torch.device(device_str)
     torch.set_grad_enabled(False)
@@ -104,15 +158,15 @@ def run_variant(
     if variant == "fp32_eager":
         description = "model.eval(), inference-only, weights resident on device"
 
-        def call():
-            return rollout(model, hist, n_steps, stats, params=None, device=device)
+        def run(h):
+            return rollout(model, h, n_steps, stats, params=None, device=device)
 
     elif variant == "autocast_fp16":
         description = "torch.autocast(cuda, float16) around the same inference graph"
 
-        def call():
+        def run(h):
             with torch.autocast(device_type="cuda", dtype=torch.float16):
-                return rollout(model, hist, n_steps, stats, params=None, device=device)
+                return rollout(model, h, n_steps, stats, params=None, device=device)
 
     elif variant in ("compile_default", "compile_reduce_overhead"):
         mode = "default" if variant == "compile_default" else "reduce-overhead"
@@ -126,16 +180,19 @@ def run_variant(
         t0 = time.perf_counter()
         compiled = torch.compile(model, mode=mode)
 
-        def call():
-            return rollout(compiled, hist, n_steps, stats, params=None, device=device)
+        def run(h):
+            return rollout(compiled, h, n_steps, stats, params=None, device=device)
 
         # Trigger compilation and measure the cold-start cost separately.
-        call()
+        run(hist)
         _sync(device)
         compile_seconds = time.perf_counter() - t0
 
     else:
         raise ValueError(f"unknown variant {variant!r}")
+
+    def call():
+        return run(hist)
 
     if device.type == "cuda":
         torch.cuda.empty_cache()
@@ -152,6 +209,22 @@ def run_variant(
             "peak_reserved_gib": torch.cuda.max_memory_reserved(device) / 1024**3,
         }
 
+    # ---- the full output tensors, for the element-wise comparison ----
+    tensor_paths: dict[str, str] = {}
+    if tensor_dir is not None:
+        tensor_dir = Path(tensor_dir)
+        tensor_dir.mkdir(parents=True, exist_ok=True)
+        timed = _drop_channel(out).detach().cpu().numpy()
+        timed_path = tensor_dir / f"timed_{variant}.npy"
+        np.save(timed_path, timed)
+        tensor_paths["timed"] = str(timed_path)
+        if correctness_inputs is not None:
+            inputs = dict(np.load(correctness_inputs))
+            rollouts = _correctness_rollouts(run, inputs, n_steps, device)
+            corr_path = tensor_dir / f"correctness_{variant}.npz"
+            np.savez_compressed(corr_path, rollouts=rollouts)
+            tensor_paths["correctness"] = str(corr_path)
+
     return {
         "variant": variant,
         "description": description,
@@ -161,7 +234,16 @@ def run_variant(
         "throughput_samples_per_second": float(n_traj * n_steps / timing["median_seconds"]),
         "batch_size": int(n_traj),
         "rollout_steps": int(n_steps),
+        "output_shape": list(_drop_channel(out).shape),
+        "output_tensors": tensor_paths,
+        # Supplementary *identity* diagnostic only.  Two completely
+        # different trajectories share this number, so it is never used
+        # as an accuracy proof.
         "output_checksum": float(out.double().abs().mean().item()),
+        "output_checksum_role": (
+            "supplementary identity diagnostic (mean absolute value of the "
+            "rollout); NOT an accuracy measure"
+        ),
     }
 
 
@@ -175,6 +257,11 @@ def main() -> int:
     ap.add_argument("--n-blocks", type=int, default=5)
     ap.add_argument("--iters-per-block", type=int, default=10)
     ap.add_argument("--warmup", type=int, default=3)
+    ap.add_argument("--tensor-dir", default=None,
+                    help="directory in which the full rollout tensors are written")
+    ap.add_argument("--correctness-inputs", default=None,
+                    help="npz file with the correctness workload (identical inputs "
+                         "for every variant)")
     args = ap.parse_args()
 
     run_dir = Path(args.run_dir)
@@ -188,6 +275,8 @@ def main() -> int:
         n_blocks=args.n_blocks,
         iters_per_block=args.iters_per_block,
         warmup=args.warmup,
+        tensor_dir=Path(args.tensor_dir) if args.tensor_dir else None,
+        correctness_inputs=Path(args.correctness_inputs) if args.correctness_inputs else None,
     )
     Path(args.out).write_text(json.dumps(result, indent=2))
     return 0
