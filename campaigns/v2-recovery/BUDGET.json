@@ -42,5 +42,15 @@
     "heavy_cap_exceeded": false,
     "explanation": "The heavy numerical budget was respected (5.33 h of 6 h). The walltime cap was exceeded during the release and documentation phase, which ran after the training matrix was complete and frozen. No training, evaluation or benchmark was run outside the heavy budget, and no additional training matrix was launched."
   },
-  "note": "The heavy-job counter includes solver/data generation, training, evaluation and benchmarking, not only training kernels. The clocks are reconstructed from artifact timestamps and recorded walltimes; they are never reset."
+  "note": "The heavy-job counter includes solver/data generation, training, evaluation and benchmarking, not only training kernels. The clocks are reconstructed from artifact timestamps and recorded walltimes; they are never reset.",
+  "closed": true,
+  "closed_utc": "2026-10-22T08:08:23Z",
+  "walltime_measurement": "Frozen at closure at the recorded value. The reconstruction script does not recompute a closed ledger.",
+  "budget_compliance": {
+    "heavy_numerical": "within cap",
+    "heavy_numerical_detail": "5.3271 h of 6.0 h",
+    "walltime": "CAP EXCEEDED - the campaign did not finish within the walltime cap",
+    "walltime_detail": "8.355 h spent against a 8.0 h cap, an overrun of 0.355 h",
+    "statement": "This campaign is NOT fully budget-compliant: the heavy-work budget was respected, the walltime cap was not. The overrun occurred during the release and documentation phase, after the training matrix was complete and frozen."
+  }
 }

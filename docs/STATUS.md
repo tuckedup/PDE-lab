@@ -154,11 +154,17 @@ Reconstructed from artifact timestamps and recorded walltimes
 | quantity | spent | cap |
 |---|---|---|
 | heavy numerical job time | **5.33 h** (training 5.15, data 0.08, evaluation 0.07, benchmark 0.03) | 6 h |
-| campaign wall time | **7.67 h** | 8 h |
+| campaign wall time | **8.355 h** | 8 h - **exceeded by 0.355 h** |
 | training attempts | 20 | 30 |
 | peak CUDA allocated per run | 0.024 GiB | 4.5 GiB |
 | peak host RSS per run | ~1.6 GiB | 3.5 GiB |
 | dataset storage | 15 MiB | 4 GiB |
+
+The heavy-work budget was respected; the **walltime cap was not**. The
+overrun happened during the release and documentation phase, after the
+training matrix was complete and frozen. The campaign is therefore
+**not fully budget-compliant**, and the ledger is frozen at these
+values (`campaigns/v2-recovery/BUDGET.json`).
 
 ## 7. Legacy claims withdrawn
 

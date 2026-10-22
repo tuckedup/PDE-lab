@@ -47,6 +47,15 @@ def main() -> int:
     benchmark_seconds = 0.0
     rows: list[dict] = []
 
+    # A closed ledger is frozen: the recorded spend is authoritative and
+    # is never recomputed, so the recorded walltime and its overrun
+    # cannot drift as time passes.
+    previous_budget = None
+    budget_path = CAMPAIGN / "BUDGET.json"
+    if budget_path.exists():
+        previous_budget = _read(budget_path)
+    frozen = bool(previous_budget and previous_budget.get("closed"))
+
     for run_dir in sorted(RUNS.iterdir()):
         if not run_dir.is_dir() or run_dir.name.startswith("_"):
             continue
@@ -121,7 +130,6 @@ def main() -> int:
     now = time.time()
     start = time.mktime(time.strptime(CAMPAIGN_START_UTC, "%Y-%m-%dT%H:%M:%SZ")) - time.timezone
     walltime_seconds = max(0.0, now - start)
-
     budget = {
         "caps": {
             "campaign_active_walltime_hours": WALLTIME_CAP_HOURS,
@@ -183,13 +191,27 @@ def main() -> int:
         ),
     }
 
-    (CAMPAIGN / "BUDGET.json").write_text(json.dumps(budget, indent=2) + "\n")
     (CAMPAIGN / "MATRIX.json").write_text(json.dumps({"rows": rows}, indent=2) + "\n")
     (CAMPAIGN / "EVENTS.jsonl").write_text(
         "".join(json.dumps(e) + "\n" for e in sorted(
             events, key=lambda e: e.get("created_utc") or ""
         ))
     )
+
+    if frozen:
+        # A closed campaign keeps its recorded STATE.json and BUDGET.json
+        # exactly as they were at closure. The matrix and the event log
+        # are refreshed above because they are derived from the artifacts
+        # and cannot drift the recorded spend.
+        print("campaign is CLOSED: STATE.json and BUDGET.json left untouched")
+        print(f"  recorded walltime : {previous_budget['spent']['walltime_hours']} h "
+              f"(overrun {previous_budget['overrun']['walltime_overrun_hours']} h)")
+        print(f"  recorded heavy    : "
+              f"{previous_budget['spent']['heavy_numerical_job_elapsed_hours']} h")
+        print(f"  matrix rows       : {len(rows)}")
+        return 0
+
+    (CAMPAIGN / "BUDGET.json").write_text(json.dumps(budget, indent=2) + "\n")
 
     state = _read(CAMPAIGN / "STATE.json") or {}
     state.update({

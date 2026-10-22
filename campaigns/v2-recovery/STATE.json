@@ -2,7 +2,7 @@
   "campaign_id": "v2-recovery",
   "created_utc": "2026-10-21T22:18:35Z",
   "objective": "Repair the confirmed numerical/evidence defects, regenerate the data under a corrected protocol with a FRESH unseen test set, run the required 18-row main matrix, and produce an evidence-based report plus a local installable release.",
-  "phase": "gate6",
+  "phase": "closed",
   "gates": {
     "gate0_inventory": "complete",
     "gate1_bug_reproduction_and_repair": "complete",
@@ -10,12 +10,45 @@
     "gate3_freeze_protocol_and_main_matrix": "complete",
     "gate4_ablations": "partial - see NOT_EXECUTED",
     "gate5_final_test_and_benchmark": "complete",
-    "gate6_report_and_release": "in_progress"
+    "gate6_report_and_release": "complete",
+    "gate6_evidence": {
+      "released_artifact": {
+        "path": "dist/pdelab-0.1.0-py3-none-any.whl",
+        "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+        "reproducible_builds": 3,
+        "record": "campaigns/release/build_reproducibility.json"
+      },
+      "clean_install": {
+        "status": "pass",
+        "open_blockers": [],
+        "record": "campaigns/release/clean_install.json",
+        "log": "campaigns/release/clean_install.log",
+        "note": "executed from a temporary directory outside the source checkout, CPU only, with the import path shown to come from the installed wheel"
+      },
+      "release_manifest": {
+        "path": "RELEASE_MANIFEST.json",
+        "documentation": "docs/RELEASE.md"
+      },
+      "final_report": {
+        "markdown": "docs/RESULTS.md",
+        "json": "results/results.json",
+        "generated_from": "runs/*/manifest.json, runs/*/evaluation.json, runs/*/benchmark_matched.json"
+      },
+      "final_verification": {
+        "script": "scripts/linux/final_check_v2.py",
+        "result": "68/68 checks passed"
+      },
+      "legacy_invalidation": "docs/LEGACY_INVALIDATION.md"
+    }
   },
   "git": {
-    "revision": "96fd61cd5ebfc53b5f1be7e1272e3d39b53b7fab",
-    "branch": "master",
-    "dirty": true
+    "verified_head_at_closure": "19883c75e85a23e90be281bfb61016dda7ec56be",
+    "verified_head_branch": "master",
+    "verified_head_working_tree_clean": true,
+    "release_build_source_revision": "c73809950d1f5f902fd5f3b890f5abe0f9505649",
+    "release_build_source_note": "The released wheel was built from this commit with 179 additional uncommitted paths present in the tree at build time; the manifest records that tree in full. It is not identical to any single commit.",
+    "labelling_note": "This state file is tracked in git, so it cannot contain the hash of the commit that carries it. The commit that records this closure necessarily follows both revisions named above. No self-referential 'current revision' is asserted.",
+    "verified_head_note": "The working tree was clean at this revision when the owner verified the release (18/18 required rows evaluated, the wheel hash matching the manifest, all packaged files matching the current source, both solver CLIs passing). The only changes made after it are the closure metadata listed in closure_touches."
   },
   "environment": {
     "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
@@ -46,7 +79,7 @@
       "note": "first dispatch (ses_e9f99f0e7ffe7GS2Zmei3ogLAz) returned an empty result and made no changes"
     }
   ],
-  "last_accepted_result": "The 18 required main-matrix rows are trained and evaluated once on the fresh, unseen test split (IC seeds 7001/7002, zero overlap with the development set). All six declared targets are met on the frozen cohort, with the Burgers residual improvement recorded as evaluator-specific.",
+  "last_accepted_result": "The 18 required main-matrix rows are trained and evaluated once on the fresh, unseen test split (IC seeds 7001/7002, zero overlap with the development set). All six declared targets are met on the frozen cohort, with the Burgers residual improvement recorded as evaluator-specific. The release is verified: the wheel matches its recorded hash, the clean install passes every fixture from outside the source checkout, and the final verification script reports 68/68 checks passed.",
   "blocker": null,
   "matrix_rows": {
     "total_runs": 20,
@@ -59,5 +92,31 @@
     "The Burgers residual improvement is evaluator-specific: the declared primary implicit-Euler residual improves ~70%, but the independent centred first-derivative residual is ~45-63% WORSE, and the reference solution is more PDE-consistent than either model under that evaluator.",
     "The peak ALLOCATED memory reduction of ~96% is not a device-memory saving: peak RESERVED memory rises ~9% and total device memory is unchanged.",
     "The physics arm costs rollout accuracy on both PDEs; the overall method recommendation under the global 5% accuracy constraint is data-only."
-  ]
+  ],
+  "not_executed": [
+    "the physics-regularized U-Net at three seeds (the optional extension; the configs exist, the rows were not run)",
+    "the lambda grid at seeds 1 and 2 for the non-selected candidate (the screening was at seed 0 and the selected condition was then confirmed at three seeds, as the protocol prescribes)",
+    "a near parameter-matched U-Net width search (the width-4 U-Net is 0.63x / 0.51x the FNO parameter count, not matched)",
+    "the width / spectral-mode ablation on the repaired FNO2D",
+    "the maximum-throughput-at-best-batch benchmark profile",
+    "a parameter-OOD / resolution-transfer benchmark",
+    "the reference own-error budget re-measured against the v2 model error at the v2 horizons"
+  ],
+  "not_executed_note": "This list is complete and is retained unchanged. gate4 remains partial because these rows were not executed; no optional sweep was run to chase a headline.",
+  "closure": {
+    "closed_utc": "2026-10-22T08:08:23Z",
+    "scope": "administrative closure only",
+    "actions_taken": [
+      "marked the release gate complete with explicit evidence references",
+      "replaced the obsolete git revision and stale dirty flag with an unambiguously labelled source-revision block",
+      "retained the complete NOT_EXECUTED list and gate4 as partial",
+      "froze the budget ledger at its recorded values"
+    ],
+    "not_done_by_design": [
+      "no training, benchmarking, solver execution, full test suite, rebuild, new search or optional experiment was run",
+      "no counter was reset and no cap was extended",
+      "no new public performance claim was made",
+      "the released artifact hash and the existing results are unchanged"
+    ]
+  }
 }
