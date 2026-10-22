@@ -54,7 +54,7 @@ for f in ["AGENTS.md", "PLAN.md", "README.md", "CITATIONS.md", "pyproject.toml",
 for cmd in [["doctor"], ["resources", "check"],
             ["sweep", "--config", "configs/experiments/main_matrix.yaml",
              "--profile", "full", "--dry-run"], ["report"]]:
-    p = subprocess.run([PY, "-m", "pdelab.cli"] + cmd, capture_output=True,
+    p = subprocess.run([PY, "-m", "pdelab.cli", *cmd], capture_output=True,
                        text=True, cwd=str(ROOT))
     check(f"cli: pdelab {' '.join(cmd)}", p.returncode == 0, p.stderr[-160:])
 
