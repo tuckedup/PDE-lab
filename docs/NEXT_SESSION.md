@@ -1,108 +1,133 @@
 # Next session
 
-Everything below is a concrete, executable next step. Nothing here has
-been run.
+**State at the close of the v2-recovery campaign (2026-10-22).**
 
-## 0. Read first
+Everything below refers to the **v2** protocol
+(`configs/protocol_v2.yaml`). The prototype results are withdrawn; see
+`docs/LEGACY_INVALIDATION.md`.
 
-* `docs/STATUS.md` - what is done, what is measured, what is not.
-* `docs/DECISIONS.md` - why the configuration and the methods are what
-  they are.
-* `results/RESULTS.md` - the generated target table.
+## What is done and valid
 
-## 1. Immediate: finish the confirmatory matrix
+* The reference solvers are repaired and validated: **19/19** Burgers and
+  **14/14** Allen-Cahn checks, including manufactured solutions driven
+  through the real integrator, sign-aware flux tests, exact
+  observation-time tests, and reference own-error bounds at the real
+  horizons.
+* The dataset is regenerated with **exact** observation times and a
+  **fresh, unseen test set** (IC seeds 7001/7002, zero overlap with the
+  development set). Verify with
+  `scripts/linux/verify_v2_data.py`.
+* The **18 required main-matrix rows** are trained (3 seeds x 2 PDEs x 3
+  conditions) and evaluated **once** on the fresh test set.
+* The report is cohort-based, artifact-generated and reports every
+  condition and seed separately (`docs/RESULTS.md`).
+* A byte-reproducible wheel installs and runs from **outside** the source
+  tree (`RELEASE_MANIFEST.json`, `docs/RELEASE.md`).
+* 184 tests pass; lint is clean.
 
-The single largest gap is that only **seed 0** has been trained. The
-requirement is three independent training seeds per condition.
+## Resource state
 
-### 1a. Write the seed-1 and seed-2 configs
+`campaigns/v2-recovery/BUDGET.json` holds the reconstructed spend:
+heavy numerical **5.33 h of 6 h**; walltime **8.36 h against the 8 h
+cap** (a 0.36 h overrun during the release/documentation phase, after
+the matrix was frozen - recorded, not hidden); 20 training attempts of
+30.
+
+## The results, in one paragraph
+
+All six declared targets are met on the frozen cohort, but the
+scientific picture is qualified and the qualifications matter: the
+**learned operators do not beat direct numerical stepping** (18-46x
+worse on Burgers), the **Burgers residual gain is evaluator-specific**
+(+70% on the declared primary implicit-Euler residual, **-45% to -63%**
+on the independent centred first-derivative residual, under which the
+*reference* is more PDE-consistent than either model), and the physics
+arm **costs rollout accuracy** on both PDEs, so the overall method
+recommendation is data-only.
+
+## The next thing to do (in priority order)
+
+1. **Investigate the Burgers residual discrepancy.** This is the most
+   scientifically interesting open question. The physics arm optimises
+   the implicit-Euler time map it is handed, and that map is *not* the
+   continuous PDE. Hypotheses, in order of plausibility:
+   * the penalty's implicit-Euler bias is the mechanism - test by
+     evaluating the *reference* trajectory under the same discrete map
+     and comparing the signed residual, not just the magnitude;
+   * the penalty is over-regularising the small-amplitude early steps -
+     test with a declared lambda warm-up (a *controlled* experiment,
+     one variable);
+   * the centred evaluator has a different support/truncation error on
+     this system - test by measuring the reference's own centred
+     residual under temporal refinement (the "floor" must be measured,
+     not assumed).
+   Any of these must be run on the **validation** split; the fresh test
+   set has been inspected and must not be used to choose a change.
+
+2. **Add a numerical baseline to the headline table** - it is already in
+   the per-condition table, but the narrative should lead with it, since
+   it is the honest context for the accuracy numbers.
+
+3. **Near parameter-matched U-Net.** The width-4 U-Net is 0.63x / 0.51x
+   the FNO's parameter count, not matched. Run a width search to land
+   inside a declared tolerance (e.g. 10%), and report the mismatch if
+   it cannot be reached.
+
+4. **Optional rows that were not executed** (configs exist, runs do
+   not): the physics-regularised U-Net at 3 seeds; the lambda grid at
+   seeds 1 and 2 for the non-selected candidate; the width / spectral
+   mode ablation on the repaired FNO2D; the maximum-throughput-at-best-
+   batch benchmark profile; a parameter-OOD benchmark.
+
+5. **Re-open the reference own-error budget.** The audit asked for the
+   reference discrepancy to be at least an order of magnitude below the
+   claimed model error. Measured reference own error: 2.2e-4 (Burgers)
+   and 9.6e-8 (Allen-Cahn) at the old horizons; re-measure at the v2
+   horizons and state the ratio to the model error explicitly.
+
+## Exact commands
 
 ```bash
-.venv/bin/python scripts/linux/gen_experiment_configs.py    # currently seeds [0] only
+cd /home/atulp/projects/pdelab
+
+# the numerical gate
+.venv/bin/python scripts/linux/validate_solvers.py
+
+# the tests
+.venv/bin/python -m pytest tests/ -q
+
+# verify the dataset identities (exact times, disjoint test ICs)
+.venv/bin/python scripts/linux/verify_v2_data.py
+
+# evaluate the frozen cohort on the fresh test set (once)
+bash scripts/linux/evaluate_frozen_test.sh
+
+# regenerate the report from the artifacts
+.venv/bin/python -m pdelab.cli report
+
+# the matched inference benchmark
+.venv/bin/python -m pdelab.cli benchmark \
+    --run-id burgers_fno1d_data_only_seed0 --profile matched
+
+# the release
+bash scripts/linux/release_all.sh
+
+# the campaign state
+.venv/bin/python scripts/linux/reconstruct_campaign_state.py
 ```
 
-Extend `scripts/linux/gen_experiment_configs.py` to emit
-`{system}_{arch}_{condition}_seed{1,2}.yaml` for the six main
-conditions (3 per system x 2 systems x 2 seeds = 12 new configs), and
-add the physics-regularized U-Net configs, which already exist for
-seed 0.
+## Do not
 
-### 1b. Estimate the cost before running
-
-```bash
-.venv/bin/python -m pdelab.cli sweep --config configs/experiments/main_matrix.yaml --profile full --dry-run
-```
-
-At the measured prototype cost (~12 min/run) the 18-run required matrix
-is about 3.6 hours (24 runs including the optional physics U-Net is
-about 4.8 hours), which **exceeds the declared 120-minute sweep
-budget**. Pick one:
-
-* split the matrix across sessions (recommended - the budget is a
-  standing limit, not a target to raise), or
-* raise `max_default_sweep_walltime_minutes` in
-  `configs/hardware/atul_laptop.yaml` **explicitly and in writing**, or
-* reduce the epoch count for the confirmatory runs (this changes the
-  protocol, so it must be recorded in `configs/prereg.yaml`).
-
-### 1c. Run the matrix sequentially
-
-```bash
-.venv/bin/python -m pdelab.cli sweep --config configs/experiments/main_matrix.yaml --profile full
-```
-
-The job lock enforces one job at a time. Check `nvidia-smi` before
-starting and do not run while another project is using the GPU.
-
-## 2. Ablations that are declared but not run
-
-The pre-registration lists these; they are the smallest justified set.
-
-| ablation | how | note |
-|---|---|---|
-| no physics penalty vs the selected penalty | already measured at seed 0 | repeat over 3 seeds |
-| residual weight λ ∈ {0, 0.01, 0.1} | 2 new configs per system | **validation split only**; the physics model must not be tuned against the test set |
-| one-step vs rollout horizon | already reported separately per run | `nrmse_one_step_teacher_forced` vs `nrmse` |
-| spectral modes / model width at a fixed budget | 2-3 extra configs | keep the parameter count fixed and report it |
-| correctness of residual gradients | already automated | `physics_grad_check` in every manifest |
-| near parameter-matched U-Net | width 4-6 U-Net configs | the U-Net is currently 8-10x larger than the FNO |
-
-## 3. Two things worth fixing before the confirmatory runs
-
-1. **The allen_cahn residual improvement is evaluator-dependent.**
-   Under the primary (forward-difference) evaluator the physics model
-   improves the residual by 20.6%, but under the second-order
-   diagnostic evaluator it is 2.6% *worse*. The Burgers result is
-   positive under both (88.1% / 23.8%). This should be investigated
-   before the confirmatory matrix, because it may be a λ-scaling issue:
-   the residual magnitudes differ by three orders of magnitude between
-   the two systems (1.0 vs 0.08), so a single `pde_scale` may not suit
-   both. The scales are currently frozen at 1.0 for both.
-
-2. **The inference memory target is missed at the declared reference
-   model** (1.7% against a 20% target) because the model is small
-   enough that the cuFFT workspace dominates the peak. Either
-   (a) report it as missed and explain, which is the current state, or
-   (b) measure at a batch size where activations dominate and label
-   that result clearly as a *different* workload, which the brief
-   allows but requires to be labelled. The `throughput` benchmark
-   profile (batch sweep 1/2/4/8) is implemented but has not been run.
-
-## 4. Optional extension
-
-A parameter-OOD or resolution-transfer benchmark must have **separate
-labels** and must not replace the main held-out test. The infrastructure
-needed is the PDE-parameter channel in the models (already implemented
-and tested, but unused: `n_params` is 0 in every current config) and a
-second dataset with different `nu` / `D`.
-
-## 5. Housekeeping
-
-* `git add -A && git commit` - the working tree has uncommitted changes
-  since the last commit, and every future run manifest will record the
-  revision and the dirty flag.
-* Re-run `pdelab report` after any new run so `docs/RESULTS.md` stays
-  generated rather than hand-written.
-* Consider a `CITATIONS.md` entry for the two reference solvers and for
-  the neural-operator and physics-informed-operator papers listed in
-  `CITATIONS.md`.
+* Do not re-tune anything against the fresh test set. It has been
+  inspected; a future protocol (v3) with new test ICs is required for
+  that.
+* Do not present the cohort mean as a single method's score; use the
+  per-condition and per-seed table.
+* Do not describe the 96% memory figure as a device-memory saving; peak
+  *reserved* memory rises 9% and total device memory is unchanged.
+* Do not describe the Burgers residual gain as general physics
+  superiority; it is evaluator-specific, and Allen-Cahn behaves
+  differently.
+* Do not backdate work. The January-June 2026 dates in the original
+  brief have no support in this repository's execution history; the
+  verified dates are 2026-10-19 (prototype) and 2026-10-21/22 (v2).

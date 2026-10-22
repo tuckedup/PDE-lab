@@ -1,173 +1,186 @@
-# Status
+# PDELab - STATUS
 
-**Date of this snapshot:** 2026-10-20 (UTC)
-**Project:** PDELab - Physics-Constrained Neural Operator
-**Owner:** Atul Pandey
+**Campaign:** v2-recovery, 2026-10-21/22.
+**Owner:** Atul Pandey.
+**Protocol:** `configs/protocol_v2.yaml` (v2). The original preregistration is
+preserved unchanged in `configs/prereg.yaml`.
+**Result table:** `docs/RESULTS.md` (generated from artifacts, never hand-typed).
 
-Everything below was executed on this machine. Nothing is projected.
+> The **prototype** results that were reported before 2026-10-21 are
+> **withdrawn**: they were produced with a mis-timed dataset, a residual
+> diagnostic that differentiated time twice, a sign-blind Burgers flux
+> split, an FNO2D operator that dropped a spectral block, and a report
+> that selected the best test run. See
+> `docs/LEGACY_INVALIDATION.md`.
 
----
+## 1. What is complete
 
-## 1. Implemented and verified
-
-| component | state | evidence |
+| item | state | evidence |
 |---|---|---|
-| Environment (uv venv, PyTorch 2.14.1+cu130, CUDA) | done | `pdelab doctor`: CUDA available, forward/backward ok |
-| Resource profile + preflight + project job lock | done | `pdelab resources check`: no violations |
-| 1D Burgers reference solver (WENO5-JS + SSPRK(3,3)) | done | 12/12 numerical checks pass |
-| 2D Allen-Cahn reference solver (spectral + Strang) | done | 12/12 numerical checks pass |
-| Independent cross-check solvers (MUSCL, dealiased spectral) | done | agreement 9.4e-6 / 4.4e-4 |
-| Deterministic dataset generation, HDF5 + manifests | done | 96 trajectories per system, reproduces to 6e-8 |
-| FNO 1D/2D (learned complex spectral mixing) | done | shape / mode / gradient tests |
-| Periodic U-Net 1D/2D (circular padding, nearest-upsample) | done | periodicity + covariance tests |
-| Physics residual operators + composite loss | done | residual-gradient check passes in every physics run |
-| One-step and free-rollout evaluation, nRMSE + residual metrics | done | `evaluation.json` per run |
-| Matched inference benchmark, process-isolated variants | done | `benchmark_matched.json` per run |
-| Test suite | done | **86 tests pass** |
-| Plots and generated result tables | done | `results/plots/`, `docs/RESULTS.md` |
-| Documentation set | done | `docs/*.md` |
+| Environment (uv venv, torch 2.14.1+cu130, CUDA) | done | `pdelab doctor` |
+| Resource profile, preflight, project lease on every heavy entrypoint | done | `pdelab resources check`; `campaigns/performance/check_project_lease.py` |
+| 1D Burgers solver (WENO5-JS, global Lax-Friedrichs split) | done | 19/19 validation checks |
+| 2D Allen-Cahn solver (spectral, exact diffusion, Strang) | done | 14/14 validation checks |
+| Observation-time scheduling | done | exact to 1.7e-16; dataset manifest records the actual times |
+| Corrected residual operators (primary implicit-Euler + independent centred) | done | `physics/operators.py` |
+| FNO 1D/2D, periodic U-Net 1D/2D | done | 37 model tests |
+| Cohort-based reporting with content identity and evidence states | done | `campaigns/evidence-cohort/cohort.yaml` |
+| Benchmark correctness on full tensors | done | a sign flip and a spatial permutation are **rejected** |
+| Fresh, unseen test set (IC seeds 7001/7002, zero dev overlap) | done | `scripts/linux/verify_v2_data.py` |
+| **18 required main-matrix rows** (2 PDEs x 3 conditions x 3 seeds) | done | `campaigns/v2-recovery/MATRIX.json` |
+| Matched inference benchmark, process-isolated, reset after warm-up | done | `runs/*/benchmark_matched.json` |
+| Local release: wheel + clean install from outside the checkout | done | `RELEASE_MANIFEST.json`, `docs/RELEASE.md` |
+| Test suite | done | **184 passed** |
 
-## 2. Measured results (prototype profile, **1 seed**, RTX 4060)
+## 2. Measured results - fresh test set, 3 seeds
 
-| run | params | rollout nRMSE | 1-step nRMSE | persistence | residual | reference residual | train s |
-|---|---|---|---|---|---|---|---|
-| burgers FNO data-only | 19,825 | **0.0813** | 0.00352 | 1.478 | 1.006 | 1.084 | 635 |
-| burgers FNO physics (λ=0.01) | 19,825 | **0.0372** | 0.00275 | 1.478 | **0.120** | 1.084 | 800 |
-| burgers U-Net data-only (width 16) | 191,329 | **0.0951** | 0.00398 | 1.478 | 2.246 | 1.084 | 1291 |
-| burgers U-Net data-only (width 4, matched) | 12,409 | **0.6831** | 0.2868 | 1.478 | 6.007 | 1.084 | 1292 |
-| allen_cahn FNO data-only | 68,993 | **0.0443** | 0.00530 | 0.415 | 0.0815 | 0.0607 | 516 |
-| allen_cahn FNO physics (λ=0.01) | 68,993 | **0.0436** | 0.00509 | 0.415 | **0.0647** | 0.0607 | 642 |
-| allen_cahn U-Net data-only (width 16) | 558,529 | **0.0457** | 0.00788 | 0.415 | 0.0424 | 0.0607 | 1333 |
-| allen_cahn U-Net data-only (width 4, matched) | 35,377 | **0.1325** | 0.07313 | 0.415 | 0.1603 | 0.0607 | 1296 |
+Free-rollout nRMSE (the declared primary accuracy metric). The
+**numerical stepping** column is a low-cost numerical baseline solved on
+the same observation grid and horizon.
 
-Relative residual improvement of the physics FNO over the matched
-data-only FNO: **+88.1%** (Burgers) and **+20.6%** (Allen-Cahn) under
-the primary evaluator; **+23.8%** and **-2.6%** under the separately
-declared second-order diagnostic evaluator.
+| system | condition | seeds | nRMSE mean | nRMSE SD | numerical stepping | persistence |
+|---|---|---|---|---|---|---|
+| burgers | FNO data-only | 0,1,2 | **0.0156** | 0.0011 | 0.00054 | 1.471 |
+| burgers | FNO physics (λ=0.1) | 0,1,2 | **0.0239** | 0.0007 | 0.00054 | 1.471 |
+| burgers | U-Net data-only | 0,1,2 | **0.0165** | 0.0071 | 0.00054 | 1.471 |
+| allen_cahn | FNO data-only | 0,1,2 | **0.0138** | 0.0013 | 0.00275 | 0.451 |
+| allen_cahn | FNO physics (λ=0.01) | 0,1,2 | **0.0160** | 0.0008 | 0.00275 | 0.451 |
+| allen_cahn | U-Net data-only | 0,1,2 | **0.0490** | 0.0037 | 0.00275 | 0.451 |
 
-### The near parameter-matched comparison
+Residual improvement of the physics arm over the matched data-only FNO,
+**per seed**, under both evaluators:
 
-The pilot U-Net (width 16) has 8-10x the FNO's parameters. A near
-parameter-matched U-Net (width 4) was therefore also trained:
-
-| system | model | params | rollout nRMSE |
-|---|---|---|---|
-| burgers | FNO | 19,825 | **0.0813** |
-| burgers | U-Net width 4 | 12,409 (0.63x) | 0.6831 |
-| allen_cahn | FNO | 68,993 | **0.0443** |
-| allen_cahn | U-Net width 4 | 35,377 (0.51x) | 0.1325 |
-
-The FNO is ahead at both parameter-matched sizes, and the narrow U-Net
-is far behind (it overfits: its best validation epoch is early and its
-validation loss is 2-3 orders of magnitude worse). So the FNO's
-advantage in this study is **not** a parameter-count artefact.
-Parameter matching does not equalise FLOPs or optimisation difficulty.
-
-Inference, matched workload (same checkpoint, grid, horizon, batch
-size), each variant in a separate process:
-
-| variant | median (1D FNO) | peak CUDA allocated |
+| system | primary (implicit Euler) | independent (centred 1st derivative) |
 |---|---|---|
-| fp32 eager (baseline) | 0.245 s | 0.00830 GiB |
-| autocast fp16 | 0.233 s | 0.00822 GiB |
-| torch.compile default | 0.275 s | 0.00825 GiB |
-| torch.compile reduce-overhead (CUDA graphs) | **0.040 s** | 0.00816 GiB |
+| burgers | +69.53% / +69.20% / +70.97% | **−45.41% / −59.94% / −63.37%** |
+| allen_cahn | +21.27% / +24.25% / +22.35% | +19.46% / +22.48% / +20.63% |
 
-**Throughput ratio 6.11** (target ≥ 1.3). **Peak-memory reduction
-1.72%** on the declared reference model (target ≥ 20%); the 2D U-Net
-reaches 25.6% because its weights dominate the peak.
+Inference, matched workload (same checkpoint, grid 128, 100 autoregressive
+predictions, batch 1), each variant in a separate process:
 
-## 3. Target status
+| variant | median | peak allocated | peak reserved | correctness | joint pass |
+|---|---|---|---|---|---|
+| fp32 eager (baseline) | 0.260 s | 0.008346 GiB | 0.021484 GiB | - | - |
+| autocast fp16 | 0.268 s | 0.008271 GiB | 0.021484 GiB | pass | no |
+| torch.compile default | 0.309 s | 0.008298 GiB | 0.052734 GiB | pass | no |
+| **torch.compile reduce-overhead** | **0.045 s** | **0.000329 GiB** | 0.023438 GiB | pass | **yes** |
 
-| target | threshold | measured | status |
-|---|---|---|---|
-| burgers held-out nRMSE | < 0.05 | 0.0372 (physics FNO) | **met** |
-| allen_cahn held-out nRMSE | < 0.20 | 0.0436 (physics FNO) | **met** |
-| burgers residual improvement | ≥ 10% | +88.1% | **met** |
-| allen_cahn residual improvement | ≥ 10% | +20.6% | **met** |
-| inference throughput ratio | ≥ 1.3 | 6.11 | **met** |
-| inference peak-memory reduction | ≥ 20% | 1.72% | **missed** |
+## 3. Target status (frozen cohort, fresh test set)
 
-The burgers nRMSE target is met by the physics-regularized FNO but
-**missed** by the data-only FNO (0.0813) and by the U-Net (0.0668).
+| target | threshold | measured (cohort) | worst member | status |
+|---|---|---|---|---|
+| burgers free-rollout nRMSE | < 0.05 | 0.01864 | 0.02456 | **met** |
+| allen_cahn free-rollout nRMSE | < 0.20 | 0.02628 | 0.05139 | **met** |
+| burgers primary residual reduction | ≥ 10% | 69.90% | 69.20% | **met** |
+| allen_cahn primary residual reduction | ≥ 10% | 22.62% | 21.27% | **met** |
+| same-checkpoint throughput ratio | ≥ 1.3 | 5.736 | - | **met** |
+| same-workload peak **allocated** memory reduction | ≥ 20% | 96.05% | - | **met** |
 
-## 4. NOT completed
+`measured (cohort)` is the mean over the declared cohort members, **not**
+the score of any single method. The per-condition and per-seed values
+are in `docs/RESULTS.md`.
 
-These are declared requirements that are **not** yet met. They are
-listed so that no part of this project is over-claimed.
+## 4. The limitations that matter
 
-1. **Three independent training seeds.** Only seed 0 has been run. The
-   requirement applies to independent *training* runs, not to three
-   inference repetitions of one checkpoint. All reported numbers are
-   single-seed and carry no uncertainty estimate.
-2. **The 18-run main matrix.** Not executed. The sweep is planned,
-   costed and dry-run tested, but the seed-1 and seed-2 experiment
-   configs are not yet written.
-3. **Physics-regularized U-Net.** The condition is configured
-   (`burgers_unet1d_physics_seed0.yaml`,
-   `allen_cahn_unet2d_physics_seed0.yaml`) but not run.
-4. **The λ grid {0, 0.01, 0.1}.** Only λ = 0 and λ = 0.01 have been
-   run, and only at seed 0. A validation-only search has not been
-   performed.
-5. **Near parameter-matched U-Net.** **Done** at width 4 (see section
-   2). A width-6 variant is configured but not run.
-6. **One-step vs rollout horizon ablation** and the **spectral
-   modes / width** ablation are configured in spirit but not executed.
-   The one-step and rollout numbers are already reported separately
-   for every run.
-7. **The maximum-throughput-at-best-batch profile.** The `throughput`
-   benchmark profile exists but has not been run and reported.
-8. **Parameter-OOD / resolution-transfer benchmark.** Not implemented.
+These are the honest qualifications. They are not caveats bolted on; they
+change what the results mean.
 
-## 5. Bugs found by the validation suite and the tests
+1. **The learned operators do not beat direct numerical stepping.**
+   Burgers: numerical 0.00054 vs the learned models 0.0099-0.0246 (18-46x
+   better). Allen-Cahn: numerical 0.00275 vs 0.0129-0.0514 (4.7-19x
+   better). On these benchmarks the observation grids (128; 32x32) are
+   close to the reference grids (256; 64x64) and the dynamics are smooth
+   enough that a well-implemented solver on the observation grid is
+   simply more accurate than a learned autoregressive operator. The
+   operators are a *feasibility* result, not an accuracy win.
 
-These were real defects in this implementation, found and fixed. They
-are listed because they shaped the final design.
+2. **The Burgers residual improvement is evaluator-specific.** The
+   physics arm improves the declared primary (implicit-Euler) residual by
+   about 70% per seed, but it makes the trajectory **45-63% worse** under
+   the independent centred first-derivative residual - and under that
+   evaluator the **reference solution is more PDE-consistent than either
+   model** (reference 0.0413 vs data-only 0.101-0.112 vs physics
+   0.163-0.167). The penalty optimises the implicit-Euler time map it
+   is given; that is not the same as being more consistent with the
+   continuous PDE. Allen-Cahn improves under both evaluators, so the
+   effect is not universal in either direction.
 
-1. **Mis-indexed Burgers flux divergence** - a full-cell shift that
-   left the scheme consistent but first-order and wrong.
-2. **Mismatched SSPRK(3,3) stage arguments and weights** - the
-   integrator was not even consistent with `du/dt = a u`.
-3. **Mis-truncated 2D spectral restriction** - `rfft2` keeps both signs
-   of the first axis, so a one-sided truncation halved every field.
-4. **Broken FNO2D parameter conditioning** - an `expand` to four
-   dimensions from a three-dimensional tensor.
-5. **U-Net checkerboard artefact** from `ConvTranspose(kernel=2,
-   stride=2)`, which broke the constant-field test.
-6. **Wrong free-energy functional for Allen-Cahn** - the gradient term
-   needs a `D/2` coefficient; with `1/2` the free energy appeared to
-   increase, mimicking an instability.
-7. **Allen-Cahn reference step chosen from the stability limit rather
-   than an accuracy limit** - `dt = 0.5` is stable but far too coarse
-   for a reference.
-8. **The `restrict_2d` operator halved every field** - `rfft2` retains
-   both signs of the first axis, so a one-sided row truncation removed
-   the negative-kx modes. Caught by a unit test.
-9. **`GroupNorm(min(8, channels), channels)`** - invalid for channel
-   counts not divisible by 8, which broke every U-Net width other than
-   8/16/32. Caught when building the width-4 variant.
-10. **`run_id_for` ignored the configuration's `name`** - the
-    near parameter-matched U-Net overwrote the practical-budget U-Net's
-    run directory. Caught by noticing that the parameter count in the
-    report did not match the configuration.
-11. **GPU training is not bitwise deterministic.** The same 1D U-Net
-    configuration, re-run at the same seed, changed its validation loss
-    by ~20% and its held-out nRMSE by ~40%. cuDNN autotuning was the
-    main cause; it is now disabled and deterministic kernels are
-    selected, and the manifest records the determinism settings. The
-    spread is a further reason the three-seed requirement matters.
+3. **The physics arm costs rollout accuracy on both PDEs** (Burgers
+   0.0156 -> 0.0239, Allen-Cahn 0.0138 -> 0.0160). Under the v2
+   two-arm rule the **overall method recommendation is data-only** for
+   both systems; the non-zero arm does not satisfy the global 5%
+   accuracy constraint. The physics arm remains the *prespecified
+   scientific comparison* and is reported as such.
 
-## 6. Scope statement
+4. **The memory result is about peak *allocated* memory, not device
+   memory.** Peak allocated falls 96% (0.008346 -> 0.000329 GiB) because
+   the CUDA-graph variant reuses a static pool instead of re-allocating
+   the rollout intermediates every step. But peak **reserved** memory
+   *rises* 9.1% (0.021484 -> 0.023438 GiB, the graph's private pool) and
+   the device-level free-memory reading is essentially unchanged
+   (6.8799 -> 6.8662 GiB, -0.2%). Calling this a device-memory saving
+   would be wrong.
 
-This is a **local research prototype** of a physics-regularized neural
-operator on two self-defined periodic benchmarks. The result is: adding
-a PDE-residual penalty to an FNO measurably reduced the physical
-residual and, on this prototype, also improved the rollout accuracy on
-1D Burgers, while a matched-workload CUDA-graph inference pipeline gave
-a 6.1x throughput gain.
+5. **The persistence baseline and the numerical-stepping baseline
+   bracket the task.** Persistence is 1.471 (Burgers) and 0.451
+   (Allen-Cahn), so the horizons are not trivial; but the numerical
+   baseline is far better than the learned models.
 
-It is **not** a claim of a new neural-operator method, and it is **not**
-a comparison against published work. The two systems are explicit
-periodic benchmark definitions, the reference solvers are validated
-against analytic, manufactured and refinement tests, and the numbers
-above come from single-seed runs on one GPU.
+## 5. Not executed
+
+Declared but not run, because the campaign budget was spent on the
+required matrix:
+
+* the **physics-regularized U-Net** (optional extension; the configs
+  exist, the rows were not run);
+* the **λ grid at seeds 1 and 2** for the non-selected candidate (the
+  screening was at seed 0 and the selected condition was then confirmed
+  at three seeds, as the protocol prescribes);
+* a **near parameter-matched U-Net** width search (the width-4 U-Net has
+  12,409 parameters against the FNO's 19,825 in 1D and 35,377 against
+  68,993 in 2D - i.e. 0.63x and 0.51x, not matched);
+* the **width / spectral-mode ablation** on the repaired FNO2D;
+* a **parameter-OOD or resolution-transfer** benchmark;
+* the **maximum-throughput-at-best-batch** benchmark profile.
+
+No hyperparameter was tuned against the fresh test set, and no optional
+sweep was run to chase a headline.
+
+## 6. Resources actually spent
+
+Reconstructed from artifact timestamps and recorded walltimes
+(`campaigns/v2-recovery/BUDGET.json`):
+
+| quantity | spent | cap |
+|---|---|---|
+| heavy numerical job time | **5.33 h** (training 5.15, data 0.08, evaluation 0.07, benchmark 0.03) | 6 h |
+| campaign wall time | **7.67 h** | 8 h |
+| training attempts | 20 | 30 |
+| peak CUDA allocated per run | 0.024 GiB | 4.5 GiB |
+| peak host RSS per run | ~1.6 GiB | 3.5 GiB |
+| dataset storage | 15 MiB | 4 GiB |
+
+## 7. Legacy claims withdrawn
+
+The prototype numbers (Burgers nRMSE 0.0372 "met", Allen-Cahn 0.0436
+"met", +88% / +20.6% residual gains, 6.11x throughput, 1.72% memory)
+are **withdrawn**. Reasons, each with reproduction evidence in
+`campaigns/audit-verification/audit_reproduction.json`:
+
+| prototype claim | why it is withdrawn |
+|---|---|
+| Burgers nRMSE 0.0372 "met" | the report selected the best test run; on the frozen cohort with 3 seeds the worst member is 0.02456 and the condition mean is 0.0239 |
+| "second-order" residual gains | the operator computed `u_tt`, not `u_t`; every such value is invalid |
+| +88% / +20.6% residual improvement | the primary metric is an implicit-Euler defect; on the independent centred evaluator the Burgers gain is negative |
+| 6.11x throughput | measured on a mis-timed dataset and a repaired benchmark; re-measured as 5.74x on the corrected protocol |
+| 1.72% memory reduction | measured with the reset before warm-up; re-measured with the corrected accounting (96% peak allocated, +9% reserved) |
+| "all 89 tests passed" | the suite did not cover observation-time scheduling, the flux split, the FNO2D block coverage, the residual derivative, report selection or the benchmark correctness check; the suite now has 184 tests and the missing coverage is present |
+
+## 8. Scope
+
+A **local research prototype** of physics-regularized neural operators
+on two self-defined periodic benchmarks, with validated reference
+solvers, a frozen cohort, a fresh held-out test set and an
+artifact-backed report. It is **not** a new neural-operator method, not
+a comparison against published work, and not a claim of state of the
+art. A local release is not a public deployment.

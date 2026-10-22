@@ -1,0 +1,316 @@
+{
+  "schema": "pdelab-release-evidence-index/1",
+  "generated_utc": "2026-10-22T05:26:11Z",
+  "cohort_id": "pdelab-main-confirmatory",
+  "cohort_file": "campaigns/evidence-cohort/cohort.yaml",
+  "cohort_sha256": "00b005a2e7a0a3765c2ee23d7f7f4064ff9a16d603e01e1264e1310f2b33b9f3",
+  "campaign_evidence_index": "campaigns/v2-recovery/EVIDENCE_INDEX.json",
+  "artifacts": [
+    {
+      "path": "dist/pdelab-0.1.0-py3-none-any.whl",
+      "kind": "release_artifact",
+      "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+      "description": "the built wheel of this release"
+    },
+    {
+      "path": "campaigns/evidence-cohort/cohort.yaml",
+      "kind": "cohort_declaration",
+      "sha256": "00b005a2e7a0a3765c2ee23d7f7f4064ff9a16d603e01e1264e1310f2b33b9f3",
+      "description": "the declared evidence cohort the results are judged against"
+    },
+    {
+      "path": "campaigns/release/clean_install.json",
+      "kind": "release_verification",
+      "sha256": "e02f7927d182b8b3cdb6efdca71e578e03a082f53ee847c25ef35f6b4050a761",
+      "description": "the structured record of the clean-environment installation test"
+    },
+    {
+      "path": "campaigns/release/clean_install.log",
+      "kind": "release_verification",
+      "sha256": "fdaa7ee54cf7b83825a4ddc97c38fcd344ab358eb293818e434a8b249bcf2753",
+      "description": "the full transcript of the clean-environment installation test"
+    },
+    {
+      "path": "campaigns/release/wheel_contents.txt",
+      "kind": "release_verification",
+      "sha256": "46c8c72d3a89fda94e73804477db5a61ab840e8967f52f46d42b19632412430a",
+      "description": "the explicit listing of the wheel contents"
+    },
+    {
+      "path": "campaigns/release/build_summary.json",
+      "kind": "release_verification",
+      "sha256": "d29fe1d31e24cf71738f2596fa016f8c48b5e990323a95fa7586a63d9be2d2e5",
+      "description": "the machine readable summary of the wheel build"
+    },
+    {
+      "path": "campaigns/release/build_reproducibility.json",
+      "kind": "release_verification",
+      "sha256": "2bf37dd10a4f3fb40a569e3052cc0a2a204fd812fc4b577992952b8c7afd275c",
+      "description": "the measured three-build reproducibility check of the wheel SHA-256"
+    },
+    {
+      "path": "campaigns/release/build_reproducibility.log",
+      "kind": "release_verification",
+      "sha256": "d4cbf8c30452f965ab7ceabecb93b38547fcdd169cf18a496132836ecd2198c5",
+      "description": "the transcript of the three-build reproducibility check"
+    },
+    {
+      "path": "results/results.json",
+      "kind": "report",
+      "sha256": "f8fae66cbe6fa3a88d5d545c161eb8c7803c2198b123749fd9a97f9d65cb3061",
+      "description": "the generated result table (every reported number comes from here)"
+    },
+    {
+      "path": "results/RESULTS.md",
+      "kind": "report",
+      "sha256": "b198305c0b441448a5a0bab9cba834e58f98c35881135ea1a153d3ec1a8a83e8",
+      "description": "the generated result tables"
+    },
+    {
+      "path": "docs/RESULTS.md",
+      "kind": "report",
+      "sha256": "b198305c0b441448a5a0bab9cba834e58f98c35881135ea1a153d3ec1a8a83e8",
+      "description": "the published copy of the result tables"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed0/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "c61a254b5a9d48567ccabeee31dda9756f0d0e27a6ce803b80bf9f88395c6929",
+      "description": "run_manifest of burgers_fno1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed0/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "c0cb9da739f1fb14a9bf9ab89b6c4742659fc6369ffbcdd6a290a0ad6d674829",
+      "description": "evaluation of burgers_fno1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed0/benchmark_matched.json",
+      "kind": "inference_benchmark",
+      "sha256": "dea5cd2536d28132e2dd64ce9a89b5136e0c2f2235965cce9e50f528644a6194",
+      "description": "inference_benchmark of burgers_fno1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed1/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "61f3bf3c802a8acea9f6fb9c47dd58a3f5a7ae13ca7ed7fc90e3b92d783c441d",
+      "description": "run_manifest of burgers_fno1d_data_only_seed1"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed1/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "95bcaf065b17a6bf53fa49990eb6bf85ab5529e20d8530161ba017348acd2f0f",
+      "description": "evaluation of burgers_fno1d_data_only_seed1"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed2/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "37106cf9f0964e6cb4a4e543c234981559db748e4a171d79e7cf5b17e5dc8dd4",
+      "description": "run_manifest of burgers_fno1d_data_only_seed2"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed2/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "21317617ff27cc4de4bbd4a15685ff42ed05dc97d7e0786b89945b575aab2813",
+      "description": "evaluation of burgers_fno1d_data_only_seed2"
+    },
+    {
+      "path": "runs/burgers_fno1d_physics_seed0/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "3ee066b3d6ad9db04f174e40f25d6ded97a6f2cc3bbde3963051ca0fe9f85d97",
+      "description": "run_manifest of burgers_fno1d_physics_seed0"
+    },
+    {
+      "path": "runs/burgers_fno1d_physics_seed0/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "3354a773eea481d834a5d1df35ec4862142d03f4c21da203aada622894750d70",
+      "description": "evaluation of burgers_fno1d_physics_seed0"
+    },
+    {
+      "path": "runs/burgers_fno1d_physics_seed1/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "dfa275e4cd4d49577f7348b6ea5bb0ff9f2a3450095a05173b5128fc18a04009",
+      "description": "run_manifest of burgers_fno1d_physics_seed1"
+    },
+    {
+      "path": "runs/burgers_fno1d_physics_seed1/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "36d6861af697cedee7066a29b9948996c951b15415f381b3390c812841fb867e",
+      "description": "evaluation of burgers_fno1d_physics_seed1"
+    },
+    {
+      "path": "runs/burgers_fno1d_physics_seed2/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "376bd40c39290f6d80f7de0ad91bce156cb0731a9f111e90adf478281283a693",
+      "description": "run_manifest of burgers_fno1d_physics_seed2"
+    },
+    {
+      "path": "runs/burgers_fno1d_physics_seed2/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "e61e93c8f8a050a0fa06441a2f38e4fd1b7f31d75b924e6e43c33e63699e606e",
+      "description": "evaluation of burgers_fno1d_physics_seed2"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_data_only_seed0/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "9315e896f0ea7824aa00d82f6d0fcf4ec0c7521c236a5ebdb2a80ea46536bef7",
+      "description": "run_manifest of allen_cahn_fno2d_data_only_seed0"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_data_only_seed0/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "fac2a4610d188b3bc76be2ea60297e265ffbaf0b20bf37c4951d4b2c013dd4cc",
+      "description": "evaluation of allen_cahn_fno2d_data_only_seed0"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_data_only_seed1/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "a31fd7cbbab218e4eeacb0f9e6969a317f72b8406532b6d9d291124688b0fa85",
+      "description": "run_manifest of allen_cahn_fno2d_data_only_seed1"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_data_only_seed1/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "b0af7f965be1cf91d3b7fe5a9546609e0dbb67188d21ae97fb39e5e9194ff86a",
+      "description": "evaluation of allen_cahn_fno2d_data_only_seed1"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_data_only_seed2/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "a024ff0b9cab6d0915daf705d26a04513fc6ee11dd46c49ff1f398995f2e31c8",
+      "description": "run_manifest of allen_cahn_fno2d_data_only_seed2"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_data_only_seed2/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "eb8e2af1499956c8bfe920ea04aa949468f4d97d968a637db7483d7faa55510a",
+      "description": "evaluation of allen_cahn_fno2d_data_only_seed2"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_physics_seed0/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "e1d6a1ba25580bd7d15bafa58ee2aa352b01b079928f1ae5b1ab5cf3c97e9f68",
+      "description": "run_manifest of allen_cahn_fno2d_physics_seed0"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_physics_seed0/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "e0202d2c4ded9f4f3c9803c1f756f3dd9859ffa1a5257fdc31a35da99520e358",
+      "description": "evaluation of allen_cahn_fno2d_physics_seed0"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_physics_seed1/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "2a5106f7a9f9bfc8ffc429e8519c73e11cd74f62105b2d6554cd62a6300b29c3",
+      "description": "run_manifest of allen_cahn_fno2d_physics_seed1"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_physics_seed1/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "cd9e5b3b9cdee2e57f3ba8ed37f7f15a499d17645b43e0a5a572a0a6ea51a91d",
+      "description": "evaluation of allen_cahn_fno2d_physics_seed1"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_physics_seed2/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "d546f7a6f445cdddfbcd2e500b68dd0e1a1d5290edd10fa0067272aa2ce7cd12",
+      "description": "run_manifest of allen_cahn_fno2d_physics_seed2"
+    },
+    {
+      "path": "runs/allen_cahn_fno2d_physics_seed2/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "11a944b2458089f6356937bef9a9d157d497203d435e00ec9ae4e29b4860e5da",
+      "description": "evaluation of allen_cahn_fno2d_physics_seed2"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed0/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "c61a254b5a9d48567ccabeee31dda9756f0d0e27a6ce803b80bf9f88395c6929",
+      "description": "run_manifest of burgers_fno1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed0/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "c0cb9da739f1fb14a9bf9ab89b6c4742659fc6369ffbcdd6a290a0ad6d674829",
+      "description": "evaluation of burgers_fno1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_fno1d_data_only_seed0/benchmark_matched.json",
+      "kind": "inference_benchmark",
+      "sha256": "dea5cd2536d28132e2dd64ce9a89b5136e0c2f2235965cce9e50f528644a6194",
+      "description": "inference_benchmark of burgers_fno1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_unet1d_data_only_seed0/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "d6c563f8bed8a17797bdf92a1247a9cb346bcf270d9872a0e89071253e6c8a3a",
+      "description": "run_manifest of burgers_unet1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_unet1d_data_only_seed0/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "25a0a19c6cd7cd581d39ef7dde63083aabd75de5104193e0dc1c39776e216c86",
+      "description": "evaluation of burgers_unet1d_data_only_seed0"
+    },
+    {
+      "path": "runs/burgers_unet1d_data_only_seed1/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "37f6c3d23f214f7e90ac90554fbfc5058a44d96c0ec8d3dc63d012a536724b95",
+      "description": "run_manifest of burgers_unet1d_data_only_seed1"
+    },
+    {
+      "path": "runs/burgers_unet1d_data_only_seed1/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "9a24ce20ac004b007e94cbb19b1b71a6722280330f8bdc3e12244e7be1fd2ff9",
+      "description": "evaluation of burgers_unet1d_data_only_seed1"
+    },
+    {
+      "path": "runs/burgers_unet1d_data_only_seed2/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "28557ede3aa61343a38a6cf6189985d8f3674c26c10e2a9263b1e97789938b46",
+      "description": "run_manifest of burgers_unet1d_data_only_seed2"
+    },
+    {
+      "path": "runs/burgers_unet1d_data_only_seed2/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "112e3ca76740efda3c58e859753742e9b7ceb72acd3314a339dcac085a6bf4c0",
+      "description": "evaluation of burgers_unet1d_data_only_seed2"
+    },
+    {
+      "path": "runs/allen_cahn_unet2d_data_only_seed0/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "062c0c19f543e175bc68c10cd04d45fcef1c8902e2d940b499a9e9607f1ba039",
+      "description": "run_manifest of allen_cahn_unet2d_data_only_seed0"
+    },
+    {
+      "path": "runs/allen_cahn_unet2d_data_only_seed0/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "d1075eb9c1d7788144dce52f1e1f09db27fb2028e4ea5f2ec840623507022ea3",
+      "description": "evaluation of allen_cahn_unet2d_data_only_seed0"
+    },
+    {
+      "path": "runs/allen_cahn_unet2d_data_only_seed1/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "f287b4bea3b65a2bdb4ac883392d4f85a53934cf56d17ac4d79ae6d47e582da1",
+      "description": "run_manifest of allen_cahn_unet2d_data_only_seed1"
+    },
+    {
+      "path": "runs/allen_cahn_unet2d_data_only_seed1/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "20b0b1e8ddc69fb0ce28ba933ab2a47b10f523937317d6d8d595525147deefbf",
+      "description": "evaluation of allen_cahn_unet2d_data_only_seed1"
+    },
+    {
+      "path": "runs/allen_cahn_unet2d_data_only_seed2/manifest.json",
+      "kind": "run_manifest",
+      "sha256": "89c4f95db53c86154f827b78eeed34af3f8b399b5f8c78c9810ac8196fce4323",
+      "description": "run_manifest of allen_cahn_unet2d_data_only_seed2"
+    },
+    {
+      "path": "runs/allen_cahn_unet2d_data_only_seed2/evaluation.json",
+      "kind": "evaluation",
+      "sha256": "b238523abf6e18f22155833381b7add7fb73cf3ac2137d5b18967fb51fda203c",
+      "description": "evaluation of allen_cahn_unet2d_data_only_seed2"
+    }
+  ]
+}

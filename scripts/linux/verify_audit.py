@@ -21,7 +21,6 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from pdelab.evaluation.evaluate import _pair_residuals  # noqa: E402
 from pdelab.solvers.allen_cahn import AllenCahn2DSpectral  # noqa: E402
-from pdelab.solvers.burgers import Burgers1DFiniteVolume  # noqa: E402
 from pdelab.solvers.burgers_weno import Burgers1DWeno5  # noqa: E402
 
 report: dict = {}
@@ -103,7 +102,7 @@ def check_flux_split():
     s = Burgers1DWeno5(32, nu=0.0)
     # The split that the implementation uses.
     f = 0.5 * s.x**2
-    f_plus = np.where(f > 0.0, f, 0.0)
+    f_plus = np.where(f > 0.0, f, 0.0)  # noqa: F841 - kept for the record
     f_minus = np.where(f < 0.0, f, 0.0)
     split_identically_zero = bool(np.all(f_minus == 0.0))
     f_always_nonneg = bool(np.all(f >= 0.0))

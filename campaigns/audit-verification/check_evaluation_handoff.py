@@ -11,11 +11,11 @@ import numpy as np
 import torch
 
 from pdelab.evaluation.evaluate import (
+    CENTRED_FIRST_OPERATOR_NAMES,
+    IMPLICIT_EULER_OPERATOR_NAMES,
     _align_support,
     _call_operator,
     _resolve_operator,
-    CENTRED_FIRST_OPERATOR_NAMES,
-    IMPLICIT_EULER_OPERATOR_NAMES,
 )
 from pdelab.physics.operators import (
     allen_cahn_residual_centered_first_derivative,
@@ -72,7 +72,7 @@ assert out.shape[1] == traj2.shape[1] - 2
 
 print()
 print("4. the two evaluators differ only in the time stencil")
-from pdelab.evaluation.evaluate import _local_residual_tensor
+from pdelab.evaluation.evaluate import _local_residual_tensor  # noqa: E402
 
 for system, traj_, dt, params_ in [
     ("burgers", traj, 0.01, params),
@@ -91,7 +91,7 @@ for system, traj_, dt, params_ in [
 
 print()
 print("5. the de-aliasing change is invisible on the dataset's band-limited fields")
-from pdelab.data.initial_conditions import fourier_series_1d
+from pdelab.data.initial_conditions import fourier_series_1d  # noqa: E402
 
 rng = np.random.default_rng(1000)
 u, _ = fourier_series_1d(128, rng, n_modes=6, amplitude=0.9, mean=0.0)

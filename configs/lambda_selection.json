@@ -1,81 +1,165 @@
 {
   "burgers": {
-    "selected_lambda": 0.1,
-    "selected_run_id": "burgers_fno1d_physics_lam0p1_seed0",
-    "selected_val_rollout_nrmse": 0.031055020580026838,
-    "selected_val_residual_rms": 0.07956303363796528,
-    "accuracy_only_selection_lambda": 0.1,
-    "accuracy_only_selection_run_id": "burgers_fno1d_physics_lam0p1_seed0",
-    "accuracy_tolerance": 0.05,
-    "admissible_lambdas": [
+    "arm_a_selected_lambda": 0.1,
+    "arm_a_selected_mean_val_rollout_nrmse": 0.024286723362024858,
+    "arm_a_selected_mean_val_primary_residual": 0.07537293037606183,
+    "arm_a_pure_accuracy_lambda": 0.1,
+    "arm_a_admissible_lambdas": [
+      0.01,
       0.1
     ],
+    "arm_b_overall_recommended_lambda": 0.0,
+    "arm_b_pure_accuracy_lambda": 0.0,
+    "arm_b_admissible_lambdas": [
+      0.0
+    ],
+    "arm_a_satisfies_global_accuracy_constraint": false,
+    "accuracy_tolerance": 0.05,
+    "seeds_used": [
+      0
+    ],
     "candidates": [
       {
         "lambda": 0.0,
-        "run_id": "burgers_fno1d_data_only_seed0",
-        "val_rollout_nrmse": 0.06980487541593154,
-        "val_one_step_nrmse": 0.0028978262094999235,
-        "val_residual_rms": 0.7382555094670876
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "mean_val_rollout_nrmse": 0.01619134079261783,
+        "mean_val_one_step_nrmse": 0.0006395406414786474,
+        "mean_val_primary_residual": 0.24839435572347215,
+        "per_seed": [
+          {
+            "run_id": "burgers_fno1d_data_only_seed0",
+            "seed": 0,
+            "val_rollout_nrmse": 0.01619134079261783,
+            "val_one_step_nrmse": 0.0006395406414786474,
+            "val_primary_residual": 0.24839435572347215
+          }
+        ]
       },
       {
         "lambda": 0.01,
-        "run_id": "burgers_fno1d_physics_seed0",
-        "val_rollout_nrmse": 0.03274556595408735,
-        "val_one_step_nrmse": 0.0024536321753216707,
-        "val_residual_rms": 0.08367188897487018
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "mean_val_rollout_nrmse": 0.024528578384679624,
+        "mean_val_one_step_nrmse": 0.0010640181421993746,
+        "mean_val_primary_residual": 0.0789005541123042,
+        "per_seed": [
+          {
+            "run_id": "burgers_fno1d_physics_seed0",
+            "seed": 0,
+            "val_rollout_nrmse": 0.024528578384679624,
+            "val_one_step_nrmse": 0.0010640181421993746,
+            "val_primary_residual": 0.0789005541123042
+          }
+        ]
       },
       {
         "lambda": 0.1,
-        "run_id": "burgers_fno1d_physics_lam0p1_seed0",
-        "val_rollout_nrmse": 0.031055020580026838,
-        "val_one_step_nrmse": 0.002446276156621988,
-        "val_residual_rms": 0.07956303363796528
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "mean_val_rollout_nrmse": 0.024286723362024858,
+        "mean_val_one_step_nrmse": 0.0010378732489997756,
+        "mean_val_primary_residual": 0.07537293037606183,
+        "per_seed": [
+          {
+            "run_id": "burgers_fno1d_physics_lam0p1_seed0",
+            "seed": 0,
+            "val_rollout_nrmse": 0.024286723362024858,
+            "val_one_step_nrmse": 0.0010378732489997756,
+            "val_primary_residual": 0.07537293037606183
+          }
+        ]
       }
     ],
-    "selection_metric": "free-rollout nRMSE on the validation split, with the 5% accuracy tolerance, then the lowest validation PDE residual",
-    "selection_split": "validation",
+    "selection_split": "validation (development)",
     "test_split_used": false,
-    "note": "Selection used the validation split only. The pure-accuracy selection is recorded alongside. The seed-0 test split had already been examined during the prototype phase, so this selection is not fully blind with respect to seed 0; the confirmatory seeds 1 and 2 were not examined at all."
+    "rule": "Arm A: among the non-zero candidates [0.01, 0.1] within 5% of the best non-zero mean validation rollout nRMSE, take the lowest mean validation primary residual, then the smaller lambda. Arm B: the same rule applied over {0, 0.01, 0.1}."
   },
   "allen_cahn": {
-    "selected_lambda": 0.01,
-    "selected_run_id": "allen_cahn_fno2d_physics_seed0",
-    "selected_val_rollout_nrmse": 0.041053375253228525,
-    "selected_val_residual_rms": 0.06152625795711124,
-    "accuracy_only_selection_lambda": 0.01,
-    "accuracy_only_selection_run_id": "allen_cahn_fno2d_physics_seed0",
-    "accuracy_tolerance": 0.05,
-    "admissible_lambdas": [
-      0.0,
+    "arm_a_selected_lambda": 0.01,
+    "arm_a_selected_mean_val_rollout_nrmse": 0.016349340355742675,
+    "arm_a_selected_mean_val_primary_residual": 0.02636683120658257,
+    "arm_a_pure_accuracy_lambda": 0.01,
+    "arm_a_admissible_lambdas": [
       0.01
+    ],
+    "arm_b_overall_recommended_lambda": 0.0,
+    "arm_b_pure_accuracy_lambda": 0.0,
+    "arm_b_admissible_lambdas": [
+      0.0
+    ],
+    "arm_a_satisfies_global_accuracy_constraint": false,
+    "accuracy_tolerance": 0.05,
+    "seeds_used": [
+      0
     ],
     "candidates": [
       {
         "lambda": 0.0,
-        "run_id": "allen_cahn_fno2d_data_only_seed0",
-        "val_rollout_nrmse": 0.041413777666425705,
-        "val_one_step_nrmse": 0.005310021838040248,
-        "val_residual_rms": 0.07612766007403346
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "mean_val_rollout_nrmse": 0.014088213156771837,
+        "mean_val_one_step_nrmse": 0.0018873659771586919,
+        "mean_val_primary_residual": 0.0333629111822614,
+        "per_seed": [
+          {
+            "run_id": "allen_cahn_fno2d_data_only_seed0",
+            "seed": 0,
+            "val_rollout_nrmse": 0.014088213156771837,
+            "val_one_step_nrmse": 0.0018873659771586919,
+            "val_primary_residual": 0.0333629111822614
+          }
+        ]
       },
       {
         "lambda": 0.01,
-        "run_id": "allen_cahn_fno2d_physics_seed0",
-        "val_rollout_nrmse": 0.041053375253228525,
-        "val_one_step_nrmse": 0.004918869803996662,
-        "val_residual_rms": 0.06152625795711124
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "mean_val_rollout_nrmse": 0.016349340355742675,
+        "mean_val_one_step_nrmse": 0.002477908607974212,
+        "mean_val_primary_residual": 0.02636683120658257,
+        "per_seed": [
+          {
+            "run_id": "allen_cahn_fno2d_physics_seed0",
+            "seed": 0,
+            "val_rollout_nrmse": 0.016349340355742675,
+            "val_one_step_nrmse": 0.002477908607974212,
+            "val_primary_residual": 0.02636683120658257
+          }
+        ]
       },
       {
         "lambda": 0.1,
-        "run_id": "allen_cahn_fno2d_physics_lam0p1_seed0",
-        "val_rollout_nrmse": 0.04455278599414278,
-        "val_one_step_nrmse": 0.004477894331910705,
-        "val_residual_rms": 0.0482521802453483
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "mean_val_rollout_nrmse": 0.02236465048501849,
+        "mean_val_one_step_nrmse": 0.003710206141351531,
+        "mean_val_primary_residual": 0.02073566017411779,
+        "per_seed": [
+          {
+            "run_id": "allen_cahn_fno2d_physics_lam0p1_seed0",
+            "seed": 0,
+            "val_rollout_nrmse": 0.02236465048501849,
+            "val_one_step_nrmse": 0.003710206141351531,
+            "val_primary_residual": 0.02073566017411779
+          }
+        ]
       }
     ],
-    "selection_metric": "free-rollout nRMSE on the validation split, with the 5% accuracy tolerance, then the lowest validation PDE residual",
-    "selection_split": "validation",
+    "selection_split": "validation (development)",
     "test_split_used": false,
-    "note": "Selection used the validation split only. The pure-accuracy selection is recorded alongside. The seed-0 test split had already been examined during the prototype phase, so this selection is not fully blind with respect to seed 0; the confirmatory seeds 1 and 2 were not examined at all."
+    "rule": "Arm A: among the non-zero candidates [0.01, 0.1] within 5% of the best non-zero mean validation rollout nRMSE, take the lowest mean validation primary residual, then the smaller lambda. Arm B: the same rule applied over {0, 0.01, 0.1}."
   }
 }

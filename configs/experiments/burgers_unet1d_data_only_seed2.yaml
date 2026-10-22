@@ -1,17 +1,23 @@
 # burgers / unet1d / data_only (seed 2, lambda=0.0)
+#
+# Frozen v2 main-matrix row. The physics weight is the Arm-A selection
+# from configs/lambda_selection.json (validation split only).
 name: burgers_unet1d_data_only_seed2
 system: burgers
 condition: data_only
 seed: 2
 observation_dt: 0.005
 lambda_pde: 0.0
-tags: [main]
+tags: [main,v2]
 
 model:
   architecture: unet1d
   history: 1
   width: 16
   n_levels: 3
+
+data:
+  dataset_dir: data/burgers
 
 train:
   epochs: 60

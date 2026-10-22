@@ -1,0 +1,23 @@
+{"kind": "benchmark", "run_id": "burgers_fno1d_data_only_seed0", "walltime_seconds": 101.6}
+{"kind": "data_generate", "system": "burgers", "walltime_seconds": 40.5, "created_utc": "2026-10-21T22:20:38Z", "split_seed": 1000, "test_split_seed": 7001}
+{"kind": "data_generate", "system": "allen_cahn", "walltime_seconds": 261.4, "created_utc": "2026-10-21T22:25:03Z", "split_seed": 2000, "test_split_seed": 7002}
+{"kind": "train", "run_id": "allen_cahn_fno2d_physics_seed0", "walltime_seconds": 853.4, "created_utc": "2026-10-21T22:40:18Z"}
+{"kind": "train", "run_id": "burgers_fno1d_physics_lam0p1_seed0", "walltime_seconds": 798.3, "created_utc": "2026-10-21T22:54:40Z"}
+{"kind": "train", "run_id": "allen_cahn_fno2d_physics_lam0p1_seed0", "walltime_seconds": 848.3, "created_utc": "2026-10-21T23:08:12Z"}
+{"kind": "train", "run_id": "burgers_fno1d_data_only_seed0", "walltime_seconds": 627.1, "created_utc": "2026-10-21T23:23:01Z"}
+{"kind": "train", "run_id": "allen_cahn_fno2d_data_only_seed0", "walltime_seconds": 704.0, "created_utc": "2026-10-21T23:33:39Z"}
+{"kind": "train", "run_id": "burgers_fno1d_data_only_seed1", "walltime_seconds": 626.4, "created_utc": "2026-10-21T23:45:30Z"}
+{"kind": "train", "run_id": "allen_cahn_fno2d_data_only_seed1", "walltime_seconds": 680.8, "created_utc": "2026-10-21T23:56:09Z"}
+{"kind": "train", "run_id": "burgers_fno1d_data_only_seed2", "walltime_seconds": 620.7, "created_utc": "2026-10-22T00:07:42Z"}
+{"kind": "train", "run_id": "allen_cahn_fno2d_data_only_seed2", "walltime_seconds": 698.1, "created_utc": "2026-10-22T00:18:15Z"}
+{"kind": "train", "run_id": "burgers_fno1d_physics_seed0", "walltime_seconds": 807.2, "created_utc": "2026-10-22T00:34:53Z"}
+{"kind": "train", "run_id": "burgers_fno1d_physics_seed1", "walltime_seconds": 814.3, "created_utc": "2026-10-22T00:48:30Z"}
+{"kind": "train", "run_id": "allen_cahn_fno2d_physics_seed1", "walltime_seconds": 867.1, "created_utc": "2026-10-22T01:02:16Z"}
+{"kind": "train", "run_id": "burgers_fno1d_physics_seed2", "walltime_seconds": 806.7, "created_utc": "2026-10-22T01:16:55Z"}
+{"kind": "train", "run_id": "allen_cahn_fno2d_physics_seed2", "walltime_seconds": 867.6, "created_utc": "2026-10-22T01:30:33Z"}
+{"kind": "train", "run_id": "burgers_unet1d_data_only_seed0", "walltime_seconds": 1367.3, "created_utc": "2026-10-22T01:45:34Z"}
+{"kind": "train", "run_id": "burgers_unet1d_data_only_seed1", "walltime_seconds": 1328.0, "created_utc": "2026-10-22T02:08:35Z"}
+{"kind": "train", "run_id": "burgers_unet1d_data_only_seed2", "walltime_seconds": 1313.7, "created_utc": "2026-10-22T02:30:52Z"}
+{"kind": "train", "run_id": "allen_cahn_unet2d_data_only_seed0", "walltime_seconds": 1329.5, "created_utc": "2026-10-22T02:53:39Z"}
+{"kind": "train", "run_id": "allen_cahn_unet2d_data_only_seed1", "walltime_seconds": 1281.3, "created_utc": "2026-10-22T03:16:00Z"}
+{"kind": "train", "run_id": "allen_cahn_unet2d_data_only_seed2", "walltime_seconds": 1294.8, "created_utc": "2026-10-22T03:37:29Z"}

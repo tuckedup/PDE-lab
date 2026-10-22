@@ -14,7 +14,6 @@ Usage:
 from __future__ import annotations
 
 import json
-import os
 import platform
 import subprocess
 import time
@@ -57,7 +56,7 @@ def _git(*args) -> str:
         return subprocess.run(
             ["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=20
         ).stdout.strip()
-    except Exception:  # noqa: BLE001
+    except Exception:
         return ""
 
 
@@ -73,7 +72,7 @@ def _gpu() -> dict:
             "torch": torch.__version__,
             "cuda": torch.version.cuda,
         }
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         return {"error": str(exc)}
 
 

@@ -8,7 +8,6 @@ Two properties are checked:
      loss.
 """
 
-import torch
 
 from pdelab.models.registry import build_model_from_config
 from pdelab.utils import init_fingerprint, seed_everything

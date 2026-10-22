@@ -1,0 +1,317 @@
+{
+  "status": "completed",
+  "evidence_status": "valid",
+  "run_id": "allen_cahn_fno2d_data_only_seed2",
+  "split": "val",
+  "system": "allen_cahn",
+  "architecture": "fno2d",
+  "condition": "data_only",
+  "seed": 2,
+  "lambda_pde": 0.0,
+  "checkpoint": "/home/atulp/projects/pdelab/runs/allen_cahn_fno2d_data_only_seed2/best.pt",
+  "checkpoint_epoch": 40,
+  "test_dataset_sha256": "adc2912b5945c2ce0f505b6a77a9379aa25962e957e4fae622f4a80c159e1921",
+  "identity": {
+    "evaluator": {
+      "id": "pdelab-evaluation/2",
+      "sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+      "files": {
+        "src/pdelab/evaluation/evaluate.py": "7feeab44e84e64f491dd383804002e85f5b9f6467531e45ec34b072dfe0b239c",
+        "src/pdelab/evaluation/metrics.py": "82b94e1de39a841d31ecc01270128cc440c182d6a9b2a1a76efced240450553d",
+        "src/pdelab/evaluation/rollout.py": "d94141fa268bd6d8c003c017ae4fbbfa46d86598bc71d40ec255be2bf904107a",
+        "src/pdelab/physics/operators.py": "05e940ba4013d575e621729124acbb9fd00560c73a1c7c919ef4f8afa44ed14c"
+      }
+    },
+    "protocol": {
+      "id": "pdelab-free-rollout/2",
+      "sha256": "22603f7169181807c5d2fc16ea985a756c01e9901b9384f80176df24be05b8a9"
+    },
+    "resolved_settings": {
+      "metric_implementation_version": "pdelab-metrics/2",
+      "split": "val",
+      "observation_dt": 0.1,
+      "n_rollout_steps": 30,
+      "n_test_trajectories": 16,
+      "history_length": 1,
+      "epsilon": 1e-12,
+      "near_zero_reference_threshold": 1e-08,
+      "copied_initial_frame_included_in_error": false,
+      "residual_evaluators": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "residual_support": "interior_snapshots_only",
+      "baselines": [
+        "persistence",
+        "numerical_stepping_rk2"
+      ],
+      "numerical_stepping_scheme": "rk2",
+      "one_step_aggregation": "per_trajectory"
+    },
+    "resolved_settings_sha256": "e313f59ac4cf937a2ef1daaa0211632aef3a536b109d24aae10f0c6e0f824b58",
+    "checkpoint_sha256": "ace93c66d398832dfe30c14f594cf4f76e2a5483b72de2c2c0679344c06c93d1",
+    "dataset": {
+      "split": "val",
+      "path": "/home/atulp/projects/pdelab/data/allen_cahn/allen_cahn_val.h5",
+      "sha256": "adc2912b5945c2ce0f505b6a77a9379aa25962e957e4fae622f4a80c159e1921",
+      "manifest_sha256": "adc2912b5945c2ce0f505b6a77a9379aa25962e957e4fae622f4a80c159e1921"
+    },
+    "normalization": {
+      "values": {
+        "mean": 0.0022160306107252836,
+        "std": 0.6421112418174744,
+        "source": "train"
+      },
+      "sha256": "b0e77000f6c280ac3de9137715e3657e17af6a0d8533a46ec239042bdb054f6d"
+    }
+  },
+  "protocol": {
+    "id": "pdelab-free-rollout/2",
+    "type": "free_rollout",
+    "split": "val",
+    "observation_dt": 0.1,
+    "n_rollout_steps": 30,
+    "n_test_trajectories": 16,
+    "history_length": 1,
+    "copied_initial_frame_included_in_error": false,
+    "epsilon": 1e-12,
+    "residual_evaluators": [
+      "implicit_euler_first_order",
+      "centred_first_derivative"
+    ],
+    "residual_support": "interior_snapshots_only",
+    "residual_support_detail": "both evaluators are evaluated at the interior snapshot indices 1 .. T-2 of the trajectory, so the compared values share the same support",
+    "baselines": [
+      "persistence",
+      "numerical_stepping_rk2"
+    ]
+  },
+  "residual_evaluators": {
+    "implicit_euler_first_order": {
+      "evaluator": "implicit_euler_first_order",
+      "support": "interior_snapshots_only",
+      "support_indices": "1 .. T-2 (interior snapshots of the trajectory)",
+      "shared_with": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "implementation": "physics.operators.allen_cahn_residual_implicit_euler",
+      "operator": "allen_cahn_residual_implicit_euler",
+      "cross_check": {
+        "available": true,
+        "local_reference_rms": 0.03315583267823912,
+        "operator_rms": 0.033155832676230235,
+        "relative_difference": 6.058922218933021e-11,
+        "agrees": true,
+        "tolerance": 0.001
+      },
+      "reference_implementation": "physics.operators.allen_cahn_residual_implicit_euler",
+      "reference_cross_check": {
+        "available": true,
+        "local_reference_rms": 0.03141242160721285,
+        "operator_rms": 0.03141242160235594,
+        "relative_difference": 1.5461760774897247e-10,
+        "agrees": true,
+        "tolerance": 0.001
+      }
+    },
+    "centred_first_derivative": {
+      "evaluator": "centred_first_derivative",
+      "support": "interior_snapshots_only",
+      "support_indices": "1 .. T-2 (interior snapshots of the trajectory)",
+      "shared_with": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "implementation": "physics.operators.allen_cahn_residual_centered_first_derivative",
+      "operator": "allen_cahn_residual_centered_first_derivative",
+      "cross_check": {
+        "available": true,
+        "local_reference_rms": 0.031708412540863005,
+        "operator_rms": 0.03170841253758367,
+        "relative_difference": 1.03421611931794e-10,
+        "agrees": true,
+        "tolerance": 0.001
+      },
+      "reference_implementation": "physics.operators.allen_cahn_residual_centered_first_derivative",
+      "reference_cross_check": {
+        "available": true,
+        "local_reference_rms": 0.0300345665243522,
+        "operator_rms": 0.030034566510677294,
+        "relative_difference": 4.5530555426253193e-10,
+        "agrees": true,
+        "tolerance": 0.001
+      }
+    }
+  },
+  "residual_rms_implicit_euler_first_order": 0.033155832676230235,
+  "reference_residual_rms_implicit_euler_first_order": 0.03141242160235594,
+  "residual_rms_centred_first_derivative": 0.03170841253758367,
+  "reference_residual_rms_centred_first_derivative": 0.030034566510677294,
+  "residual_error_physical_rms": 0.033155832676230235,
+  "reference_residual_physical_rms": 0.03141242160235594,
+  "residual_temporal_refinement_probe": {
+    "description": "Temporal truncation error of each residual evaluator, measured on an exact solution of the system PDE. The reported value is the residual an exact solution still shows under the evaluator, i.e. the empirical floor of the metric.",
+    "support": "interior_snapshots_only",
+    "rows": [
+      {
+        "dt": 0.1,
+        "n_snapshots": 31,
+        "n_interior_snapshots": 29,
+        "implicit_euler_first_order_residual_rms": 0.009435840950927199,
+        "implicit_euler_first_order_truncation_rms": 0.009435840950927199,
+        "centred_first_derivative_residual_rms": 0.00046542062678632046,
+        "centred_first_derivative_truncation_rms": 0.00046542062678632046
+      },
+      {
+        "dt": 0.05,
+        "n_snapshots": 61,
+        "n_interior_snapshots": 59,
+        "implicit_euler_first_order_residual_rms": 0.0046967094701824644,
+        "implicit_euler_first_order_truncation_rms": 0.0046967094701824644,
+        "centred_first_derivative_residual_rms": 0.00011581934139535754,
+        "centred_first_derivative_truncation_rms": 0.00011581934139535754,
+        "observed_order_implicit_euler_first_order": 1.006500747046763,
+        "observed_order_centred_first_derivative": 2.006658952267612
+      },
+      {
+        "dt": 0.025,
+        "n_snapshots": 121,
+        "n_interior_snapshots": 119,
+        "implicit_euler_first_order_residual_rms": 0.002342643236944569,
+        "implicit_euler_first_order_truncation_rms": 0.002342643236944569,
+        "centred_first_derivative_residual_rms": 2.8876336668581132e-05,
+        "centred_first_derivative_truncation_rms": 2.8876336668581132e-05,
+        "observed_order_implicit_euler_first_order": 1.0035130921705933,
+        "observed_order_centred_first_derivative": 2.00391656341476
+      }
+    ],
+    "observed_order_implicit_euler_first_order": 1.0035130921705933,
+    "observed_order_centred_first_derivative": 2.00391656341476
+  },
+  "nrmse": {
+    "mean": 0.011647615023772012,
+    "median": 0.011350221089033016,
+    "std": 0.0018850218463760634,
+    "min": 0.0078377271658734,
+    "max": 0.014684192350535459,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "nrmse_one_step_teacher_forced": {
+    "mean": 0.0017083902839852279,
+    "median": 0.00167538244191699,
+    "std": 0.00031698055018845287,
+    "min": 0.001190246987788813,
+    "max": 0.0023864403654726336,
+    "n_trajectories": 16,
+    "n_windows": 480,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "nrmse_one_step_teacher_forced_per_window": {
+    "mean": 0.0017083902839852279,
+    "median": 0.001649012120150816,
+    "std": 0.0006600063763613418,
+    "min": 0.000841905427624237,
+    "max": 0.006811662467132642,
+    "n_trajectories": 480,
+    "n_windows": 480,
+    "aggregation": "per_window",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "persistence_baseline_nrmse": {
+    "mean": 0.42889280561741727,
+    "median": 0.42867494639897785,
+    "std": 0.03248648832219691,
+    "min": 0.37657316814143843,
+    "max": 0.47795416581775185,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "persistence_baseline_walltime_seconds": 0.002149,
+  "numerical_stepping_baseline_nrmse": {
+    "mean": 0.0029463204090927186,
+    "median": 0.0029606235046361327,
+    "std": 0.000857644844943453,
+    "min": 0.0014958266329985785,
+    "max": 0.0043754771487431055,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "numerical_stepping_baseline_walltime_seconds": 0.117096,
+  "numerical_stepping_plan": {
+    "system": "allen_cahn",
+    "observation_dt": 0.1,
+    "internal_dt": 0.05,
+    "sub_steps_per_observation_step": 2,
+    "stability_limits": {
+      "diffusion": 0.25330295910584444,
+      "reaction": 1.0
+    },
+    "max_speed": 1.8276782035827637,
+    "spatial_filter": "2/3 retained band (Galerkin truncation)"
+  },
+  "per_time_nrmse": [
+    0.004287354707416232,
+    0.004775774820753638,
+    0.004525748581754415,
+    0.004511304291072848,
+    0.004833394049439806,
+    0.0053225579836967615,
+    0.0058521668114436135,
+    0.006372414369647338,
+    0.006872873416537093,
+    0.007353203862142905,
+    0.00781809513175861,
+    0.008274358221796207,
+    0.008728541881287988,
+    0.009180849122562902,
+    0.009638437898560918,
+    0.010098696974372927,
+    0.010564316641156946,
+    0.011038183257254797,
+    0.01152237075930592,
+    0.012011784853392101,
+    0.012509240586636045,
+    0.013013690825976702,
+    0.01352331015871297,
+    0.014039506412273193,
+    0.014558356091988398,
+    0.015080906690728363,
+    0.015603858938585626,
+    0.01612513685394926,
+    0.016644071844369775,
+    0.017159242009122267
+  ],
+  "per_trajectory_nrmse": [
+    0.0078377271658734,
+    0.01396996888736377,
+    0.014684192350535459,
+    0.013587456625778859,
+    0.012354358245589676,
+    0.01312553701043531,
+    0.012827451796481324,
+    0.010368120427865495,
+    0.011496354232709812,
+    0.013635292181367597,
+    0.010873166176603792,
+    0.010764257733566037,
+    0.008491514110986559,
+    0.010113607089475077,
+    0.01120408794535622,
+    0.011028748400363813
+  ],
+  "evaluation_walltime_seconds": 7.037
+}

@@ -1,11 +1,14 @@
-# burgers / fno1d / physics (seed 2, lambda=0.01)
+# burgers / fno1d / physics (seed 2, lambda=0.1)
+#
+# Frozen v2 main-matrix row. The physics weight is the Arm-A selection
+# from configs/lambda_selection.json (validation split only).
 name: burgers_fno1d_physics_seed2
 system: burgers
 condition: physics
 seed: 2
 observation_dt: 0.005
-lambda_pde: 0.01
-tags: [main]
+lambda_pde: 0.1
+tags: [main,v2]
 
 model:
   architecture: fno1d
@@ -13,6 +16,9 @@ model:
   modes: 16
   width: 16
   n_layers: 4
+
+data:
+  dataset_dir: data/burgers
 
 train:
   epochs: 60

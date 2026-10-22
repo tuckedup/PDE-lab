@@ -11,7 +11,7 @@ ROOT = Path("/home/atulp/projects/pdelab")
 sys.path.insert(0, str(ROOT / "src"))
 
 fail = 0
-for system, dev_seed, test_seed in [("burgers", 1000, 7001), ("allen_cahn", 2000, 7002)]:
+for system, _dev_seed, _test_seed in [("burgers", 1000, 7001), ("allen_cahn", 2000, 7002)]:
     man = json.loads((ROOT / f"data/{system}/{system}_manifest.json").read_text())
     recs = man["trajectories"]
     dev = {r["ic_seed"] for r in recs if r["split"] in ("train", "val")}

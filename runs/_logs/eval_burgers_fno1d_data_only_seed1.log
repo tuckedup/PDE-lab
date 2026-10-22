@@ -1,0 +1,477 @@
+{
+  "timestamp_utc": "2026-10-22T04:01:07Z",
+  "host": {
+    "total_ram_gib": 7.387,
+    "available_ram_gib": 6.404,
+    "used_ram_percent": 13.3,
+    "disk_total_gib": 1006.854,
+    "disk_free_gib": 909.176,
+    "wsl_filesystem": {
+      "path": "/home/atulp/projects/pdelab",
+      "total_gib": 1006.854,
+      "free_gib": 909.176,
+      "scope": "the WSL root filesystem (a virtual disk). Its free space is NOT the physical free space of the Windows volume that backs it; the physical figure is reported separately."
+    },
+    "windows_physical_disk": {
+      "available": true,
+      "source": "powershell.exe Win32_LogicalDisk (physical Windows volume)",
+      "backing_drive": "C:",
+      "free_gib": 83.428,
+      "total_gib": 929.63,
+      "drives": [
+        {
+          "device": "C:",
+          "label": "Windows",
+          "total_gib": 929.63,
+          "free_gib": 83.428
+        },
+        {
+          "device": "D:",
+          "label": "My Passport",
+          "total_gib": 931.479,
+          "free_gib": 146.484
+        }
+      ],
+      "distro_base_path": "C:\\Users\\atulp\\AppData\\Local\\wsl\\{7f0f0668-c4cf-46d1-bbaa-850d0cef396b}",
+      "note": null
+    },
+    "cpu_count_logical": 16,
+    "cpu_count_physical": 8,
+    "rss_gib": 0.6006
+  },
+  "gpu": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "total_gib": 7.996,
+    "free_gib": 6.931,
+    "used_gib": 1.065,
+    "utilization_percent": null,
+    "processes": [],
+    "note": null
+  },
+  "nvidia_smi": {
+    "available": true,
+    "processes": [],
+    "note": null
+  },
+  "profile": {
+    "experiment_concurrency": 1,
+    "cpu_threads": 4,
+    "dataloader_workers": 0,
+    "max_pipeline_ram_gib": 3.5,
+    "max_cuda_allocated_gib": 4.5,
+    "min_cuda_free_before_job_gib": 5.0,
+    "min_host_free_disk_gib": 40,
+    "max_new_dataset_storage_gib": 4,
+    "max_new_project_storage_gib": 10,
+    "max_checkpoints_per_run": 2,
+    "initial_batch_size_1d": 8,
+    "initial_batch_size_2d": 2,
+    "initial_trial_walltime_minutes": 20,
+    "max_default_job_walltime_minutes": 45,
+    "max_default_sweep_walltime_minutes": 120,
+    "training_seeds_prototype": [
+      0
+    ],
+    "training_seeds_confirmatory": [
+      0,
+      1,
+      2
+    ],
+    "run_full_sweep_by_default": false
+  },
+  "violations": [],
+  "warnings": [],
+  "ok": true,
+  "disk_scope_note": "the WSL filesystem figure is the size of the distribution's virtual disk; the physical free space of the Windows volume that backs it is reported separately under host.windows_physical_disk",
+  "lock_scope_note": "the project job lock excludes cooperating PDELab jobs only. It is not a system-wide scheduler and it does not protect the GPU against unrelated software."
+}
+{
+  "status": "completed",
+  "evidence_status": "valid",
+  "run_id": "burgers_fno1d_data_only_seed1",
+  "split": "test",
+  "system": "burgers",
+  "architecture": "fno1d",
+  "condition": "data_only",
+  "seed": 1,
+  "lambda_pde": 0.0,
+  "checkpoint": "/home/atulp/projects/pdelab/runs/burgers_fno1d_data_only_seed1/best.pt",
+  "checkpoint_epoch": 60,
+  "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+  "identity": {
+    "evaluator": {
+      "id": "pdelab-evaluation/2",
+      "sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+      "files": {
+        "src/pdelab/evaluation/evaluate.py": "7feeab44e84e64f491dd383804002e85f5b9f6467531e45ec34b072dfe0b239c",
+        "src/pdelab/evaluation/metrics.py": "82b94e1de39a841d31ecc01270128cc440c182d6a9b2a1a76efced240450553d",
+        "src/pdelab/evaluation/rollout.py": "d94141fa268bd6d8c003c017ae4fbbfa46d86598bc71d40ec255be2bf904107a",
+        "src/pdelab/physics/operators.py": "05e940ba4013d575e621729124acbb9fd00560c73a1c7c919ef4f8afa44ed14c"
+      }
+    },
+    "protocol": {
+      "id": "pdelab-free-rollout/2",
+      "sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58"
+    },
+    "resolved_settings": {
+      "metric_implementation_version": "pdelab-metrics/2",
+      "split": "test",
+      "observation_dt": 0.005,
+      "n_rollout_steps": 100,
+      "n_test_trajectories": 16,
+      "history_length": 1,
+      "epsilon": 1e-12,
+      "near_zero_reference_threshold": 1e-08,
+      "copied_initial_frame_included_in_error": false,
+      "residual_evaluators": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "residual_support": "interior_snapshots_only",
+      "baselines": [
+        "persistence",
+        "numerical_stepping_rk2"
+      ],
+      "numerical_stepping_scheme": "rk2",
+      "one_step_aggregation": "per_trajectory"
+    },
+    "resolved_settings_sha256": "8b76c7ea90be6145c52b8c6e89a45be8586d39ecf48acba34f0e566f42798f6a",
+    "checkpoint_sha256": "f1b5135c42e5d2475d68927ae4b0bf52f3a41e7e4e60c1683ff196611ce9a9fd",
+    "dataset": {
+      "split": "test",
+      "path": "/home/atulp/projects/pdelab/data/burgers/burgers_test.h5",
+      "sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+      "manifest_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae"
+    },
+    "normalization": {
+      "values": {
+        "mean": -8.759964975624257e-11,
+        "std": 0.3153051435947418,
+        "source": "train"
+      },
+      "sha256": "01506050a4de2c0897f641e92b5afa0149b9e27a313b90f08bde77d3bd2179d1"
+    }
+  },
+  "protocol": {
+    "id": "pdelab-free-rollout/2",
+    "type": "free_rollout",
+    "split": "test",
+    "observation_dt": 0.005,
+    "n_rollout_steps": 100,
+    "n_test_trajectories": 16,
+    "history_length": 1,
+    "copied_initial_frame_included_in_error": false,
+    "epsilon": 1e-12,
+    "residual_evaluators": [
+      "implicit_euler_first_order",
+      "centred_first_derivative"
+    ],
+    "residual_support": "interior_snapshots_only",
+    "residual_support_detail": "both evaluators are evaluated at the interior snapshot indices 1 .. T-2 of the trajectory, so the compared values share the same support",
+    "baselines": [
+      "persistence",
+      "numerical_stepping_rk2"
+    ]
+  },
+  "residual_evaluators": {
+    "implicit_euler_first_order": {
+      "evaluator": "implicit_euler_first_order",
+      "support": "interior_snapshots_only",
+      "support_indices": "1 .. T-2 (interior snapshots of the trajectory)",
+      "shared_with": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "implementation": "physics.operators.burgers_residual_implicit_euler",
+      "operator": "burgers_residual_implicit_euler",
+      "cross_check": {
+        "available": true,
+        "local_reference_rms": 0.22520239414409818,
+        "operator_rms": 0.22520239397818645,
+        "relative_difference": 7.367227574580002e-10,
+        "agrees": true,
+        "tolerance": 0.001
+      },
+      "reference_implementation": "physics.operators.burgers_residual_implicit_euler",
+      "reference_cross_check": {
+        "available": true,
+        "local_reference_rms": 0.21026347846823917,
+        "operator_rms": 0.21026347970505377,
+        "relative_difference": 5.882213136559891e-09,
+        "agrees": true,
+        "tolerance": 0.001
+      }
+    },
+    "centred_first_derivative": {
+      "evaluator": "centred_first_derivative",
+      "support": "interior_snapshots_only",
+      "support_indices": "1 .. T-2 (interior snapshots of the trajectory)",
+      "shared_with": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "implementation": "physics.operators.burgers_residual_centered_first_derivative",
+      "operator": "burgers_residual_centered_first_derivative",
+      "cross_check": {
+        "available": true,
+        "local_reference_rms": 0.10422071530167766,
+        "operator_rms": 0.10422071605107243,
+        "relative_difference": 7.190458886153792e-09,
+        "agrees": true,
+        "tolerance": 0.001
+      },
+      "reference_implementation": "physics.operators.burgers_residual_centered_first_derivative",
+      "reference_cross_check": {
+        "available": true,
+        "local_reference_rms": 0.04133716396477272,
+        "operator_rms": 0.04133716460859511,
+        "relative_difference": 1.5574904578428015e-08,
+        "agrees": true,
+        "tolerance": 0.001
+      }
+    }
+  },
+  "residual_rms_implicit_euler_first_order": 0.22520239397818645,
+  "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+  "residual_rms_centred_first_derivative": 0.10422071605107243,
+  "reference_residual_rms_centred_first_derivative": 0.04133716460859511,
+  "residual_error_physical_rms": 0.22520239397818645,
+  "reference_residual_physical_rms": 0.21026347970505377,
+  "residual_temporal_refinement_probe": {
+    "description": "Temporal truncation error of each residual evaluator, measured on an exact solution of the system PDE. The reported value is the residual an exact solution still shows under the evaluator, i.e. the empirical floor of the metric.",
+    "support": "interior_snapshots_only",
+    "rows": [
+      {
+        "dt": 0.005,
+        "n_snapshots": 101,
+        "n_interior_snapshots": 99,
+        "implicit_euler_first_order_residual_rms": 0.40259563918277624,
+        "implicit_euler_first_order_truncation_rms": 0.0007036246494111888,
+        "centred_first_derivative_residual_rms": 0.4022982018838337,
+        "centred_first_derivative_truncation_rms": 1.170755514202229e-06
+      },
+      {
+        "dt": 0.0025,
+        "n_snapshots": 201,
+        "n_interior_snapshots": 199,
+        "implicit_euler_first_order_residual_rms": 0.4027201644237232,
+        "implicit_euler_first_order_truncation_rms": 0.0003515911613038644,
+        "centred_first_derivative_residual_rms": 0.40257161255047963,
+        "centred_first_derivative_truncation_rms": 2.927486162193832e-07,
+        "observed_order_implicit_euler_first_order": 1.0009072214163355,
+        "observed_order_centred_first_derivative": 1.999705576634095
+      },
+      {
+        "dt": 0.00125,
+        "n_snapshots": 401,
+        "n_interior_snapshots": 399,
+        "implicit_euler_first_order_residual_rms": 0.40278264030350813,
+        "implicit_euler_first_order_truncation_rms": 0.0001757403355007585,
+        "centred_first_derivative_residual_rms": 0.40270840595463214,
+        "centred_first_derivative_truncation_rms": 7.319463823387755e-08,
+        "observed_order_implicit_euler_first_order": 1.0004534495772717,
+        "observed_order_centred_first_derivative": 1.9998524763522183
+      }
+    ],
+    "observed_order_implicit_euler_first_order": 1.0004534495772717,
+    "observed_order_centred_first_derivative": 1.9998524763522183
+  },
+  "nrmse": {
+    "mean": 0.015955095601800737,
+    "median": 0.01354429664204944,
+    "std": 0.006469012786406642,
+    "min": 0.0072012995128157235,
+    "max": 0.02948336296972178,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "nrmse_one_step_teacher_forced": {
+    "mean": 0.0006390471437078454,
+    "median": 0.0006223594356905991,
+    "std": 0.0001293110137438854,
+    "min": 0.00042533199018392475,
+    "max": 0.000944504225408734,
+    "n_trajectories": 16,
+    "n_windows": 1600,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "nrmse_one_step_teacher_forced_per_window": {
+    "mean": 0.0006390471437078454,
+    "median": 0.00042505557309475354,
+    "std": 0.0005334341351667801,
+    "min": 0.00017502247504618345,
+    "max": 0.004055675229550347,
+    "n_trajectories": 1600,
+    "n_windows": 1600,
+    "aggregation": "per_window",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "persistence_baseline_nrmse": {
+    "mean": 1.471354626667444,
+    "median": 1.5110432552494777,
+    "std": 0.2765987327434294,
+    "min": 0.7131053680457066,
+    "max": 1.8182490842529822,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "persistence_baseline_walltime_seconds": 8.7e-05,
+  "numerical_stepping_baseline_nrmse": {
+    "mean": 0.0005358012357648053,
+    "median": 0.0005689868935462908,
+    "std": 0.0001461325776856828,
+    "min": 0.00015686793498386752,
+    "max": 0.0007191918928799165,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "numerical_stepping_baseline_walltime_seconds": 0.694869,
+  "numerical_stepping_plan": {
+    "system": "burgers",
+    "observation_dt": 0.005,
+    "internal_dt": 0.0007142857142857143,
+    "sub_steps_per_observation_step": 7,
+    "stability_limits": {
+      "diffusion": 0.0014359578180603424,
+      "advection": 0.0021474103950146323
+    },
+    "max_speed": 1.7646386623382568,
+    "spatial_filter": "2/3 retained band (Galerkin truncation)"
+  },
+  "per_time_nrmse": [
+    0.0022959030478361306,
+    0.0033313138059934684,
+    0.0043073217509812245,
+    0.00511413733038725,
+    0.005849278193462219,
+    0.006527323063769177,
+    0.007167840932628821,
+    0.007773425420002764,
+    0.008366110367368887,
+    0.00892856114560217,
+    0.009454843369155145,
+    0.009956654880676463,
+    0.010438307366865766,
+    0.010881144237163791,
+    0.011305345724170008,
+    0.011699288959968884,
+    0.012068301774084406,
+    0.012421326244658118,
+    0.012764903977227866,
+    0.013094991505923715,
+    0.013412733001022971,
+    0.01372082943822954,
+    0.014032107324888148,
+    0.014317901513669098,
+    0.014595910447516127,
+    0.014877232022309138,
+    0.015153251002367966,
+    0.015407533921795011,
+    0.01566629342228697,
+    0.015917549591466056,
+    0.016161480982091754,
+    0.016403218710653727,
+    0.016637784174012224,
+    0.01686750757655977,
+    0.017086351188330833,
+    0.017303206669082315,
+    0.01751434666189493,
+    0.01771832653349344,
+    0.017918200531901664,
+    0.018110557036571318,
+    0.018288308818694046,
+    0.018465391415165552,
+    0.018633520289586526,
+    0.01879793650783176,
+    0.018962256097474282,
+    0.019125606304752,
+    0.01927374334115662,
+    0.019428294566696678,
+    0.0195788502550027,
+    0.019732621412827903,
+    0.019877561785169563,
+    0.02000988710422483,
+    0.020148577504199936,
+    0.02027950929343497,
+    0.020402684834957743,
+    0.020534126715346983,
+    0.020657759603543352,
+    0.020790945095914764,
+    0.02092282999209908,
+    0.02104992607959882,
+    0.02117338840770427,
+    0.02130099318956008,
+    0.02143729524125054,
+    0.02155417981745259,
+    0.021677122011658088,
+    0.02179256909982179,
+    0.02192010828782376,
+    0.022041852598236666,
+    0.022158838873681693,
+    0.022257831915903036,
+    0.022390516494253332,
+    0.022498991517330386,
+    0.022606678136063308,
+    0.022714258966102192,
+    0.022829456500539472,
+    0.022941321035904738,
+    0.023045486025192245,
+    0.023161426520774634,
+    0.02328526244455271,
+    0.023398898966961706,
+    0.023512009546940944,
+    0.023625421651267686,
+    0.02374230531902584,
+    0.023859593852494917,
+    0.023974459185586022,
+    0.024093171127149066,
+    0.024205180300935977,
+    0.02432447082693632,
+    0.024428496400752207,
+    0.024541908226546044,
+    0.02465574996168493,
+    0.024769525432711586,
+    0.024890415356613113,
+    0.02499769707403564,
+    0.025112613877988573,
+    0.02522357060477234,
+    0.025346700284077484,
+    0.025443305630093244,
+    0.02555343163235524,
+    0.025667041402806207
+  ],
+  "per_trajectory_nrmse": [
+    0.012753333021521013,
+    0.009403806693110377,
+    0.0072012995128157235,
+    0.013827282736216941,
+    0.018767783687597003,
+    0.012216850976064942,
+    0.010584833623205014,
+    0.012098578233946724,
+    0.024577505398510127,
+    0.01326131054788194,
+    0.0289234662820971,
+    0.014433681842034802,
+    0.02948336296972178,
+    0.01116743899352027,
+    0.018884234607921355,
+    0.017696760502646642
+  ],
+  "evaluation_walltime_seconds": 14.643,
+  "artifact_sha256": "95bcaf065b17a6bf53fa49990eb6bf85ab5529e20d8530161ba017348acd2f0f",
+  "evaluation_path": "/home/atulp/projects/pdelab/runs/burgers_fno1d_data_only_seed1/evaluation.json"
+}

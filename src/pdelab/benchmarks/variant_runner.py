@@ -194,19 +194,65 @@ def run_variant(
     def call():
         return run(hist)
 
+    # ---- uniform warm-up BEFORE the reset point -------------------
+    # The warm-up must precede the reset so that the measurement covers
+    # the *steady state* of the variant. This matters for the
+    # CUDA-graphs variants: their private memory pool is allocated when
+    # the graph is captured, and a reset taken before that would
+    # charge the pool to the measured region and hide it.
+    for _ in range(warmup):
+        call()
+    _sync(device)
+
+    # ---- reset point ------------------------------------------------
+    # Everything that is *persistent* for the variant (the model
+    # weights, the CUDA-graph private pool, the resident input) is
+    # already in place at this point, and the counters are reset so
+    # that the reported peak describes the steady-state working set.
+    memory_before: dict[str, Any] = {}
     if device.type == "cuda":
-        torch.cuda.empty_cache()
+        torch.cuda.synchronize(device)
+        memory_before = {
+            "allocated_gib": torch.cuda.memory_allocated(device) / 1024**3,
+            "reserved_gib": torch.cuda.memory_reserved(device) / 1024**3,
+        }
         torch.cuda.reset_peak_memory_stats(device)
     _sync(device)
 
     out = call()
-    timing = _time_blocks(call, device, n_blocks, iters_per_block, warmup)
+    timing = _time_blocks(call, device, n_blocks, iters_per_block, warmup=0)
 
-    memory = {}
+    memory: dict[str, Any] = {}
     if device.type == "cuda":
+        free_after, total = torch.cuda.mem_get_info(device)
+        weights_bytes = sum(p.numel() * p.element_size() for p in model.parameters())
+        input_bytes = hist.numel() * hist.element_size()
+        output_bytes = out.numel() * out.element_size()
         memory = {
+            # The declared metric: peak *allocated* during the measured
+            # region. This is NOT total device memory.
             "peak_allocated_gib": torch.cuda.max_memory_allocated(device) / 1024**3,
             "peak_reserved_gib": torch.cuda.max_memory_reserved(device) / 1024**3,
+            # What was already resident when the counters were reset:
+            # the weights and, for the CUDA-graph variants, the graph
+            # private pool.
+            "allocated_before_reset_gib": memory_before.get("allocated_gib"),
+            "reserved_before_reset_gib": memory_before.get("reserved_gib"),
+            # Persistent bytes that every variant must hold: the model
+            # weights, the resident input and one rollout output.
+            "persistent_weights_bytes": int(weights_bytes),
+            "persistent_input_bytes": int(input_bytes),
+            "persistent_output_bytes": int(output_bytes),
+            "persistent_total_bytes": int(weights_bytes + input_bytes + output_bytes),
+            # Device-level observation: free memory on the device now.
+            "device_free_gib": free_after / 1024**3,
+            "device_total_gib": total / 1024**3,
+            "note": (
+                "peak_allocated is the declared metric and is not total device "
+                "memory; compare it with peak_reserved and with the "
+                "persistent_* byte counts before drawing a device-memory "
+                "conclusion"
+            ),
         }
 
     # ---- the full output tensors, for the element-wise comparison ----

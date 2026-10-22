@@ -24,8 +24,6 @@ from pdelab.evaluation.rollout import rollout, teacher_forced_one_step
 from pdelab.models.base import TimeAdvanceModel
 from pdelab.models.fno import FNO1d
 from pdelab.reporting.report import (
-    EVIDENCE_STATES,
-    assess_run_evidence,
     build_report,
     build_target_table,
     collect_runs,
@@ -894,7 +892,7 @@ def test_evaluation_reports_the_reference_residual_under_every_evaluator(tmp_pat
 
 def test_evaluation_reports_the_numerical_stepping_baseline(tmp_path):
     run_dir, h5 = _make_run_dir(tmp_path, run_id="run0")
-    result = evaluate_run(run_dir, device="cpu", split="test")
+    evaluate_run(run_dir, device="cpu", split="test")
     artifact = json.loads((run_dir / "evaluation.json").read_text())
     assert "numerical_stepping_baseline_nrmse" in artifact
     assert "numerical_stepping_baseline_walltime_seconds" in artifact

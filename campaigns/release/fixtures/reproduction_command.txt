@@ -1,0 +1,1 @@
+pdelab doctor && pdelab solvers validate --system burgers

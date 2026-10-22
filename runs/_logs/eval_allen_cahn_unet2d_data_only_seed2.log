@@ -1,0 +1,407 @@
+{
+  "timestamp_utc": "2026-10-22T04:05:44Z",
+  "host": {
+    "total_ram_gib": 7.387,
+    "available_ram_gib": 6.394,
+    "used_ram_percent": 13.4,
+    "disk_total_gib": 1006.854,
+    "disk_free_gib": 909.175,
+    "wsl_filesystem": {
+      "path": "/home/atulp/projects/pdelab",
+      "total_gib": 1006.854,
+      "free_gib": 909.175,
+      "scope": "the WSL root filesystem (a virtual disk). Its free space is NOT the physical free space of the Windows volume that backs it; the physical figure is reported separately."
+    },
+    "windows_physical_disk": {
+      "available": true,
+      "source": "powershell.exe Win32_LogicalDisk (physical Windows volume)",
+      "backing_drive": "C:",
+      "free_gib": 83.435,
+      "total_gib": 929.63,
+      "drives": [
+        {
+          "device": "C:",
+          "label": "Windows",
+          "total_gib": 929.63,
+          "free_gib": 83.435
+        },
+        {
+          "device": "D:",
+          "label": "My Passport",
+          "total_gib": 931.479,
+          "free_gib": 146.484
+        }
+      ],
+      "distro_base_path": "C:\\Users\\atulp\\AppData\\Local\\wsl\\{7f0f0668-c4cf-46d1-bbaa-850d0cef396b}",
+      "note": null
+    },
+    "cpu_count_logical": 16,
+    "cpu_count_physical": 8,
+    "rss_gib": 0.6005
+  },
+  "gpu": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "total_gib": 7.996,
+    "free_gib": 6.931,
+    "used_gib": 1.065,
+    "utilization_percent": null,
+    "processes": [],
+    "note": null
+  },
+  "nvidia_smi": {
+    "available": true,
+    "processes": [],
+    "note": null
+  },
+  "profile": {
+    "experiment_concurrency": 1,
+    "cpu_threads": 4,
+    "dataloader_workers": 0,
+    "max_pipeline_ram_gib": 3.5,
+    "max_cuda_allocated_gib": 4.5,
+    "min_cuda_free_before_job_gib": 5.0,
+    "min_host_free_disk_gib": 40,
+    "max_new_dataset_storage_gib": 4,
+    "max_new_project_storage_gib": 10,
+    "max_checkpoints_per_run": 2,
+    "initial_batch_size_1d": 8,
+    "initial_batch_size_2d": 2,
+    "initial_trial_walltime_minutes": 20,
+    "max_default_job_walltime_minutes": 45,
+    "max_default_sweep_walltime_minutes": 120,
+    "training_seeds_prototype": [
+      0
+    ],
+    "training_seeds_confirmatory": [
+      0,
+      1,
+      2
+    ],
+    "run_full_sweep_by_default": false
+  },
+  "violations": [],
+  "warnings": [],
+  "ok": true,
+  "disk_scope_note": "the WSL filesystem figure is the size of the distribution's virtual disk; the physical free space of the Windows volume that backs it is reported separately under host.windows_physical_disk",
+  "lock_scope_note": "the project job lock excludes cooperating PDELab jobs only. It is not a system-wide scheduler and it does not protect the GPU against unrelated software."
+}
+{
+  "status": "completed",
+  "evidence_status": "valid",
+  "run_id": "allen_cahn_unet2d_data_only_seed2",
+  "split": "test",
+  "system": "allen_cahn",
+  "architecture": "unet2d",
+  "condition": "data_only",
+  "seed": 2,
+  "lambda_pde": 0.0,
+  "checkpoint": "/home/atulp/projects/pdelab/runs/allen_cahn_unet2d_data_only_seed2/best.pt",
+  "checkpoint_epoch": 26,
+  "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+  "identity": {
+    "evaluator": {
+      "id": "pdelab-evaluation/2",
+      "sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+      "files": {
+        "src/pdelab/evaluation/evaluate.py": "7feeab44e84e64f491dd383804002e85f5b9f6467531e45ec34b072dfe0b239c",
+        "src/pdelab/evaluation/metrics.py": "82b94e1de39a841d31ecc01270128cc440c182d6a9b2a1a76efced240450553d",
+        "src/pdelab/evaluation/rollout.py": "d94141fa268bd6d8c003c017ae4fbbfa46d86598bc71d40ec255be2bf904107a",
+        "src/pdelab/physics/operators.py": "05e940ba4013d575e621729124acbb9fd00560c73a1c7c919ef4f8afa44ed14c"
+      }
+    },
+    "protocol": {
+      "id": "pdelab-free-rollout/2",
+      "sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4"
+    },
+    "resolved_settings": {
+      "metric_implementation_version": "pdelab-metrics/2",
+      "split": "test",
+      "observation_dt": 0.1,
+      "n_rollout_steps": 30,
+      "n_test_trajectories": 16,
+      "history_length": 1,
+      "epsilon": 1e-12,
+      "near_zero_reference_threshold": 1e-08,
+      "copied_initial_frame_included_in_error": false,
+      "residual_evaluators": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "residual_support": "interior_snapshots_only",
+      "baselines": [
+        "persistence",
+        "numerical_stepping_rk2"
+      ],
+      "numerical_stepping_scheme": "rk2",
+      "one_step_aggregation": "per_trajectory"
+    },
+    "resolved_settings_sha256": "d27b15b28bdb586864da0c47203e381c876e21fee05d145132bc1071d341898f",
+    "checkpoint_sha256": "a7dbec618ca92f53490cde53231bfd91d57e345cb1011877e5ee7afcc31ee075",
+    "dataset": {
+      "split": "test",
+      "path": "/home/atulp/projects/pdelab/data/allen_cahn/allen_cahn_test.h5",
+      "sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+      "manifest_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6"
+    },
+    "normalization": {
+      "values": {
+        "mean": 0.0022160306107252836,
+        "std": 0.6421112418174744,
+        "source": "train"
+      },
+      "sha256": "b0e77000f6c280ac3de9137715e3657e17af6a0d8533a46ec239042bdb054f6d"
+    }
+  },
+  "protocol": {
+    "id": "pdelab-free-rollout/2",
+    "type": "free_rollout",
+    "split": "test",
+    "observation_dt": 0.1,
+    "n_rollout_steps": 30,
+    "n_test_trajectories": 16,
+    "history_length": 1,
+    "copied_initial_frame_included_in_error": false,
+    "epsilon": 1e-12,
+    "residual_evaluators": [
+      "implicit_euler_first_order",
+      "centred_first_derivative"
+    ],
+    "residual_support": "interior_snapshots_only",
+    "residual_support_detail": "both evaluators are evaluated at the interior snapshot indices 1 .. T-2 of the trajectory, so the compared values share the same support",
+    "baselines": [
+      "persistence",
+      "numerical_stepping_rk2"
+    ]
+  },
+  "residual_evaluators": {
+    "implicit_euler_first_order": {
+      "evaluator": "implicit_euler_first_order",
+      "support": "interior_snapshots_only",
+      "support_indices": "1 .. T-2 (interior snapshots of the trajectory)",
+      "shared_with": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "implementation": "physics.operators.allen_cahn_residual_implicit_euler",
+      "operator": "allen_cahn_residual_implicit_euler",
+      "cross_check": {
+        "available": true,
+        "local_reference_rms": 0.04550639754576587,
+        "operator_rms": 0.04550639755571101,
+        "relative_difference": 2.1854381951894943e-10,
+        "agrees": true,
+        "tolerance": 0.001
+      },
+      "reference_implementation": "physics.operators.allen_cahn_residual_implicit_euler",
+      "reference_cross_check": {
+        "available": true,
+        "local_reference_rms": 0.03240951217348564,
+        "operator_rms": 0.03240951216903391,
+        "relative_difference": 1.373585535029003e-10,
+        "agrees": true,
+        "tolerance": 0.001
+      }
+    },
+    "centred_first_derivative": {
+      "evaluator": "centred_first_derivative",
+      "support": "interior_snapshots_only",
+      "support_indices": "1 .. T-2 (interior snapshots of the trajectory)",
+      "shared_with": [
+        "implicit_euler_first_order",
+        "centred_first_derivative"
+      ],
+      "implementation": "physics.operators.allen_cahn_residual_centered_first_derivative",
+      "operator": "allen_cahn_residual_centered_first_derivative",
+      "cross_check": {
+        "available": true,
+        "local_reference_rms": 0.04219431326349676,
+        "operator_rms": 0.04219431326605911,
+        "relative_difference": 6.072728693499739e-11,
+        "agrees": true,
+        "tolerance": 0.001
+      },
+      "reference_implementation": "physics.operators.allen_cahn_residual_centered_first_derivative",
+      "reference_cross_check": {
+        "available": true,
+        "local_reference_rms": 0.030518226334426194,
+        "operator_rms": 0.03051822633207527,
+        "relative_difference": 7.703347450331395e-11,
+        "agrees": true,
+        "tolerance": 0.001
+      }
+    }
+  },
+  "residual_rms_implicit_euler_first_order": 0.04550639755571101,
+  "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+  "residual_rms_centred_first_derivative": 0.04219431326605911,
+  "reference_residual_rms_centred_first_derivative": 0.03051822633207527,
+  "residual_error_physical_rms": 0.04550639755571101,
+  "reference_residual_physical_rms": 0.03240951216903391,
+  "residual_temporal_refinement_probe": {
+    "description": "Temporal truncation error of each residual evaluator, measured on an exact solution of the system PDE. The reported value is the residual an exact solution still shows under the evaluator, i.e. the empirical floor of the metric.",
+    "support": "interior_snapshots_only",
+    "rows": [
+      {
+        "dt": 0.1,
+        "n_snapshots": 31,
+        "n_interior_snapshots": 29,
+        "implicit_euler_first_order_residual_rms": 0.009435840950927199,
+        "implicit_euler_first_order_truncation_rms": 0.009435840950927199,
+        "centred_first_derivative_residual_rms": 0.00046542062678632046,
+        "centred_first_derivative_truncation_rms": 0.00046542062678632046
+      },
+      {
+        "dt": 0.05,
+        "n_snapshots": 61,
+        "n_interior_snapshots": 59,
+        "implicit_euler_first_order_residual_rms": 0.0046967094701824644,
+        "implicit_euler_first_order_truncation_rms": 0.0046967094701824644,
+        "centred_first_derivative_residual_rms": 0.00011581934139535754,
+        "centred_first_derivative_truncation_rms": 0.00011581934139535754,
+        "observed_order_implicit_euler_first_order": 1.006500747046763,
+        "observed_order_centred_first_derivative": 2.006658952267612
+      },
+      {
+        "dt": 0.025,
+        "n_snapshots": 121,
+        "n_interior_snapshots": 119,
+        "implicit_euler_first_order_residual_rms": 0.002342643236944569,
+        "implicit_euler_first_order_truncation_rms": 0.002342643236944569,
+        "centred_first_derivative_residual_rms": 2.8876336668581132e-05,
+        "centred_first_derivative_truncation_rms": 2.8876336668581132e-05,
+        "observed_order_implicit_euler_first_order": 1.0035130921705933,
+        "observed_order_centred_first_derivative": 2.00391656341476
+      }
+    ],
+    "observed_order_implicit_euler_first_order": 1.0035130921705933,
+    "observed_order_centred_first_derivative": 2.00391656341476
+  },
+  "nrmse": {
+    "mean": 0.050897966229494246,
+    "median": 0.05033123241347724,
+    "std": 0.01531815762336833,
+    "min": 0.02592931654359938,
+    "max": 0.08991216965178979,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "nrmse_one_step_teacher_forced": {
+    "mean": 0.010940893293737583,
+    "median": 0.010956775795287081,
+    "std": 0.005378335137255145,
+    "min": 0.0032553180945732946,
+    "max": 0.02491987095755536,
+    "n_trajectories": 16,
+    "n_windows": 480,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "nrmse_one_step_teacher_forced_per_window": {
+    "mean": 0.010940893293737585,
+    "median": 0.00808622727545602,
+    "std": 0.010408407540837978,
+    "min": 0.0018423000490489412,
+    "max": 0.07051377173522236,
+    "n_trajectories": 480,
+    "n_windows": 480,
+    "aggregation": "per_window",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "persistence_baseline_nrmse": {
+    "mean": 0.45139719590329774,
+    "median": 0.450051565794202,
+    "std": 0.037885220494961326,
+    "min": 0.39060498609749245,
+    "max": 0.523116733281329,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "persistence_baseline_walltime_seconds": 0.002,
+  "numerical_stepping_baseline_nrmse": {
+    "mean": 0.002746101949090048,
+    "median": 0.0024720256894651743,
+    "std": 0.0010772916917730405,
+    "min": 0.0013960159815977874,
+    "max": 0.005188631406400668,
+    "n_trajectories": 16,
+    "n_windows": null,
+    "aggregation": "per_trajectory",
+    "near_zero_reference_count": 0,
+    "epsilon": 1e-12
+  },
+  "numerical_stepping_baseline_walltime_seconds": 0.152479,
+  "numerical_stepping_plan": {
+    "system": "allen_cahn",
+    "observation_dt": 0.1,
+    "internal_dt": 0.05,
+    "sub_steps_per_observation_step": 2,
+    "stability_limits": {
+      "diffusion": 0.25330295910584444,
+      "reaction": 1.0
+    },
+    "max_speed": 2.1788623332977295,
+    "spatial_filter": "2/3 retained band (Galerkin truncation)"
+  },
+  "per_time_nrmse": [
+    0.031095953228491124,
+    0.042125938150952745,
+    0.04560344206304191,
+    0.0462463997951942,
+    0.04591877828537225,
+    0.04532489386895298,
+    0.04473009150609392,
+    0.04426395376858222,
+    0.04400722364350531,
+    0.04396904869671101,
+    0.04411603018655621,
+    0.0444257399865377,
+    0.044871617439520534,
+    0.04543843750158211,
+    0.04610842420963165,
+    0.04685886711829916,
+    0.04767386162741719,
+    0.04853897786167648,
+    0.04943463298673234,
+    0.05034763536040886,
+    0.0512652866490433,
+    0.052177915264277404,
+    0.05307924059713758,
+    0.053971287111628366,
+    0.054853765902655276,
+    0.05573744040563279,
+    0.05663300163486376,
+    0.0575572873460123,
+    0.058518101941815524,
+    0.05952147347806207
+  ],
+  "per_trajectory_nrmse": [
+    0.06996565037330646,
+    0.04161961943441543,
+    0.02592931654359938,
+    0.0351256309762548,
+    0.056898865238598814,
+    0.050703098735037734,
+    0.05074838246823935,
+    0.04995936609191676,
+    0.04278372354495426,
+    0.08991216965178979,
+    0.038217532040358666,
+    0.03698515316264053,
+    0.04079584915954755,
+    0.062103755627249735,
+    0.05921440963731678,
+    0.06340493698668193
+  ],
+  "evaluation_walltime_seconds": 9.617,
+  "artifact_sha256": "b238523abf6e18f22155833381b7add7fb73cf3ac2137d5b18967fb51fda203c",
+  "evaluation_path": "/home/atulp/projects/pdelab/runs/allen_cahn_unet2d_data_only_seed2/evaluation.json"
+}

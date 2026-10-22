@@ -1,0 +1,260 @@
+{
+  "system": "allen_cahn",
+  "checks": [
+    {
+      "name": "allen_cahn.equilibrium_+0",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 0.0,
+        "tolerance": 1e-10
+      }
+    },
+    {
+      "name": "allen_cahn.equilibrium_+1",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 0.0,
+        "tolerance": 1e-10
+      }
+    },
+    {
+      "name": "allen_cahn.equilibrium_-1",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 0.0,
+        "tolerance": 1e-10
+      }
+    },
+    {
+      "name": "allen_cahn.reaction_law_exact",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 5.551115123125783e-16,
+        "tolerance": 0.0001,
+        "u0": 0.5,
+        "t_final": 1.0
+      }
+    },
+    {
+      "name": "allen_cahn.linear_diffusion_rate",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 3.2526065174565133e-18,
+        "tolerance": 1e-08
+      }
+    },
+    {
+      "name": "allen_cahn.energy_decreases",
+      "passed": true,
+      "detail": {
+        "energy_initial": -0.02658533327472766,
+        "energy_final": -0.1257911361510304,
+        "t_final": 2.0
+      }
+    },
+    {
+      "name": "allen_cahn.spatial_refinement",
+      "passed": true,
+      "detail": {
+        "errors": [
+          {
+            "n": 16,
+            "l2_error": 0.012761488349667307
+          },
+          {
+            "n": 32,
+            "l2_error": 8.666491878985864e-05
+          },
+          {
+            "n": 64,
+            "l2_error": 2.6459980020249596e-09
+          }
+        ],
+        "pairwise_orders": [
+          7.202132761403699,
+          14.999348528429666
+        ],
+        "observed_order": 11.100740644916677,
+        "note": "spectral discretisation; the retained band limits the order, so the order is far above second order until the accuracy floor is hit"
+      }
+    },
+    {
+      "name": "allen_cahn.temporal_refinement",
+      "passed": true,
+      "detail": {
+        "errors": [
+          {
+            "dt": 0.02,
+            "l2_error": 5.083834807620456e-06
+          },
+          {
+            "dt": 0.01,
+            "l2_error": 1.2104926663519212e-06
+          },
+          {
+            "dt": 0.005,
+            "l2_error": 2.421013311613612e-07
+          }
+        ],
+        "observed_orders": [
+          2.070322813727555,
+          2.321911422006042
+        ],
+        "note": "Strang splitting with exact linear diffusion; second order in time in principle"
+      }
+    },
+    {
+      "name": "allen_cahn.mass_not_conserved_expected",
+      "passed": true,
+      "detail": {
+        "max_abs_mass_drift": 0.2675800358475581,
+        "mean_initial": 0.29999999999999993,
+        "mean_final": 0.567580035847558,
+        "note": "drift must be non-negligible; no conservation constraint is imposed on this system. The IC is offset from zero so that mean(u - u^3) != 0."
+      }
+    },
+    {
+      "name": "allen_cahn.manufactured_solution",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 1.4890707666914693e-08,
+        "tolerance": 1e-06,
+        "refined_dt_error": 3.7226262072920235e-09,
+        "observed_order": 2.0000196521891893,
+        "solve_to_row": {
+          "path": "solve_to",
+          "grid": 64,
+          "dt": 0.005,
+          "n_frames": 2,
+          "max_abs_error": 1.4890707666914693e-08,
+          "initial_frame_error": 0.0,
+          "integrator_calls": 10
+        },
+        "rows": [
+          {
+            "path": "solve",
+            "grid": 64,
+            "dt": 0.005,
+            "max_abs_error": 1.4890707666914693e-08,
+            "integrator_calls": 10
+          },
+          {
+            "path": "solve",
+            "grid": 64,
+            "dt": 0.0025,
+            "max_abs_error": 3.7226262072920235e-09,
+            "integrator_calls": 20
+          },
+          {
+            "path": "solve",
+            "grid": 64,
+            "dt": 0.00125,
+            "max_abs_error": 9.306531101316295e-10,
+            "integrator_calls": 40
+          }
+        ],
+        "forcing": "continuum: u_t - D laplacian(u) - a(u - u^3) = g, g written in closed form for u = exp(-t) cos(2 pi x) cos(2 pi y)",
+        "driven_through": "solve/solve_to -> step (real integrator)",
+        "note": "the forcing is evaluated independently of the solver; the error is a real integration error and is limited to second order by the Strang splitting."
+      }
+    },
+    {
+      "name": "allen_cahn.reference_solution_accuracy",
+      "passed": true,
+      "detail": {
+        "reference_grid": 64,
+        "fine_grid": 128,
+        "relative_l2_errors": [
+          3.1344323740340474e-05,
+          3.829176716470311e-05,
+          3.206005093480677e-05,
+          4.1173850606256106e-05
+        ],
+        "median_relative_l2_error": 3.517590904975494e-05,
+        "max_relative_l2_error": 4.1173850606256106e-05,
+        "tolerance": 0.005,
+        "t_final": 3.0,
+        "n_initial_conditions": 4,
+        "note": "the real benchmark horizon T = 3.0 with the actual random initial conditions of the dataset; the reference is an approximation of the true solution, not exact ground truth"
+      }
+    },
+    {
+      "name": "allen_cahn.observation_times_exact",
+      "passed": true,
+      "detail": {
+        "requested": [
+          0.0,
+          1.0,
+          2.0,
+          3.0
+        ],
+        "solvers": {
+          "allen_cahn": {
+            "n_frames": 4,
+            "returned_clock": [
+              0.0,
+              1.0000000000000007,
+              1.9999999999999793,
+              2.9999999999999583
+            ],
+            "max_abs_time_error": 4.1744385725905886e-14
+          }
+        },
+        "tolerance": 1e-12,
+        "note": "the step function is replaced by a clock so that the scheduling is measured independently of the PDE accuracy"
+      }
+    },
+    {
+      "name": "allen_cahn.dataset_observation_times_exact",
+      "passed": true,
+      "detail": {
+        "systems": {
+          "allen_cahn": {
+            "n_requested": 31,
+            "n_recorded": 31,
+            "max_abs_time_error": 0.0,
+            "manifest_observation_scheduler": {
+              "observation_scheduler": "pdelab.observation_schedule.v1",
+              "observation_scheduler_policy": "solve_to returns exactly len(save_times) frames; frame i is the state at save_times[i]; the gap between two requested observations is covered by ceil(gap/dt_max) equal sub-steps of size gap/ceil(gap/dt_max) so that the integrator lands exactly on the requested time; dt_max is the solver's own stability bound evaluated on the current state.",
+              "observation_time_tolerance": "1e-12"
+            }
+          }
+        },
+        "tolerance": 1e-12,
+        "note": "the manifest records the observation times that were actually written, not the ones that were requested"
+      }
+    },
+    {
+      "name": "allen_cahn.dealiasing_masks_and_error",
+      "passed": true,
+      "detail": {
+        "masks": {
+          "32": {
+            "n_kept": 17,
+            "hermitian_symmetric": true,
+            "nyquist_excluded": true
+          },
+          "64": {
+            "n_kept": 33,
+            "hermitian_symmetric": true,
+            "nyquist_excluded": true
+          },
+          "128": {
+            "n_kept": 65,
+            "hermitian_symmetric": true,
+            "nyquist_excluded": true
+          }
+        },
+        "masks_hermitian_and_nyquist_excluded": true,
+        "relative_l2_aliasing_error": 3.1363254342683713e-16,
+        "tolerance": 0.01,
+        "retained_band": "|kx|, |ky| <= 16",
+        "two_thirds_rule_aliasing_error": 5.950310355879436e-16,
+        "field": "actual dataset initial condition (fourier_series_2d, n_modes=3, amplitude=0.8)",
+        "note": "the 2/3 rule is a quadratic rule; for the cubic reaction the retained band is half of the Nyquist. The residual aliasing error is measured against a 2x padded product."
+      }
+    }
+  ],
+  "passed": true,
+  "walltime_seconds": 105.518
+}

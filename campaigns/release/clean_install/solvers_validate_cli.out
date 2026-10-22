@@ -1,0 +1,363 @@
+{
+  "system": "burgers",
+  "checks": [
+    {
+      "name": "burgers.constant_state_stationary",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 0.0,
+        "tolerance": 1e-12
+      }
+    },
+    {
+      "name": "burgers.time_integrator_consistency",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 2.0255797039681056e-11,
+        "tolerance": 1e-08,
+        "test_ode": "du/dt = 0.7 u",
+        "note": "guards against an inconsistent stage/weight pairing that self-convergence cannot detect; an inconsistent pairing gives O(1) error here"
+      }
+    },
+    {
+      "name": "burgers.spatial_operator_consistency",
+      "passed": true,
+      "detail": {
+        "errors": [
+          {
+            "n": 64,
+            "rel_l2": 0.0005977680556051817
+          },
+          {
+            "n": 128,
+            "rel_l2": 0.00011508478630400141
+          },
+          {
+            "n": 256,
+            "rel_l2": 2.8958740880828495e-05
+          }
+        ],
+        "observed_orders": [
+          2.376888674031115,
+          1.990626347358569
+        ],
+        "note": "discrete RHS vs exact continuous RHS; isolates the spatial operator from time integration"
+      }
+    },
+    {
+      "name": "burgers.diffusion_operator_analytic",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 2.9724010878640073e-05,
+        "tolerance": 0.0005,
+        "grid": 64,
+        "t_final": 0.1,
+        "note": "viscous operator applied in isolation; the convective term is non-zero for a single Fourier mode and is excluded here"
+      }
+    },
+    {
+      "name": "burgers.mean_conservation",
+      "passed": true,
+      "detail": {
+        "max_abs_mean_drift": 1.9992688060632702e-16,
+        "tolerance": 1e-12,
+        "n_steps": 141,
+        "grid": 128
+      }
+    },
+    {
+      "name": "burgers.energy_non_increasing",
+      "passed": true,
+      "detail": {
+        "max_energy_increase": -0.0003885049659555495,
+        "tolerance": 1e-12
+      }
+    },
+    {
+      "name": "burgers.spatial_refinement_smooth",
+      "passed": true,
+      "detail": {
+        "t_final": 0.02,
+        "errors": [
+          {
+            "n": 64,
+            "l2_error": 0.00017933388607089304
+          },
+          {
+            "n": 128,
+            "l2_error": 6.298699993222832e-05
+          },
+          {
+            "n": 256,
+            "l2_error": 2.148955450947038e-05
+          }
+        ],
+        "pairwise_orders": [
+          1.509522116222246,
+          1.5514185221668344
+        ],
+        "observed_order": 1.5304703191945397,
+        "note": "measured before shock formation; WENO5-JS finite volume with SSPRK(3,3). The order is limited by the O(dx^2) consistency of the cell-average reconstruction and by the O(dx^2) own error of the n=1024 reference."
+      }
+    },
+    {
+      "name": "burgers.spatial_refinement_shock_regime",
+      "passed": true,
+      "detail": {
+        "t_final": 0.1,
+        "errors": [
+          {
+            "n": 64,
+            "l2_error": 0.0021331172677820976
+          },
+          {
+            "n": 128,
+            "l2_error": 0.0009688098251419827
+          },
+          {
+            "n": 256,
+            "l2_error": 0.0003373511698767832
+          }
+        ],
+        "pairwise_orders": [
+          1.1386778785417646,
+          1.5219623312664823
+        ],
+        "observed_order": 1.3303201049041233,
+        "note": "shock is forming; the nonlinear flux limits the achievable order and the reference grid is finer than the observation grid to compensate. The order is the least-squares slope over the three grids, which uses every level instead of the single noisiest refinement pair."
+      }
+    },
+    {
+      "name": "burgers.temporal_refinement",
+      "passed": true,
+      "detail": {
+        "errors": [
+          {
+            "dt_factor": 8,
+            "steps": 32,
+            "l2_error": 4.822572898517076e-08
+          },
+          {
+            "dt_factor": 4,
+            "steps": 64,
+            "l2_error": 5.928297737293605e-09
+          },
+          {
+            "dt_factor": 2,
+            "steps": 128,
+            "l2_error": 6.577746641038865e-10
+          }
+        ],
+        "observed_orders": [
+          3.0241132352231266,
+          3.1719525608155825
+        ]
+      }
+    },
+    {
+      "name": "burgers.independent_solver_agreement",
+      "passed": true,
+      "detail": {
+        "weno5_vs_spectral_rel_l2": 9.435217594068522e-06,
+        "weno5_vs_muscl_rel_l2": 0.0004342711641036597,
+        "tolerance": 0.005,
+        "t": 0.02,
+        "grid": 128,
+        "note": "three independent discretizations compared while the solution is still smooth"
+      }
+    },
+    {
+      "name": "burgers.manufactured_solution",
+      "passed": true,
+      "detail": {
+        "max_abs_error": 0.001997337633078744,
+        "tolerance": 0.005,
+        "refined_dt_error": 0.00024067203133770754,
+        "finest_dt_error": 0.0001278888586535576,
+        "observed_order": 3.0529378287407876,
+        "solve_to_row": {
+          "path": "solve_to",
+          "grid": 256,
+          "dt": 0.0006329113924050633,
+          "n_frames": 2,
+          "max_abs_error": 7.243339666174187e-05,
+          "initial_frame_error": 0.0,
+          "integrator_calls": 79
+        },
+        "rows": [
+          {
+            "path": "solve",
+            "grid": 64,
+            "dt": 0.004,
+            "max_abs_error": 0.001997337633078744,
+            "integrator_calls": 12
+          },
+          {
+            "path": "solve",
+            "grid": 64,
+            "dt": 0.002,
+            "max_abs_error": 0.00024067203133770754,
+            "integrator_calls": 25
+          },
+          {
+            "path": "solve",
+            "grid": 64,
+            "dt": 0.001,
+            "max_abs_error": 0.0001278888586535576,
+            "integrator_calls": 50
+          }
+        ],
+        "forcing": "continuum: u_t + (u^2/2)_x - nu u_xx = g, g written in closed form for u = exp(-t) cos(2 pi x)",
+        "driven_through": "solve/solve_to -> step (real integrator)",
+        "note": "the forcing is evaluated independently of the solver, so the error is a real integration error. The observed order is limited to two by the SSP-RK(3,3) treatment of a time dependent source (the stage times are t_n, t_n+dt, t_n+dt), not by the forcing."
+      }
+    },
+    {
+      "name": "burgers.reference_solution_accuracy",
+      "passed": true,
+      "detail": {
+        "reference_grid": 256,
+        "fine_grid": 512,
+        "relative_l2_errors": [
+          0.0002519750290741289,
+          0.00014709388784515584,
+          0.00010721978030685771,
+          0.00017679053895942548
+        ],
+        "median_relative_l2_error": 0.00016194221340229067,
+        "max_relative_l2_error": 0.0002519750290741289,
+        "tolerance": 0.005,
+        "t_final": 0.5,
+        "n_initial_conditions": 4,
+        "note": "the reference is an approximation of the true solution, not exact ground truth; this is its measured own error over the actual random initial conditions of the dataset"
+      }
+    },
+    {
+      "name": "burgers.flux_split_sign_aware",
+      "passed": true,
+      "detail": {
+        "split_residual": 2.7755575615628914e-17,
+        "tolerance": 1e-14,
+        "alpha": 1.0,
+        "min_f_plus_speed": 0.0,
+        "max_f_minus_speed": 0.0,
+        "note": "global Lax-Friedrichs split f+- = 0.5 (f +- alpha u); f+' >= 0 and f-' <= 0 so the reconstruction stencils are correctly biased for the characteristic speed f'(u)=u"
+      }
+    },
+    {
+      "name": "burgers.perturbation_decays_positive_background",
+      "passed": true,
+      "detail": {
+        "perturbation_energy_growth_rate": -0.8807130479415726,
+        "tolerance": 0.0,
+        "note": "pure advection (nu = 0); a perturbation on a positive background must be damped by the numerical dissipation"
+      }
+    },
+    {
+      "name": "burgers.perturbation_decays_negative_background",
+      "passed": true,
+      "detail": {
+        "perturbation_energy_growth_rate": -0.8807130479415726,
+        "tolerance": 0.0,
+        "note": "pure advection (nu = 0); on a negative background the characteristic speed is negative, so the left-biased (downwind) reconstruction of a sign-blind split is antidiffusive and the perturbation energy grows. With the global Lax-Friedrichs split the two backgrounds behave identically."
+      }
+    },
+    {
+      "name": "burgers.observation_times_exact",
+      "passed": true,
+      "detail": {
+        "requested": [
+          0.0,
+          0.1,
+          0.2,
+          0.3
+        ],
+        "solvers": {
+          "burgers_weno5": {
+            "n_frames": 4,
+            "returned_clock": [
+              0.0,
+              0.10000000000000002,
+              0.2000000000000001,
+              0.30000000000000016
+            ],
+            "max_abs_time_error": 1.6653345369377348e-16
+          },
+          "burgers_muscl": {
+            "n_frames": 4,
+            "returned_clock": [
+              0.0,
+              0.10000000000000002,
+              0.2000000000000001,
+              0.30000000000000016
+            ],
+            "max_abs_time_error": 1.6653345369377348e-16
+          }
+        },
+        "tolerance": 1e-12,
+        "note": "the step function is replaced by a clock so that the scheduling is measured independently of the PDE accuracy"
+      }
+    },
+    {
+      "name": "burgers.dataset_observation_times_exact",
+      "passed": true,
+      "detail": {
+        "systems": {
+          "burgers": {
+            "n_requested": 101,
+            "n_recorded": 101,
+            "max_abs_time_error": 0.0,
+            "manifest_observation_scheduler": {
+              "observation_scheduler": "pdelab.observation_schedule.v1",
+              "observation_scheduler_policy": "solve_to returns exactly len(save_times) frames; frame i is the state at save_times[i]; the gap between two requested observations is covered by ceil(gap/dt_max) equal sub-steps of size gap/ceil(gap/dt_max) so that the integrator lands exactly on the requested time; dt_max is the solver's own stability bound evaluated on the current state.",
+              "observation_time_tolerance": "1e-12"
+            },
+            "manifest_time_stepping_policy": {
+              "observation_scheduler": "pdelab.observation_schedule.v1",
+              "observation_scheduler_policy": "solve_to returns exactly len(save_times) frames; frame i is the state at save_times[i]; the gap between two requested observations is covered by ceil(gap/dt_max) equal sub-steps of size gap/ceil(gap/dt_max) so that the integrator lands exactly on the requested time; dt_max is the solver's own stability bound evaluated on the current state.",
+              "observation_time_tolerance": "1e-12",
+              "solver": "burgers_weno5_js_global_lax_friedrichs",
+              "time_integrator": "SSPRK(3,3)",
+              "internal_step_rule": "min(stable_internal_dt, next_observation_gap), sub-divided into ceil(gap/stable_internal_dt) equal steps so the integrator lands exactly on the observation",
+              "stability_bound": "min(cfl*dx/alpha, dx^2/(alpha*dx + 2*nu)) with alpha = max|u|; the second term is the combined advection-diffusion von Neumann bound and is not the minimum of the separate bounds"
+            }
+          }
+        },
+        "tolerance": 1e-12,
+        "note": "the manifest records the observation times that were actually written, not the ones that were requested"
+      }
+    },
+    {
+      "name": "burgers.aliasing_error_quantified",
+      "passed": true,
+      "detail": {
+        "relative_l2_aliasing_error": 3.120477069544131e-16,
+        "tolerance": 0.001,
+        "retained_band": "|k| <= 42",
+        "without_output_projection": 0.5000000000000001,
+        "field": "actual dataset initial condition (fourier_series_1d, n_modes=6, amplitude=0.9)",
+        "note": "the residual aliasing error is measured against a 2x padded (alias-free) product of the same field, not asserted to vanish"
+      }
+    },
+    {
+      "name": "burgers.sign_agreement_with_spectral_solver",
+      "passed": true,
+      "detail": {
+        "solvers": {
+          "background_+1": {
+            "relative_l2_difference": 7.851575323467026e-09
+          },
+          "background_-1": {
+            "relative_l2_difference": 7.851575555551667e-09
+          }
+        },
+        "tolerance": 0.05,
+        "t": 0.05,
+        "grid": 128,
+        "note": "the finite-volume generator and the independent spectral solver must agree for a positive *and* a negative background"
+      }
+    }
+  ],
+  "passed": true,
+  "walltime_seconds": 20.929
+}

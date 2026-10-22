@@ -47,7 +47,6 @@ selection and the pure-accuracy selection are recorded.
 
 import json
 import subprocess
-import sys
 from pathlib import Path
 
 ROOT = Path("/home/atulp/projects/pdelab")

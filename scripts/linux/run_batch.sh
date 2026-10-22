@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Run a list of experiment configs sequentially.
+# Run a list of experiment configs sequentially, with a hard per-job
+# wall-time limit and a hard stop on the first failure.
 #
 # Usage: run_batch.sh <config-name> [config-name ...]
 #
-# Each config is trained with the `prototype` profile. The CLI takes the
-# project job lock, so a batch cannot overlap with another PDELab job.
-# The batch stops on the first failure so that a partial batch is never
-# mistaken for a complete one.
+# Every job goes through the CLI, which takes the project lease and runs
+# the resource preflight. The batch stops on the first failure so a
+# partial batch is never mistaken for a complete one.
 set -uo pipefail
 cd "$(dirname "$0")/../.."
 PY=".venv/bin/python"
+
+MAX_JOB_MIN="${MAX_JOB_MIN:-45}"
 
 if [ "$#" -eq 0 ]; then
   echo "usage: $0 <config-name> [config-name ...]" >&2
@@ -17,6 +19,7 @@ if [ "$#" -eq 0 ]; then
 fi
 
 overall=0
+mkdir -p runs/_logs
 for name in "$@"; do
   cfg="configs/experiments/${name}.yaml"
   if [ ! -f "$cfg" ]; then
@@ -24,12 +27,19 @@ for name in "$@"; do
     overall=1
     continue
   fi
-  echo ">>> $(date -u +%Y-%m-%dT%H:%M:%SZ) training $name"
-  if "$PY" -m pdelab.cli train --config "$cfg" --profile prototype; then
-    echo "<<< $(date -u +%Y-%m-%dT%H:%M:%SZ) done $name"
+  log="runs/_logs/${name}.log"
+  echo ">>> $(date -u +%Y-%m-%dT%H:%M:%SZ) training $name (max ${MAX_JOB_MIN} min, log $log)"
+  start=$(date +%s)
+  if timeout "${MAX_JOB_MIN}m" "$PY" -m pdelab.cli train --config "$cfg" --profile prototype > "$log" 2>&1; then
+    mins=$(( ($(date +%s)-start)/60 ))
+    echo "<<< $(date -u +%Y-%m-%dT%H:%M:%SZ) done $name (${mins} min): $(grep -E 'best_val_loss' "$log" | tail -1 | sed 's/^ *//')"
   else
-    echo "<<< FAILED $name" >&2
+    rc=$?
+    mins=$(( ($(date +%s)-start)/60 ))
+    echo "<<< FAILED $name (exit $rc, ${mins} min) - see $log" >&2
+    tail -5 "$log" >&2
     overall=1
+    break
   fi
 done
 exit $overall

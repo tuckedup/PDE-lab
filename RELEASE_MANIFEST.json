@@ -1,0 +1,1594 @@
+{
+  "schema": "pdelab-release-manifest/1",
+  "generated_utc": "2026-10-22T05:26:11Z",
+  "generator": "scripts/linux/release_manifest.py",
+  "project": {
+    "name": "pdelab",
+    "version": "0.1.0",
+    "description": "Physics-Constrained Neural Operator Research Prototype",
+    "author": "Atul Pandey"
+  },
+  "artifact": {
+    "wheel_filename": "pdelab-0.1.0-py3-none-any.whl",
+    "wheel_path": "dist/pdelab-0.1.0-py3-none-any.whl",
+    "wheel_size_bytes": 135259,
+    "wheel_uncompressed_bytes": 451951,
+    "wheel_sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+    "wheel_entry_count": 35,
+    "wheel_contents_listing": "campaigns/release/wheel_contents.txt",
+    "wheel_contents": [
+      "pdelab-0.1.0.dist-info/METADATA",
+      "pdelab-0.1.0.dist-info/RECORD",
+      "pdelab-0.1.0.dist-info/WHEEL",
+      "pdelab-0.1.0.dist-info/entry_points.txt",
+      "pdelab-0.1.0.dist-info/top_level.txt",
+      "pdelab/__init__.py",
+      "pdelab/benchmarks/inference.py",
+      "pdelab/benchmarks/variant_runner.py",
+      "pdelab/cli.py",
+      "pdelab/config.py",
+      "pdelab/data/dataset.py",
+      "pdelab/data/generate.py",
+      "pdelab/data/initial_conditions.py",
+      "pdelab/evaluation/evaluate.py",
+      "pdelab/evaluation/metrics.py",
+      "pdelab/evaluation/rollout.py",
+      "pdelab/models/base.py",
+      "pdelab/models/fno.py",
+      "pdelab/models/registry.py",
+      "pdelab/models/unet.py",
+      "pdelab/physics/losses.py",
+      "pdelab/physics/operators.py",
+      "pdelab/reporting/plots.py",
+      "pdelab/reporting/report.py",
+      "pdelab/resources/preflight.py",
+      "pdelab/solvers/allen_cahn.py",
+      "pdelab/solvers/base.py",
+      "pdelab/solvers/burgers.py",
+      "pdelab/solvers/burgers_weno.py",
+      "pdelab/solvers/observation.py",
+      "pdelab/solvers/validation.py",
+      "pdelab/sweep.py",
+      "pdelab/training/experiment.py",
+      "pdelab/training/trainer.py",
+      "pdelab/utils.py"
+    ],
+    "console_script": "pdelab",
+    "reproducible_build": "SOURCE_DATE_EPOCH is pinned to the commit date of HEAD and the setuptools build tree is removed before every build; scripts/linux/release_reproducibility.sh builds the wheel three times in a row and compares the digests (see campaigns/release/build_reproducibility.json)",
+    "reproducibility_check": {
+      "performed": true,
+      "record": "campaigns/release/build_reproducibility.json",
+      "record_sha256": "2bf37dd10a4f3fb40a569e3052cc0a2a204fd812fc4b577992952b8c7afd275c",
+      "generated_utc": "2026-10-22T05:13:20Z",
+      "commit": "c73809950d1f5f902fd5f3b890f5abe0f9505649",
+      "source_date_epoch": 1792621523,
+      "source_date_epoch_utc": "2026-10-21T22:25:23Z",
+      "version": "0.1.0",
+      "builds": [
+        {
+          "index": 1,
+          "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+          "size_bytes": 135259
+        },
+        {
+          "index": 2,
+          "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+          "size_bytes": 135259
+        },
+        {
+          "index": 3,
+          "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+          "size_bytes": 135259
+        }
+      ],
+      "three_consecutive_builds_identical": true,
+      "shipped_wheel_path": "/home/atulp/projects/pdelab/dist/pdelab-0.1.0-py3-none-any.whl",
+      "shipped_wheel_sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+      "shipped_wheel_size_bytes": 135259,
+      "shipped_wheel_matches_the_three_builds": true,
+      "method": "three consecutive `python -m build --wheel --no-isolation` runs of the same tree with SOURCE_DATE_EPOCH pinned to the commit date of HEAD and the setuptools build tree removed before each run"
+    },
+    "must_not_ship": [
+      "datasets",
+      "checkpoints",
+      "run artifacts",
+      "secrets",
+      "plots",
+      "the .venv",
+      "the campaigns/ scratch tree"
+    ],
+    "shipped_content": "the pdelab library (Python source) and the wheel metadata only; no configuration, data or artifact is included"
+  },
+  "source": {
+    "revision": "c73809950d1f5f902fd5f3b890f5abe0f9505649",
+    "branch": "master",
+    "dirty": true,
+    "dirty_path_count": 179,
+    "dirty_paths": [
+      ".gitignore",
+      "campaigns/evidence-cohort/cohort.yaml",
+      "campaigns/v2-recovery/BUDGET.json",
+      "campaigns/v2-recovery/EVENTS.jsonl",
+      "campaigns/v2-recovery/MATRIX.json",
+      "campaigns/v2-recovery/STATE.json",
+      "configs/experiments/allen_cahn_fno2d_data_only_seed0.yaml",
+      "configs/experiments/allen_cahn_fno2d_data_only_seed1.yaml",
+      "configs/experiments/allen_cahn_fno2d_data_only_seed2.yaml",
+      "configs/experiments/allen_cahn_fno2d_physics_seed0.yaml",
+      "configs/experiments/allen_cahn_fno2d_physics_seed1.yaml",
+      "configs/experiments/allen_cahn_fno2d_physics_seed2.yaml",
+      "configs/experiments/allen_cahn_unet2d_data_only_seed0.yaml",
+      "configs/experiments/allen_cahn_unet2d_data_only_seed1.yaml",
+      "configs/experiments/allen_cahn_unet2d_data_only_seed2.yaml",
+      "configs/experiments/allen_cahn_unet2d_physics_seed0.yaml",
+      "configs/experiments/allen_cahn_unet2d_physics_seed1.yaml",
+      "configs/experiments/allen_cahn_unet2d_physics_seed2.yaml",
+      "configs/experiments/burgers_fno1d_data_only_seed0.yaml",
+      "configs/experiments/burgers_fno1d_data_only_seed1.yaml",
+      "configs/experiments/burgers_fno1d_data_only_seed2.yaml",
+      "configs/experiments/burgers_fno1d_physics_seed0.yaml",
+      "configs/experiments/burgers_fno1d_physics_seed1.yaml",
+      "configs/experiments/burgers_fno1d_physics_seed2.yaml",
+      "configs/experiments/burgers_unet1d_data_only_seed0.yaml",
+      "configs/experiments/burgers_unet1d_data_only_seed1.yaml",
+      "configs/experiments/burgers_unet1d_data_only_seed2.yaml",
+      "configs/experiments/burgers_unet1d_physics_seed0.yaml",
+      "configs/experiments/burgers_unet1d_physics_seed1.yaml",
+      "configs/experiments/burgers_unet1d_physics_seed2.yaml",
+      "configs/lambda_selection.json",
+      "docs/RESULTS.md",
+      "pyproject.toml",
+      "results/RESULTS.md",
+      "results/results.json",
+      "results/results.json.sha256",
+      "runs/.pdelab.lock",
+      "runs/allen_cahn_fno2d_data_only_seed0/benchmark_matched.json",
+      "runs/allen_cahn_fno2d_data_only_seed0/evaluation.json",
+      "runs/allen_cahn_fno2d_data_only_seed0/evaluation.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed0/evaluation_val.json",
+      "runs/allen_cahn_fno2d_data_only_seed0/evaluation_val.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed0/manifest.json",
+      "runs/allen_cahn_fno2d_data_only_seed1/evaluation.json",
+      "runs/allen_cahn_fno2d_data_only_seed1/evaluation.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed1/manifest.json",
+      "runs/allen_cahn_fno2d_data_only_seed2/evaluation.json",
+      "runs/allen_cahn_fno2d_data_only_seed2/evaluation.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed2/manifest.json",
+      "runs/allen_cahn_fno2d_physics_lam0p1_seed0/evaluation_val.json",
+      "runs/allen_cahn_fno2d_physics_lam0p1_seed0/evaluation_val.json.sha256",
+      "runs/allen_cahn_fno2d_physics_lam0p1_seed0/manifest.json",
+      "runs/allen_cahn_fno2d_physics_lam0p1_seed1/manifest.json",
+      "runs/allen_cahn_fno2d_physics_lam0p1_seed2/manifest.json",
+      "runs/allen_cahn_fno2d_physics_seed0/benchmark_matched.json",
+      "runs/allen_cahn_fno2d_physics_seed0/evaluation.json",
+      "runs/allen_cahn_fno2d_physics_seed0/evaluation.json.sha256",
+      "runs/allen_cahn_fno2d_physics_seed0/evaluation_val.json",
+      "runs/allen_cahn_fno2d_physics_seed0/evaluation_val.json.sha256",
+      "runs/allen_cahn_fno2d_physics_seed0/manifest.json",
+      "runs/allen_cahn_fno2d_physics_seed1/evaluation.json",
+      "runs/allen_cahn_fno2d_physics_seed1/evaluation.json.sha256",
+      "runs/allen_cahn_fno2d_physics_seed1/manifest.json",
+      "runs/allen_cahn_fno2d_physics_seed2/evaluation.json",
+      "runs/allen_cahn_fno2d_physics_seed2/evaluation.json.sha256",
+      "runs/allen_cahn_fno2d_physics_seed2/manifest.json",
+      "runs/allen_cahn_unet2d_data_only_seed0/benchmark_matched.json",
+      "runs/allen_cahn_unet2d_data_only_seed0/evaluation.json",
+      "runs/allen_cahn_unet2d_data_only_seed0/evaluation.json.sha256",
+      "runs/allen_cahn_unet2d_data_only_seed0/manifest.json",
+      "runs/allen_cahn_unet2d_data_only_seed1/manifest.json",
+      "runs/allen_cahn_unet2d_data_only_seed2/manifest.json",
+      "runs/allen_cahn_unet2d_physics_seed0/manifest.json",
+      "runs/allen_cahn_unet2dw4_data_only_seed0/benchmark_matched.json",
+      "runs/allen_cahn_unet2dw4_data_only_seed0/evaluation.json",
+      "runs/allen_cahn_unet2dw4_data_only_seed0/evaluation.json.sha256",
+      "runs/allen_cahn_unet2dw4_data_only_seed0/manifest.json",
+      "runs/burgers_fno1d_data_only_seed0/benchmark_matched.json",
+      "runs/burgers_fno1d_data_only_seed0/evaluation.json",
+      "runs/burgers_fno1d_data_only_seed0/evaluation.json.sha256",
+      "runs/burgers_fno1d_data_only_seed0/evaluation_val.json",
+      "runs/burgers_fno1d_data_only_seed0/evaluation_val.json.sha256",
+      "runs/burgers_fno1d_data_only_seed0/manifest.json",
+      "runs/burgers_fno1d_data_only_seed1/evaluation.json",
+      "runs/burgers_fno1d_data_only_seed1/evaluation.json.sha256",
+      "runs/burgers_fno1d_data_only_seed1/manifest.json",
+      "runs/burgers_fno1d_data_only_seed2/evaluation.json",
+      "runs/burgers_fno1d_data_only_seed2/evaluation.json.sha256",
+      "runs/burgers_fno1d_data_only_seed2/manifest.json",
+      "runs/burgers_fno1d_physics_lam0p1_seed0/evaluation_val.json",
+      "runs/burgers_fno1d_physics_lam0p1_seed0/evaluation_val.json.sha256",
+      "runs/burgers_fno1d_physics_lam0p1_seed0/manifest.json",
+      "runs/burgers_fno1d_physics_lam0p1_seed1/manifest.json",
+      "runs/burgers_fno1d_physics_lam0p1_seed2/manifest.json",
+      "runs/burgers_fno1d_physics_seed0/benchmark_matched.json",
+      "runs/burgers_fno1d_physics_seed0/evaluation.json",
+      "runs/burgers_fno1d_physics_seed0/evaluation.json.sha256",
+      "runs/burgers_fno1d_physics_seed0/evaluation_val.json",
+      "runs/burgers_fno1d_physics_seed0/evaluation_val.json.sha256",
+      "runs/burgers_fno1d_physics_seed0/manifest.json",
+      "runs/burgers_fno1d_physics_seed1/evaluation.json",
+      "runs/burgers_fno1d_physics_seed1/evaluation.json.sha256",
+      "runs/burgers_fno1d_physics_seed1/manifest.json",
+      "runs/burgers_fno1d_physics_seed2/evaluation.json",
+      "runs/burgers_fno1d_physics_seed2/evaluation.json.sha256",
+      "runs/burgers_fno1d_physics_seed2/manifest.json",
+      "runs/burgers_fno1d_w24m24_data_only_seed0/manifest.json",
+      "runs/burgers_fno1d_w8m8_data_only_seed0/manifest.json",
+      "runs/burgers_unet1d_data_only_seed0/benchmark_matched.json",
+      "runs/burgers_unet1d_data_only_seed0/evaluation.json",
+      "runs/burgers_unet1d_data_only_seed0/evaluation.json.sha256",
+      "runs/burgers_unet1d_data_only_seed0/manifest.json",
+      "runs/burgers_unet1d_data_only_seed1/manifest.json",
+      "runs/burgers_unet1d_data_only_seed2/manifest.json",
+      "runs/burgers_unet1d_physics_seed0/manifest.json",
+      "runs/burgers_unet1dw4_data_only_seed0/benchmark_matched.json",
+      "runs/burgers_unet1dw4_data_only_seed0/evaluation.json",
+      "runs/burgers_unet1dw4_data_only_seed0/evaluation.json.sha256",
+      "runs/burgers_unet1dw4_data_only_seed0/manifest.json",
+      "scripts/linux/run_batch.sh",
+      "src/pdelab/benchmarks/inference.py",
+      "src/pdelab/benchmarks/variant_runner.py",
+      "src/pdelab/reporting/report.py",
+      "src/pdelab/solvers/validation.py",
+      "RELEASE_MANIFEST.json",
+      "campaigns/evidence-cohort/declare_v2_cohort.py",
+      "campaigns/release/",
+      "docs/RELEASE.md",
+      "runs/_logs/",
+      "runs/allen_cahn_fno2d_data_only_seed0/manifest.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed1/evaluation_val.json",
+      "runs/allen_cahn_fno2d_data_only_seed1/evaluation_val.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed1/manifest.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed2/evaluation_val.json",
+      "runs/allen_cahn_fno2d_data_only_seed2/evaluation_val.json.sha256",
+      "runs/allen_cahn_fno2d_data_only_seed2/manifest.json.sha256",
+      "runs/allen_cahn_fno2d_physics_lam0p1_seed0/manifest.json.sha256",
+      "runs/allen_cahn_fno2d_physics_seed0/manifest.json.sha256",
+      "runs/allen_cahn_fno2d_physics_seed1/manifest.json.sha256",
+      "runs/allen_cahn_fno2d_physics_seed2/manifest.json.sha256",
+      "runs/allen_cahn_unet2d_data_only_seed0/manifest.json.sha256",
+      "runs/allen_cahn_unet2d_data_only_seed1/evaluation.json",
+      "runs/allen_cahn_unet2d_data_only_seed1/evaluation.json.sha256",
+      "runs/allen_cahn_unet2d_data_only_seed1/manifest.json.sha256",
+      "runs/allen_cahn_unet2d_data_only_seed2/evaluation.json",
+      "runs/allen_cahn_unet2d_data_only_seed2/evaluation.json.sha256",
+      "runs/allen_cahn_unet2d_data_only_seed2/manifest.json.sha256",
+      "runs/burgers_fno1d_data_only_seed0/benchmark_matched.json.sha256",
+      "runs/burgers_fno1d_data_only_seed0/manifest.json.sha256",
+      "runs/burgers_fno1d_data_only_seed1/evaluation_val.json",
+      "runs/burgers_fno1d_data_only_seed1/evaluation_val.json.sha256",
+      "runs/burgers_fno1d_data_only_seed1/manifest.json.sha256",
+      "runs/burgers_fno1d_data_only_seed2/evaluation_val.json",
+      "runs/burgers_fno1d_data_only_seed2/evaluation_val.json.sha256",
+      "runs/burgers_fno1d_data_only_seed2/manifest.json.sha256",
+      "runs/burgers_fno1d_physics_lam0p1_seed0/manifest.json.sha256",
+      "runs/burgers_fno1d_physics_seed0/manifest.json.sha256",
+      "runs/burgers_fno1d_physics_seed1/manifest.json.sha256",
+      "runs/burgers_fno1d_physics_seed2/manifest.json.sha256",
+      "runs/burgers_unet1d_data_only_seed0/manifest.json.sha256",
+      "runs/burgers_unet1d_data_only_seed1/evaluation.json",
+      "runs/burgers_unet1d_data_only_seed1/evaluation.json.sha256",
+      "runs/burgers_unet1d_data_only_seed1/manifest.json.sha256",
+      "runs/burgers_unet1d_data_only_seed2/evaluation.json",
+      "runs/burgers_unet1d_data_only_seed2/evaluation.json.sha256",
+      "runs/burgers_unet1d_data_only_seed2/manifest.json.sha256",
+      "scripts/linux/check_validate_cli.sh",
+      "scripts/linux/evaluate_frozen_test.sh",
+      "scripts/linux/gen_v2_matrix.py",
+      "scripts/linux/reconstruct_campaign_state.py",
+      "scripts/linux/release_all.sh",
+      "scripts/linux/release_build.sh",
+      "scripts/linux/release_clean_install.sh",
+      "scripts/linux/release_manifest.py",
+      "scripts/linux/release_reproducibility.sh",
+      "scripts/linux/select_lambda_v2.py",
+      "scripts/linux/show_memory_accounting.py",
+      "scripts/linux/show_v2_results.py",
+      "tests/integration/test_release.py"
+    ],
+    "note": "the recorded revision is the commit the wheel was built from; the working tree was dirty at build time, so the wheel is not reproducible from the commit alone - it is reproducible from the working tree that was built, which is what the three-build reproducibility check measures (see artifact.reproducibility_check)"
+  },
+  "environment": {
+    "python": "3.11.17",
+    "torch": "2.14.1+cu130",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "cpu_threads": 4,
+    "clean_install_environment": {
+      "python": "3.11.17",
+      "torch": "2.14.1+cu130",
+      "numpy": "2.4.6",
+      "pdelab_file": "/tmp/pdelab_clean_install_qqhfMX/venv/lib/python3.11/site-packages/pdelab/__init__.py",
+      "pdelab_version": "0.1.0",
+      "torch_threads": 4,
+      "cuda_available": false
+    }
+  },
+  "evidence": {
+    "evidence_index": "campaigns/release/EVIDENCE_INDEX.json",
+    "campaign_evidence_index": "campaigns/v2-recovery/EVIDENCE_INDEX.json",
+    "cohort_file": "campaigns/evidence-cohort/cohort.yaml",
+    "cohort_sha256": "00b005a2e7a0a3765c2ee23d7f7f4064ff9a16d603e01e1264e1310f2b33b9f3",
+    "cohort_id": "pdelab-main-confirmatory",
+    "cohort_schema": "pdelab-evidence-cohort/1",
+    "evaluator": {
+      "id": "pdelab-evaluation/2",
+      "sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2"
+    },
+    "protocol": {
+      "id": "pdelab-free-rollout/2",
+      "split": "test"
+    },
+    "datasets": {
+      "burgers": {
+        "system": "burgers",
+        "train_sha256": "12475d18b94db16fcc1448e96e10ae3cb136c86f8b9fc9347406186b9740bb28",
+        "val_sha256": "25422d2d66ee55bf5cc1c36499fc7ebafec3eeaa8b76a1a940cabf4ece3d1482",
+        "test_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae"
+      },
+      "allen_cahn": {
+        "system": "allen_cahn",
+        "train_sha256": "a6723f34c07f17bc76a6765c4933e2a6ebcdfed5830164ee256641c7cacf2305",
+        "val_sha256": "adc2912b5945c2ce0f505b6a77a9379aa25962e957e4fae622f4a80c159e1921",
+        "test_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6"
+      }
+    },
+    "checkpoints": {
+      "burgers_fno1d_data_only_seed0": {
+        "checkpoint_sha256": "7ac8857521cfd2bbff439b502c7e0b96a992c91973185417552fd53e69c17c33",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_fno1d_data_only_seed0/best.pt",
+        "checkpoint_file_sha256": "7ac8857521cfd2bbff439b502c7e0b96a992c91973185417552fd53e69c17c33"
+      },
+      "burgers_fno1d_data_only_seed1": {
+        "checkpoint_sha256": "f1b5135c42e5d2475d68927ae4b0bf52f3a41e7e4e60c1683ff196611ce9a9fd",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_fno1d_data_only_seed1/best.pt",
+        "checkpoint_file_sha256": "f1b5135c42e5d2475d68927ae4b0bf52f3a41e7e4e60c1683ff196611ce9a9fd"
+      },
+      "burgers_fno1d_data_only_seed2": {
+        "checkpoint_sha256": "5f63c8f8e03ad4d353ddb4fda3a67460477e6de07950f454a9fc6797234456f1",
+        "checkpoint_epoch": 58,
+        "checkpoint_file": "runs/burgers_fno1d_data_only_seed2/best.pt",
+        "checkpoint_file_sha256": "5f63c8f8e03ad4d353ddb4fda3a67460477e6de07950f454a9fc6797234456f1"
+      },
+      "burgers_fno1d_physics_seed0": {
+        "checkpoint_sha256": "c31e5205aaaacfa41bc6539a3faa05dbf55609fea2f7a900f3d484294eb697ce",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_fno1d_physics_seed0/best.pt",
+        "checkpoint_file_sha256": "c31e5205aaaacfa41bc6539a3faa05dbf55609fea2f7a900f3d484294eb697ce"
+      },
+      "burgers_fno1d_physics_seed1": {
+        "checkpoint_sha256": "88230996db9f9b9b06ffb73c9a0a6a866f8e4cd7695df7538c964c1cee043a33",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_fno1d_physics_seed1/best.pt",
+        "checkpoint_file_sha256": "88230996db9f9b9b06ffb73c9a0a6a866f8e4cd7695df7538c964c1cee043a33"
+      },
+      "burgers_fno1d_physics_seed2": {
+        "checkpoint_sha256": "2abb58cb21dcaaf1c19e72fe8b2266d1ba37b532c2bae38a5caed18b3cb7ca7f",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_fno1d_physics_seed2/best.pt",
+        "checkpoint_file_sha256": "2abb58cb21dcaaf1c19e72fe8b2266d1ba37b532c2bae38a5caed18b3cb7ca7f"
+      },
+      "allen_cahn_fno2d_data_only_seed0": {
+        "checkpoint_sha256": "c8202066a380ee025cf8b36938c0bea3b8fc6088baeb20b1a1254cf7ee88bc82",
+        "checkpoint_epoch": 40,
+        "checkpoint_file": "runs/allen_cahn_fno2d_data_only_seed0/best.pt",
+        "checkpoint_file_sha256": "c8202066a380ee025cf8b36938c0bea3b8fc6088baeb20b1a1254cf7ee88bc82"
+      },
+      "allen_cahn_fno2d_data_only_seed1": {
+        "checkpoint_sha256": "51da5042ace0efb5aef8d02880508d5a7d9b44f27152ed85faabdb5ff1c5806e",
+        "checkpoint_epoch": 40,
+        "checkpoint_file": "runs/allen_cahn_fno2d_data_only_seed1/best.pt",
+        "checkpoint_file_sha256": "51da5042ace0efb5aef8d02880508d5a7d9b44f27152ed85faabdb5ff1c5806e"
+      },
+      "allen_cahn_fno2d_data_only_seed2": {
+        "checkpoint_sha256": "ace93c66d398832dfe30c14f594cf4f76e2a5483b72de2c2c0679344c06c93d1",
+        "checkpoint_epoch": 40,
+        "checkpoint_file": "runs/allen_cahn_fno2d_data_only_seed2/best.pt",
+        "checkpoint_file_sha256": "ace93c66d398832dfe30c14f594cf4f76e2a5483b72de2c2c0679344c06c93d1"
+      },
+      "allen_cahn_fno2d_physics_seed0": {
+        "checkpoint_sha256": "7af47c68548de3f81fb796f88428e794370792e914d15e96dd4105eafcfb929f",
+        "checkpoint_epoch": 40,
+        "checkpoint_file": "runs/allen_cahn_fno2d_physics_seed0/best.pt",
+        "checkpoint_file_sha256": "7af47c68548de3f81fb796f88428e794370792e914d15e96dd4105eafcfb929f"
+      },
+      "allen_cahn_fno2d_physics_seed1": {
+        "checkpoint_sha256": "88c7bf9247e6bbe5e4254cdf390e17c29118f4f64b8cadb2d6f4fdd52376576a",
+        "checkpoint_epoch": 40,
+        "checkpoint_file": "runs/allen_cahn_fno2d_physics_seed1/best.pt",
+        "checkpoint_file_sha256": "88c7bf9247e6bbe5e4254cdf390e17c29118f4f64b8cadb2d6f4fdd52376576a"
+      },
+      "allen_cahn_fno2d_physics_seed2": {
+        "checkpoint_sha256": "faba73b9275bf89070472833b2da4759d133050b845db7b2c1718000ba0c44ae",
+        "checkpoint_epoch": 40,
+        "checkpoint_file": "runs/allen_cahn_fno2d_physics_seed2/best.pt",
+        "checkpoint_file_sha256": "faba73b9275bf89070472833b2da4759d133050b845db7b2c1718000ba0c44ae"
+      },
+      "burgers_unet1d_data_only_seed0": {
+        "checkpoint_sha256": "246d48cb26c14d525bb8e2af1f70954448e6e00f1139901cd1740e4eed1366eb",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_unet1d_data_only_seed0/best.pt",
+        "checkpoint_file_sha256": "246d48cb26c14d525bb8e2af1f70954448e6e00f1139901cd1740e4eed1366eb"
+      },
+      "burgers_unet1d_data_only_seed1": {
+        "checkpoint_sha256": "babbfc9b340ce18192e00140a467620501e1fff99838926134391493cc950b24",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_unet1d_data_only_seed1/best.pt",
+        "checkpoint_file_sha256": "babbfc9b340ce18192e00140a467620501e1fff99838926134391493cc950b24"
+      },
+      "burgers_unet1d_data_only_seed2": {
+        "checkpoint_sha256": "52fe837746d010ebc779b5a5ac8def2564c3624a0702031aa1b3f40965a97ef3",
+        "checkpoint_epoch": 60,
+        "checkpoint_file": "runs/burgers_unet1d_data_only_seed2/best.pt",
+        "checkpoint_file_sha256": "52fe837746d010ebc779b5a5ac8def2564c3624a0702031aa1b3f40965a97ef3"
+      },
+      "allen_cahn_unet2d_data_only_seed0": {
+        "checkpoint_sha256": "167b8f0d3b8ccc7b2243e926506d142b060d2dee604afa83a81fa05dfb30389d",
+        "checkpoint_epoch": 32,
+        "checkpoint_file": "runs/allen_cahn_unet2d_data_only_seed0/best.pt",
+        "checkpoint_file_sha256": "167b8f0d3b8ccc7b2243e926506d142b060d2dee604afa83a81fa05dfb30389d"
+      },
+      "allen_cahn_unet2d_data_only_seed1": {
+        "checkpoint_sha256": "e48e6813209b75f6f6a11fb366b67a4e8afbde482f48ec47359c4ab91498764a",
+        "checkpoint_epoch": 22,
+        "checkpoint_file": "runs/allen_cahn_unet2d_data_only_seed1/best.pt",
+        "checkpoint_file_sha256": "e48e6813209b75f6f6a11fb366b67a4e8afbde482f48ec47359c4ab91498764a"
+      },
+      "allen_cahn_unet2d_data_only_seed2": {
+        "checkpoint_sha256": "a7dbec618ca92f53490cde53231bfd91d57e345cb1011877e5ee7afcc31ee075",
+        "checkpoint_epoch": 26,
+        "checkpoint_file": "runs/allen_cahn_unet2d_data_only_seed2/best.pt",
+        "checkpoint_file_sha256": "a7dbec618ca92f53490cde53231bfd91d57e345cb1011877e5ee7afcc31ee075"
+      }
+    },
+    "members": [
+      {
+        "member_id": "burgers_fno1d_data_only",
+        "role": "baseline",
+        "run_id": "burgers_fno1d_data_only_seed0",
+        "system": "burgers",
+        "architecture": "fno1d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "7ac8857521cfd2bbff439b502c7e0b96a992c91973185417552fd53e69c17c33",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "c61a254b5a9d48567ccabeee31dda9756f0d0e27a6ce803b80bf9f88395c6929",
+        "evaluation_sha256": "c0cb9da739f1fb14a9bf9ab89b6c4742659fc6369ffbcdd6a290a0ad6d674829",
+        "measured": {
+          "rollout_nrmse_mean": 0.014327565776242092,
+          "one_step_nrmse_mean": 0.0006361161751025557,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.22838737051028257,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.11202488195845853,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_fno1d_data_only",
+        "role": "baseline",
+        "run_id": "burgers_fno1d_data_only_seed1",
+        "system": "burgers",
+        "architecture": "fno1d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "f1b5135c42e5d2475d68927ae4b0bf52f3a41e7e4e60c1683ff196611ce9a9fd",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "61f3bf3c802a8acea9f6fb9c47dd58a3f5a7ae13ca7ed7fc90e3b92d783c441d",
+        "evaluation_sha256": "95bcaf065b17a6bf53fa49990eb6bf85ab5529e20d8530161ba017348acd2f0f",
+        "measured": {
+          "rollout_nrmse_mean": 0.015955095601800737,
+          "one_step_nrmse_mean": 0.0006390471437078454,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.22520239397818645,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.10422071605107243,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_fno1d_data_only",
+        "role": "baseline",
+        "run_id": "burgers_fno1d_data_only_seed2",
+        "system": "burgers",
+        "architecture": "fno1d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "5f63c8f8e03ad4d353ddb4fda3a67460477e6de07950f454a9fc6797234456f1",
+        "checkpoint_epoch": 58,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "37106cf9f0964e6cb4a4e543c234981559db748e4a171d79e7cf5b17e5dc8dd4",
+        "evaluation_sha256": "21317617ff27cc4de4bbd4a15685ff42ed05dc97d7e0786b89945b575aab2813",
+        "measured": {
+          "rollout_nrmse_mean": 0.016366233942129417,
+          "one_step_nrmse_mean": 0.0006349142981157296,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.22136900182754568,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.10111474108524442,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_fno1d_physics",
+        "role": "proposed",
+        "run_id": "burgers_fno1d_physics_seed0",
+        "system": "burgers",
+        "architecture": "fno1d",
+        "condition": "physics",
+        "lambda_pde": 0.1,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "c31e5205aaaacfa41bc6539a3faa05dbf55609fea2f7a900f3d484294eb697ce",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "3ee066b3d6ad9db04f174e40f25d6ded97a6f2cc3bbde3963051ca0fe9f85d97",
+        "evaluation_sha256": "3354a773eea481d834a5d1df35ec4862142d03f4c21da203aada622894750d70",
+        "measured": {
+          "rollout_nrmse_mean": 0.023153460983982053,
+          "one_step_nrmse_mean": 0.0010444912088109727,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.06958988205845533,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.16289407563634986,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_fno1d_physics",
+        "role": "proposed",
+        "run_id": "burgers_fno1d_physics_seed1",
+        "system": "burgers",
+        "architecture": "fno1d",
+        "condition": "physics",
+        "lambda_pde": 0.1,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "88230996db9f9b9b06ffb73c9a0a6a866f8e4cd7695df7538c964c1cee043a33",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "dfa275e4cd4d49577f7348b6ea5bb0ff9f2a3450095a05173b5128fc18a04009",
+        "evaluation_sha256": "36d6861af697cedee7066a29b9948996c951b15415f381b3390c812841fb867e",
+        "measured": {
+          "rollout_nrmse_mean": 0.024560655924953226,
+          "one_step_nrmse_mean": 0.0010497089753937288,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.06935963897619547,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.16668711684031853,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_fno1d_physics",
+        "role": "proposed",
+        "run_id": "burgers_fno1d_physics_seed2",
+        "system": "burgers",
+        "architecture": "fno1d",
+        "condition": "physics",
+        "lambda_pde": 0.1,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "2abb58cb21dcaaf1c19e72fe8b2266d1ba37b532c2bae38a5caed18b3cb7ca7f",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "376bd40c39290f6d80f7de0ad91bce156cb0731a9f111e90adf478281283a693",
+        "evaluation_sha256": "e61e93c8f8a050a0fa06441a2f38e4fd1b7f31d75b924e6e43c33e63699e606e",
+        "measured": {
+          "rollout_nrmse_mean": 0.023841029229082454,
+          "one_step_nrmse_mean": 0.0010097640356222534,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.06426594416729517,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.1651907702014221,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "allen_cahn_fno2d_data_only",
+        "role": "baseline",
+        "run_id": "allen_cahn_fno2d_data_only_seed0",
+        "system": "allen_cahn",
+        "architecture": "fno2d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "c8202066a380ee025cf8b36938c0bea3b8fc6088baeb20b1a1254cf7ee88bc82",
+        "checkpoint_epoch": 40,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "9315e896f0ea7824aa00d82f6d0fcf4ec0c7521c236a5ebdb2a80ea46536bef7",
+        "evaluation_sha256": "fac2a4610d188b3bc76be2ea60297e265ffbaf0b20bf37c4951d4b2c013dd4cc",
+        "measured": {
+          "rollout_nrmse_mean": 0.015317231698834505,
+          "one_step_nrmse_mean": 0.0019813383219846182,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.0342970860909005,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.03225334778872818,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "allen_cahn_fno2d_data_only",
+        "role": "baseline",
+        "run_id": "allen_cahn_fno2d_data_only_seed1",
+        "system": "allen_cahn",
+        "architecture": "fno2d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "51da5042ace0efb5aef8d02880508d5a7d9b44f27152ed85faabdb5ff1c5806e",
+        "checkpoint_epoch": 40,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "a31fd7cbbab218e4eeacb0f9e6969a317f72b8406532b6d9d291124688b0fa85",
+        "evaluation_sha256": "b0af7f965be1cf91d3b7fe5a9546609e0dbb67188d21ae97fb39e5e9194ff86a",
+        "measured": {
+          "rollout_nrmse_mean": 0.013353809575536273,
+          "one_step_nrmse_mean": 0.001687306331025198,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.03441513525721496,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.03250542894356919,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "allen_cahn_fno2d_data_only",
+        "role": "baseline",
+        "run_id": "allen_cahn_fno2d_data_only_seed2",
+        "system": "allen_cahn",
+        "architecture": "fno2d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "ace93c66d398832dfe30c14f594cf4f76e2a5483b72de2c2c0679344c06c93d1",
+        "checkpoint_epoch": 40,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "a024ff0b9cab6d0915daf705d26a04513fc6ee11dd46c49ff1f398995f2e31c8",
+        "evaluation_sha256": "eb8e2af1499956c8bfe920ea04aa949468f4d97d968a637db7483d7faa55510a",
+        "measured": {
+          "rollout_nrmse_mean": 0.012848464338372338,
+          "one_step_nrmse_mean": 0.0017645769762115204,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.033994495639379854,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.032136074559917155,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "allen_cahn_fno2d_physics",
+        "role": "proposed",
+        "run_id": "allen_cahn_fno2d_physics_seed0",
+        "system": "allen_cahn",
+        "architecture": "fno2d",
+        "condition": "physics",
+        "lambda_pde": 0.01,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "7af47c68548de3f81fb796f88428e794370792e914d15e96dd4105eafcfb929f",
+        "checkpoint_epoch": 40,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "e1d6a1ba25580bd7d15bafa58ee2aa352b01b079928f1ae5b1ab5cf3c97e9f68",
+        "evaluation_sha256": "e0202d2c4ded9f4f3c9803c1f756f3dd9859ffa1a5257fdc31a35da99520e358",
+        "measured": {
+          "rollout_nrmse_mean": 0.016935777069131127,
+          "one_step_nrmse_mean": 0.002643632322525514,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.027003461931057814,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.02597749049158653,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "allen_cahn_fno2d_physics",
+        "role": "proposed",
+        "run_id": "allen_cahn_fno2d_physics_seed1",
+        "system": "allen_cahn",
+        "architecture": "fno2d",
+        "condition": "physics",
+        "lambda_pde": 0.01,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "88c7bf9247e6bbe5e4254cdf390e17c29118f4f64b8cadb2d6f4fdd52376576a",
+        "checkpoint_epoch": 40,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "2a5106f7a9f9bfc8ffc429e8519c73e11cd74f62105b2d6554cd62a6300b29c3",
+        "evaluation_sha256": "cd9e5b3b9cdee2e57f3ba8ed37f7f15a499d17645b43e0a5a572a0a6ea51a91d",
+        "measured": {
+          "rollout_nrmse_mean": 0.015756380344827528,
+          "one_step_nrmse_mean": 0.002416554155387692,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.026070523204851283,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.02519679956980467,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "allen_cahn_fno2d_physics",
+        "role": "proposed",
+        "run_id": "allen_cahn_fno2d_physics_seed2",
+        "system": "allen_cahn",
+        "architecture": "fno2d",
+        "condition": "physics",
+        "lambda_pde": 0.01,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "faba73b9275bf89070472833b2da4759d133050b845db7b2c1718000ba0c44ae",
+        "checkpoint_epoch": 40,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "d546f7a6f445cdddfbcd2e500b68dd0e1a1d5290edd10fa0067272aa2ce7cd12",
+        "evaluation_sha256": "11a944b2458089f6356937bef9a9d157d497203d435e00ec9ae4e29b4860e5da",
+        "measured": {
+          "rollout_nrmse_mean": 0.015304906629367914,
+          "one_step_nrmse_mean": 0.0024380227446322645,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.026397658584857684,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.02550553370654086,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "inference_reference",
+        "role": "inference_reference",
+        "run_id": "burgers_fno1d_data_only_seed0",
+        "system": "burgers",
+        "architecture": "fno1d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "7ac8857521cfd2bbff439b502c7e0b96a992c91973185417552fd53e69c17c33",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "c61a254b5a9d48567ccabeee31dda9756f0d0e27a6ce803b80bf9f88395c6929",
+        "evaluation_sha256": "c0cb9da739f1fb14a9bf9ab89b6c4742659fc6369ffbcdd6a290a0ad6d674829",
+        "measured": {
+          "rollout_nrmse_mean": 0.014327565776242092,
+          "one_step_nrmse_mean": 0.0006361161751025557,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.22838737051028257,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.11202488195845853,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_unet1d_data_only",
+        "role": "baseline",
+        "run_id": "burgers_unet1d_data_only_seed0",
+        "system": "burgers",
+        "architecture": "unet1d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "246d48cb26c14d525bb8e2af1f70954448e6e00f1139901cd1740e4eed1366eb",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "d6c563f8bed8a17797bdf92a1247a9cb346bcf270d9872a0e89071253e6c8a3a",
+        "evaluation_sha256": "25a0a19c6cd7cd581d39ef7dde63083aabd75de5104193e0dc1c39776e216c86",
+        "measured": {
+          "rollout_nrmse_mean": 0.016054283674567384,
+          "one_step_nrmse_mean": 0.0008365468305520137,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.2285757222480737,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.08191195885575854,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_unet1d_data_only",
+        "role": "baseline",
+        "run_id": "burgers_unet1d_data_only_seed1",
+        "system": "burgers",
+        "architecture": "unet1d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "babbfc9b340ce18192e00140a467620501e1fff99838926134391493cc950b24",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "37f6c3d23f214f7e90ac90554fbfc5058a44d96c0ec8d3dc63d012a536724b95",
+        "evaluation_sha256": "9a24ce20ac004b007e94cbb19b1b71a6722280330f8bdc3e12244e7be1fd2ff9",
+        "measured": {
+          "rollout_nrmse_mean": 0.009870090561626455,
+          "one_step_nrmse_mean": 0.00045940633531814476,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.22656098516519615,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.07358638131117459,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "burgers_unet1d_data_only",
+        "role": "baseline",
+        "run_id": "burgers_unet1d_data_only_seed2",
+        "system": "burgers",
+        "architecture": "unet1d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "52fe837746d010ebc779b5a5ac8def2564c3624a0702031aa1b3f40965a97ef3",
+        "checkpoint_epoch": 60,
+        "test_dataset_sha256": "32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "49a35a95aee75c0011e5d286ea49decf94376a920f8e1e7758435b98db3b6b58",
+        "manifest_sha256": "28557ede3aa61343a38a6cf6189985d8f3674c26c10e2a9263b1e97789938b46",
+        "evaluation_sha256": "112e3ca76740efda3c58e859753742e9b7ceb72acd3314a339dcac085a6bf4c0",
+        "measured": {
+          "rollout_nrmse_mean": 0.023668865081746628,
+          "one_step_nrmse_mean": 0.0010996266240097907,
+          "persistence_nrmse_mean": 1.471354626667444,
+          "numerical_stepping_nrmse_mean": 0.0005358012357648053,
+          "residual_rms_implicit_euler_first_order": 0.23546221289600144,
+          "reference_residual_rms_implicit_euler_first_order": 0.21026347970505377,
+          "residual_rms_centred_first_derivative": 0.10723298323483836,
+          "reference_residual_rms_centred_first_derivative": 0.04133716460859511
+        }
+      },
+      {
+        "member_id": "allen_cahn_unet2d_data_only",
+        "role": "baseline",
+        "run_id": "allen_cahn_unet2d_data_only_seed0",
+        "system": "allen_cahn",
+        "architecture": "unet2d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "167b8f0d3b8ccc7b2243e926506d142b060d2dee604afa83a81fa05dfb30389d",
+        "checkpoint_epoch": 32,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "062c0c19f543e175bc68c10cd04d45fcef1c8902e2d940b499a9e9607f1ba039",
+        "evaluation_sha256": "d1075eb9c1d7788144dce52f1e1f09db27fb2028e4ea5f2ec840623507022ea3",
+        "measured": {
+          "rollout_nrmse_mean": 0.04467743966546221,
+          "one_step_nrmse_mean": 0.00789148452222091,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.04635883507353197,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.0433159915783271,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "allen_cahn_unet2d_data_only",
+        "role": "baseline",
+        "run_id": "allen_cahn_unet2d_data_only_seed1",
+        "system": "allen_cahn",
+        "architecture": "unet2d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "e48e6813209b75f6f6a11fb366b67a4e8afbde482f48ec47359c4ab91498764a",
+        "checkpoint_epoch": 22,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "f287b4bea3b65a2bdb4ac883392d4f85a53934cf56d17ac4d79ae6d47e582da1",
+        "evaluation_sha256": "20b0b1e8ddc69fb0ce28ba933ab2a47b10f523937317d6d8d595525147deefbf",
+        "measured": {
+          "rollout_nrmse_mean": 0.0513877935693297,
+          "one_step_nrmse_mean": 0.010082698934436087,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.05024194814462993,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.04670269507858325,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      },
+      {
+        "member_id": "allen_cahn_unet2d_data_only",
+        "role": "baseline",
+        "run_id": "allen_cahn_unet2d_data_only_seed2",
+        "system": "allen_cahn",
+        "architecture": "unet2d",
+        "condition": "data_only",
+        "lambda_pde": 0.0,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "status": "completed",
+        "evidence_status": "valid",
+        "checkpoint_sha256": "a7dbec618ca92f53490cde53231bfd91d57e345cb1011877e5ee7afcc31ee075",
+        "checkpoint_epoch": 26,
+        "test_dataset_sha256": "8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6",
+        "evaluator_sha256": "64c4841e3852f60753b3acdf9a43e29076b79dce45ffab3e59aa65ecf390f5c2",
+        "protocol_sha256": "5331b3fdd6c8f5ea7e63becd257fae873b8f5610169d06ca61915b531e3e20c4",
+        "manifest_sha256": "89c4f95db53c86154f827b78eeed34af3f8b399b5f8c78c9810ac8196fce4323",
+        "evaluation_sha256": "b238523abf6e18f22155833381b7add7fb73cf3ac2137d5b18967fb51fda203c",
+        "measured": {
+          "rollout_nrmse_mean": 0.050897966229494246,
+          "one_step_nrmse_mean": 0.010940893293737583,
+          "persistence_nrmse_mean": 0.45139719590329774,
+          "numerical_stepping_nrmse_mean": 0.002746101949090048,
+          "residual_rms_implicit_euler_first_order": 0.04550639755571101,
+          "reference_residual_rms_implicit_euler_first_order": 0.03240951216903391,
+          "residual_rms_centred_first_derivative": 0.04219431326605911,
+          "reference_residual_rms_centred_first_derivative": 0.03051822633207527
+        }
+      }
+    ]
+  },
+  "reproduction": {
+    "command": "pdelab doctor && pdelab solvers validate --system burgers",
+    "command_file": "campaigns/release/fixtures/reproduction_command.txt",
+    "command_sha256": "0586c85569a4d904e45154e9492d627e9a89aa498631bf0a3c8e16d7bd18f54d",
+    "verified": true,
+    "executed_in": "/tmp/pdelab_clean_install_qqhfMX",
+    "executed_against": "the installed wheel in /tmp/pdelab_clean_install_qqhfMX/venv",
+    "working_directory": "/tmp/pdelab_clean_install_qqhfMX",
+    "environment": {
+      "python": "3.11.17",
+      "torch": "2.14.1+cu130",
+      "numpy": "2.4.6",
+      "pdelab_file": "/tmp/pdelab_clean_install_qqhfMX/venv/lib/python3.11/site-packages/pdelab/__init__.py",
+      "pdelab_version": "0.1.0",
+      "torch_threads": 4,
+      "cuda_available": false
+    },
+    "output": "{\n  \"project_root\": \"/tmp/pdelab_clean_install_qqhfMX\",\n  \"python\": \"3.11.17\",\n  \"executable\": \"/tmp/pdelab_clean_install_qqhfMX/venv/bin/python\",\n  \"packages\": {\n    \"torch\": \"2.14.1+cu130\",\n    \"numpy\": \"2.4.6\",\n    \"scipy\": \"1.17.1\",\n    \"h5py\": \"3.16.0\",\n    \"yaml\": \"6.0.3\",\n    \"matplotlib\": \"3.11.2\",\n    \"pytest\": \"9.1.1\"\n  },\n  \"cuda\": {\n    \"available\": false,\n    \"version\": \"13.0\",\n    \"device\": null\n  },\n  \"layout\": {\n    \"configs\": false,\n    \"src/pdelab\": false,\n    \"tests\": false,\n    \"data\": false,\n    \"runs\": false,\n    \"results\": false,\n    \"docs\": false\n  },\n  \"git\": {\n    \"revision\": null,\n    \"dirty\": null,\n    \"branch\": null\n  }\n}\n{\n  \"system\": \"burgers\",\n  \"checks\": [\n    {\n      \"name\": \"burgers.constant_state_stationary\",\n      \"passed\": true,\n      \"detail\": {\n        \"max_abs_error\": 0.0,\n        \"tolerance\": 1e-12\n      }\n    },\n    {\n      \"name\": \"burgers.time_integrator_consistency\",\n      \"passed\": true,\n      \"detail\": {\n        \"max_abs_error\": 2.0255797039681056e-11,\n        \"tolerance\": 1e-08,\n        \"test_ode\": \"du/dt = 0.7 u\",\n        \"note\": \"guards against an inconsistent stage/weight pairing that self-convergence cannot detect; an inconsistent pairing gives O(1) error here\"\n      }\n    },\n    {\n      \"name\": \"burgers.spatial_operator_consistency\",\n      \"passed\": true,\n      \"detail\": {\n        \"errors\": [\n          {\n            \"n\": 64,\n            \"rel_l2\": 0.0005977680556051817\n          },\n          {\n            \"n\": 128,\n            \"rel_l2\": 0.00011508478630400141\n          },\n          {\n            \"n\": 256,\n            \"rel_l2\": 2.8958740880828495e-05\n          }\n        ],\n        \"observed_orders\": [\n          2.376888674031115,\n          1.990626347358569\n        ],\n        \"note\": \"discrete RHS vs exact continuous RHS; isolates the spatial operator from time integration\"\n      }\n    },\n    {\n      \"name\": \"burgers.diffusion_operator_analytic\",\n      \"passed\": true,\n      \"detail\": {\n        \"max_abs_error\": 2.9724010878640073e-05,\n        \"tolerance\": 0.0005,\n        \"grid\": 64,\n        \"t_final\": 0.1,\n        \"note\": \"viscous operator applied in isolation; the convective term is non-zero for a single Fourier mode and is excluded here\"\n      }\n    },\n    {\n      \"name\": \"burgers.mean_conservation\",\n      \"passed\": true,\n      \"detail\": {\n        \"max_abs_mean_drift\": 1.9992688060632702e-16,\n        \"tolerance\": 1e-12,\n        \"n_steps\": 141,\n        \"grid\": 128\n      }\n    },\n    {\n      \"name\": \"burgers.energy_non_increasing\",\n      \"passed\": true,\n      \"detail\": {\n        \"max_energy_increase\": -0.0003885049659555495,\n        \"tolerance\": 1e-12\n      }\n    },\n    {\n      \"name\": \"burgers.spatial_refinement_smooth\",\n      \"passed\": true,\n      \"detail\": {\n        \"t_final\": 0.02,\n        \"errors\": [\n          {\n            \"n\": 64,\n            \"l2_error\": 0.00017933388607089304\n          },\n          {\n            \"n\": 128,\n            \"l2_error\": 6.298699993222832e-05\n          },\n          {\n            \"n\": 256,\n            \"l2_error\": 2.148955450947038e-05\n          }\n        ],\n        \"pairwise_orders\": [\n          1.509522116222246,\n          1.5514185221668344\n        ],\n        \"observed_order\": 1.5304703191945397,\n        \"note\": \"measured before shock formation; WENO5-JS finite volume with SSPRK(3,3). The order is limited by the O(dx^2) consistency of the cell-average reconstruction and by the O(dx^2) own error of the n=1024 reference.\"\n      }\n    },\n    {\n      \"name\": \"burgers.spatial_refinement_shock_regime\",\n      \"passed\": true,\n      \"detail\": {\n        \"t_final\": 0.1,\n        \"errors\": [\n          {\n            \"n\": 64,\n            \"l2_error\": 0.0021331172677820976\n          },\n          {\n            \"n\": 128,\n            \"l2_error\": 0.0009688098251419827\n          },\n          {\n            \"n\": 256,\n            \"l2_error\": 0.0003373511698767832\n          }\n        ],\n        \"pairwise_orders\": [\n          1.1386778785417646,\n          1.5219623312664823\n        ],\n        \"observed_order\": 1.3303201049041233,\n        \"note\": \"shock is forming; the nonlinear flux limits the achievable order and the reference grid is finer than the observation grid to compensate. The order is the least-squares slope over the three grids, which uses every level instead of the single noisiest refinement pair.\"\n      }\n    },\n    {\n      \"name\": \"burgers.temporal_refinement\",\n      \"passed\": true,\n      \"detail\": {\n        \"errors\": [\n          {\n            \"dt_factor\": 8,\n            \"steps\": 32,\n            \"l2_error\": 4.822572898517076e-08\n          },\n          {\n            \"dt_factor\": 4,\n            \"steps\": 64,\n            \"l2_error\": 5.928297737293605e-09\n          },\n          {\n            \"dt_factor\": 2,\n            \"steps\": 128,\n            \"l2_error\": 6.577746641038865e-10\n          }\n        ],\n        \"observed_orders\": [\n          3.0241132352231266,\n          3.1719525608155825\n        ]\n      }\n    },\n    {\n      \"name\": \"burgers.independent_solver_agreement\",\n      \"passed\": true,\n      \"detail\": {\n        \"weno5_vs_spectral_rel_l2\": 9.435217594068522e-06,\n        \"weno5_vs_muscl_rel_l2\": 0.0004342711641036597,\n        \"tolerance\": 0.005,\n        \"t\": 0.02,\n        \"grid\": 128,\n        \"note\": \"three independent discretizations compared while the solution is still smooth\"\n      }\n    },\n    {\n      \"name\": \"burgers.manufactured_solution\",\n      \"passed\": true,\n      \"detail\": {\n        \"max_abs_error\": 0.001997337633078744,\n        \"tolerance\": 0.005,\n        \"refined_dt_error\": 0.00024067203133770754,\n        \"finest_dt_error\": 0.0001278888586535576,\n        \"observed_order\": 3.0529378287407876,\n        \"solve_to_row\": {\n          \"path\": \"solve_to\",\n          \"grid\": 256,\n          \"dt\": 0.0006329113924050633,\n          \"n_frames\": 2,\n          \"max_abs_error\": 7.243339666174187e-05,\n          \"initial_frame_error\": 0.0,\n          \"integrator_calls\": 79\n        },\n        \"rows\": [\n          {\n            \"path\": \"solve\",\n            \"grid\": 64,\n            \"dt\": 0.004,\n            \"max_abs_error\": 0.001997337633078744,\n            \"integrator_calls\": 12\n          },\n          {\n            \"path\": \"solve\",\n            \"grid\": 64,\n            \"dt\": 0.002,\n            \"max_abs_error\": 0.00024067203133770754,\n            \"integrator_calls\": 25\n          },\n          {\n            \"path\": \"solve\",\n            \"grid\": 64,\n            \"dt\": 0.001,\n            \"max_abs_error\": 0.0001278888586535576,\n            \"integrator_calls\": 50\n          }\n        ],\n        \"forcing\": \"continuum: u_t + (u^2/2)_x - nu u_xx = g, g written in closed form for u = exp(-t) cos(2 pi x)\",\n        \"driven_through\": \"solve/solve_to -> step (real integrator)\",\n        \"note\": \"the forcing is evaluated independently of the solver, so the error is a real integration error. The observed order is limited to two by the SSP-RK(3,3) treatment of a time dependent source (the stage times are t_n, t_n+dt, t_n+dt), not by the forcing.\"\n      }\n    },\n    {\n      \"name\": \"burgers.reference_solution_accuracy\",\n      \"passed\": true,\n      \"detail\": {\n        \"reference_grid\": 256,\n        \"fine_grid\": 512,\n        \"relative_l2_errors\": [\n          0.0002519750290741289,\n          0.00014709388784515584,\n          0.00010721978030685771,\n          0.00017679053895942548\n        ],\n        \"median_relative_l2_error\": 0.00016194221340229067,\n        \"max_relative_l2_error\": 0.0002519750290741289,\n        \"tolerance\": 0.005,\n        \"t_final\": 0.5,\n        \"n_initial_conditions\": 4,\n        \"note\": \"the reference is an approximation of the true solution, not exact ground truth; this is its measured own error over the actual random initial conditions of the dataset\"\n      }\n    },\n    {\n      \"name\": \"burgers.flux_split_sign_aware\",\n      \"passed\": true,\n      \"detail\": {\n        \"split_residual\": 2.7755575615628914e-17,\n        \"tolerance\": 1e-14,\n        \"alpha\": 1.0,\n        \"min_f_plus_speed\": 0.0,\n        \"max_f_minus_speed\": 0.0,\n        \"note\": \"global Lax-Friedrichs split f+- = 0.5 (f +- alpha u); f+' >= 0 and f-' <= 0 so the reconstruction stencils are correctly biased for the characteristic speed f'(u)=u\"\n      }\n    },\n    {\n      \"name\": \"burgers.perturbation_decays_positive_background\",\n      \"passed\": true,\n      \"detail\": {\n        \"perturbation_energy_growth_rate\": -0.8807130479415726,\n        \"tolerance\": 0.0,\n        \"note\": \"pure advection (nu = 0); a perturbation on a positive background must be damped by the numerical dissipation\"\n      }\n    },\n    {\n      \"name\": \"burgers.perturbation_decays_negative_background\",\n      \"passed\": true,\n      \"detail\": {\n        \"perturbation_energy_growth_rate\": -0.8807130479415726,\n        \"tolerance\": 0.0,\n        \"note\": \"pure advection (nu = 0); on a negative background the characteristic speed is negative, so the left-biased (downwind) reconstruction of a sign-blind split is antidiffusive and the perturbation energy grows. With the global Lax-Friedrichs split the two backgrounds behave identically.\"\n      }\n    },\n    {\n      \"name\": \"burgers.observation_times_exact\",\n      \"passed\": true,\n      \"detail\": {\n        \"requested\": [\n          0.0,\n          0.1,\n          0.2,\n          0.3\n        ],\n        \"solvers\": {\n          \"burgers_weno5\": {\n            \"n_frames\": 4,\n            \"returned_clock\": [\n              0.0,\n              0.10000000000000002,\n              0.2000000000000001,\n              0.30000000000000016\n            ],\n            \"max_abs_time_error\": 1.6653345369377348e-16\n          },\n          \"burgers_muscl\": {\n            \"n_frames\": 4,\n            \"returned_clock\": [\n              0.0,\n              0.10000000000000002,\n              0.2000000000000001,\n              0.30000000000000016\n            ],\n            \"max_abs_time_error\": 1.6653345369377348e-16\n          }\n        },\n        \"tolerance\": 1e-12,\n        \"note\": \"the step function is replaced by a clock so that the scheduling is measured independently of the PDE accuracy\"\n      }\n    },\n    {\n      \"name\": \"burgers.dataset_observation_times_exact\",\n      \"passed\": true,\n      \"detail\": {\n        \"systems\": {\n          \"burgers\": {\n            \"n_requested\": 101,\n            \"n_recorded\": 101,\n            \"max_abs_time_error\": 0.0,\n            \"manifest_observation_scheduler\": {\n              \"observation_scheduler\": \"pdelab.observation_schedule.v1\",\n              \"observation_scheduler_policy\": \"solve_to returns exactly len(save_times) frames; frame i is the state at save_times[i]; the gap between two requested observations is covered by ceil(gap/dt_max) equal sub-steps of size gap/ceil(gap/dt_max) so that the integrator lands exactly on the requested time; dt_max is the solver's own stability bound evaluated on the current state.\",\n              \"observation_time_tolerance\": \"1e-12\"\n            },\n            \"manifest_time_stepping_policy\": {\n              \"observation_scheduler\": \"pdelab.observation_schedule.v1\",\n              \"observation_scheduler_policy\": \"solve_to returns exactly len(save_times) frames; frame i is the state at save_times[i]; the gap between two requested observations is covered by ceil(gap/dt_max) equal sub-steps of size gap/ceil(gap/dt_max) so that the integrator lands exactly on the requested time; dt_max is the solver's own stability bound evaluated on the current state.\",\n              \"observation_time_tolerance\": \"1e-12\",\n              \"solver\": \"burgers_weno5_js_global_lax_friedrichs\",\n              \"time_integrator\": \"SSPRK(3,3)\",\n              \"internal_step_rule\": \"min(stable_internal_dt, next_observation_gap), sub-divided into ceil(gap/stable_internal_dt) equal steps so the integrator lands exactly on the observation\",\n              \"stability_bound\": \"min(cfl*dx/alpha, dx^2/(alpha*dx + 2*nu)) with alpha = max|u|; the second term is the combined advection-diffusion von Neumann bound and is not the minimum of the separate bounds\"\n            }\n          }\n        },\n        \"tolerance\": 1e-12,\n        \"note\": \"the manifest records the observation times that were actually written, not the ones that were requested\"\n      }\n    },\n    {\n      \"name\": \"burgers.aliasing_error_quantified\",\n      \"passed\": true,\n      \"detail\": {\n        \"relative_l2_aliasing_error\": 3.120477069544131e-16,\n        \"tolerance\": 0.001,\n        \"retained_band\": \"|k| <= 42\",\n        \"without_output_projection\": 0.5000000000000001,\n        \"field\": \"actual dataset initial condition (fourier_series_1d, n_modes=6, amplitude=0.9)\",\n        \"note\": \"the residual aliasing error is measured against a 2x padded (alias-free) product of the same field, not asserted to vanish\"\n      }\n    },\n    {\n      \"name\": \"burgers.sign_agreement_with_spectral_solver\",\n      \"passed\": true,\n      \"detail\": {\n        \"solvers\": {\n          \"background_+1\": {\n            \"relative_l2_difference\": 7.851575323467026e-09\n          },\n          \"background_-1\": {\n            \"relative_l2_difference\": 7.851575555551667e-09\n          }\n        },\n        \"tolerance\": 0.05,\n        \"t\": 0.05,\n        \"grid\": 128,\n        \"note\": \"the finite-volume generator and the independent spectral solver must agree for a positive *and* a negative background\"\n      }\n    }\n  ],\n  \"passed\": true,\n  \"walltime_seconds\": 22.743\n}\n",
+    "output_file": "campaigns/release/clean_install/reproduction_command.out",
+    "note": "the command was executed verbatim (from campaigns/release/fixtures/reproduction_command.txt) against the installed CLI, in the clean environment and from outside the source checkout. The numerical gate is driven through the installed CLI itself (`pdelab solvers validate --system burgers`), which prints the JSON report of the suite; the same path is exercised for allen_cahn by the clean-install verification."
+  },
+  "clean_install": {
+    "directory": "/tmp/pdelab_clean_install_qqhfMX",
+    "directory_is_outside_the_repository": true,
+    "repository": "/home/atulp/projects/pdelab",
+    "venv": "/tmp/pdelab_clean_install_qqhfMX/venv",
+    "wheel_installed": "/home/atulp/projects/pdelab/dist/pdelab-0.1.0-py3-none-any.whl",
+    "wheel_sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+    "environment": {
+      "python": "3.11.17",
+      "torch": "2.14.1+cu130",
+      "numpy": "2.4.6",
+      "pdelab_file": "/tmp/pdelab_clean_install_qqhfMX/venv/lib/python3.11/site-packages/pdelab/__init__.py",
+      "pdelab_version": "0.1.0",
+      "torch_threads": 4,
+      "cuda_available": false
+    },
+    "cpu_threads": 4,
+    "cuda_visible_devices": "",
+    "commands": [
+      {
+        "step": "cli_doctor",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/cli_doctor.out"
+      },
+      {
+        "step": "install_probe",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/install_probe.out"
+      },
+      {
+        "step": "one_step_metric_check",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/one_step_metric_check.out"
+      },
+      {
+        "step": "reproduction_command",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/reproduction_command.out"
+      },
+      {
+        "step": "solvers_validate_cli",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/solvers_validate_cli.out"
+      },
+      {
+        "step": "solvers_validate_cli_allen_cahn",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/solvers_validate_cli_allen_cahn.out"
+      },
+      {
+        "step": "solvers_validate_cli_json_report",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/solvers_validate_cli_json_report.out"
+      },
+      {
+        "step": "solvers_validate_library",
+        "exit_code": 0,
+        "output_file": "campaigns/release/clean_install/solvers_validate_library.out"
+      }
+    ],
+    "imported_from_installed_wheel": "pdelab.__file__ = /tmp/pdelab_clean_install_qqhfMX/venv/lib/python3.11/site-packages/pdelab/__init__.py",
+    "solver_validation_cli": {
+      "burgers": {
+        "step": "solvers_validate_cli",
+        "exit_code": 0,
+        "printed_a_json_report": true,
+        "system": "burgers",
+        "passed": true,
+        "n_checks": 19,
+        "failed_checks": [],
+        "walltime_seconds": 20.929,
+        "output_file": "campaigns/release/clean_install/solvers_validate_cli.out"
+      },
+      "allen_cahn": {
+        "step": "solvers_validate_cli_allen_cahn",
+        "exit_code": 0,
+        "printed_a_json_report": true,
+        "system": "allen_cahn",
+        "passed": true,
+        "n_checks": 14,
+        "failed_checks": [],
+        "walltime_seconds": 105.518,
+        "output_file": "campaigns/release/clean_install/solvers_validate_cli_allen_cahn.out"
+      },
+      "note": "both CLI paths of `pdelab solvers validate` are exercised against the installed wheel, outside the source checkout; each must exit 0 and print a JSON report whose `passed` flag is true"
+    },
+    "status": "pass",
+    "open_blockers": []
+  },
+  "measured_limitations": {
+    "learned_operators_vs_direct_numerical_stepping": {
+      "statement": "On these benchmarks the learned operators do NOT beat direct numerical stepping of the PDE. The parameter informed numerical baseline has a lower held-out rollout nRMSE than every learned operator of the cohort, by the factors listed below.",
+      "per_run": [
+        {
+          "run_id": "burgers_fno1d_data_only_seed0",
+          "system": "burgers",
+          "architecture": "fno1d",
+          "condition": "data_only",
+          "seed": "0",
+          "learned_rollout_nrmse": 0.014327565776242092,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.03739652946861836,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_fno1d_data_only_seed1",
+          "system": "burgers",
+          "architecture": "fno1d",
+          "condition": "data_only",
+          "seed": "1",
+          "learned_rollout_nrmse": 0.015955095601800737,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.03358182546423183,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_fno1d_data_only_seed2",
+          "system": "burgers",
+          "architecture": "fno1d",
+          "condition": "data_only",
+          "seed": "2",
+          "learned_rollout_nrmse": 0.016366233942129417,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.032738211958804005,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_fno1d_physics_seed0",
+          "system": "burgers",
+          "architecture": "fno1d",
+          "condition": "physics",
+          "seed": "0",
+          "learned_rollout_nrmse": 0.023153460983982053,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.023141302120468357,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_fno1d_physics_seed1",
+          "system": "burgers",
+          "architecture": "fno1d",
+          "condition": "physics",
+          "seed": "1",
+          "learned_rollout_nrmse": 0.024560655924953226,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.02181542860263923,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_fno1d_physics_seed2",
+          "system": "burgers",
+          "architecture": "fno1d",
+          "condition": "physics",
+          "seed": "2",
+          "learned_rollout_nrmse": 0.023841029229082454,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.022473913798621105,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_fno2d_data_only_seed0",
+          "system": "allen_cahn",
+          "architecture": "fno2d",
+          "condition": "data_only",
+          "seed": "0",
+          "learned_rollout_nrmse": 0.015317231698834505,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.17928187045045482,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_fno2d_data_only_seed1",
+          "system": "allen_cahn",
+          "architecture": "fno2d",
+          "condition": "data_only",
+          "seed": "1",
+          "learned_rollout_nrmse": 0.013353809575536273,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.20564183827518506,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_fno2d_data_only_seed2",
+          "system": "allen_cahn",
+          "architecture": "fno2d",
+          "condition": "data_only",
+          "seed": "2",
+          "learned_rollout_nrmse": 0.012848464338372338,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.21372997400854585,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_fno2d_physics_seed0",
+          "system": "allen_cahn",
+          "architecture": "fno2d",
+          "condition": "physics",
+          "seed": "0",
+          "learned_rollout_nrmse": 0.016935777069131127,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.16214797454410126,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_fno2d_physics_seed1",
+          "system": "allen_cahn",
+          "architecture": "fno2d",
+          "condition": "physics",
+          "seed": "1",
+          "learned_rollout_nrmse": 0.015756380344827528,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.1742850762035287,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_fno2d_physics_seed2",
+          "system": "allen_cahn",
+          "architecture": "fno2d",
+          "condition": "physics",
+          "seed": "2",
+          "learned_rollout_nrmse": 0.015304906629367914,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.1794262464705713,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_unet1d_data_only_seed0",
+          "system": "burgers",
+          "architecture": "unet1d",
+          "condition": "data_only",
+          "seed": "0",
+          "learned_rollout_nrmse": 0.016054283674567384,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.0333743470980024,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_unet1d_data_only_seed1",
+          "system": "burgers",
+          "architecture": "unet1d",
+          "condition": "data_only",
+          "seed": "1",
+          "learned_rollout_nrmse": 0.009870090561626455,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.05428534139777058,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "burgers_unet1d_data_only_seed2",
+          "system": "burgers",
+          "architecture": "unet1d",
+          "condition": "data_only",
+          "seed": "2",
+          "learned_rollout_nrmse": 0.023668865081746628,
+          "numerical_stepping_nrmse": 0.0005358012357648053,
+          "numerical_stepping_over_learned_ratio": 0.022637386030731736,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_unet2d_data_only_seed0",
+          "system": "allen_cahn",
+          "architecture": "unet2d",
+          "condition": "data_only",
+          "seed": "0",
+          "learned_rollout_nrmse": 0.04467743966546221,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.061465069835076415,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_unet2d_data_only_seed1",
+          "system": "allen_cahn",
+          "architecture": "unet2d",
+          "condition": "data_only",
+          "seed": "1",
+          "learned_rollout_nrmse": 0.0513877935693297,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.05343879856186376,
+          "learned_is_worse_than_numerical_stepping": true
+        },
+        {
+          "run_id": "allen_cahn_unet2d_data_only_seed2",
+          "system": "allen_cahn",
+          "architecture": "unet2d",
+          "condition": "data_only",
+          "seed": "2",
+          "learned_rollout_nrmse": 0.050897966229494246,
+          "numerical_stepping_nrmse": 0.002746101949090048,
+          "numerical_stepping_over_learned_ratio": 0.05395307813888136,
+          "learned_is_worse_than_numerical_stepping": true
+        }
+      ],
+      "note": "the numerical baseline is not parameter free and is not comparable with a learned model in terms of prior knowledge; it quantifies how much of the task is solvable by direct numerical integration."
+    },
+    "burgers_residual_improvement_is_operator_specific": {
+      "statement": "The Burgers residual improvement is a property of the declared residual operator, not of the model. Under the declared implicit-Euler (first order) residual the physics-regularized FNO improves on the data-only FNO (about +70% per seed); under the independently declared centred first-derivative residual it is WORSE on every seed (45% to 63% worse), and under that independent evaluator the reference solution has a LOWER residual than either learned model, i.e. the reference is more PDE-consistent than both models. Allen-Cahn improves under both evaluators.",
+      "per_seed": {
+        "burgers": [
+          {
+            "seed": 0,
+            "baseline_run": "burgers_fno1d_data_only_seed0",
+            "proposed_run": "burgers_fno1d_physics_seed0",
+            "primary_implicit_euler_improvement_percent": 69.52989042127344,
+            "independent_centred_derivative_improvement_percent": -45.40883488433831,
+            "primary_implicit_euler": {
+              "baseline_residual_rms": 0.22838737051028257,
+              "proposed_residual_rms": 0.06958988205845533,
+              "reference_residual_rms": 0.21026347970505377
+            },
+            "independent_centred_derivative": {
+              "baseline_residual_rms": 0.11202488195845853,
+              "proposed_residual_rms": 0.16289407563634986,
+              "reference_residual_rms": 0.04133716460859511,
+              "reference_is_more_pde_consistent_than_either_model": true
+            }
+          },
+          {
+            "seed": 1,
+            "baseline_run": "burgers_fno1d_data_only_seed1",
+            "proposed_run": "burgers_fno1d_physics_seed1",
+            "primary_implicit_euler_improvement_percent": 69.20119819733631,
+            "independent_centred_derivative_improvement_percent": -59.936645185430315,
+            "primary_implicit_euler": {
+              "baseline_residual_rms": 0.22520239397818645,
+              "proposed_residual_rms": 0.06935963897619547,
+              "reference_residual_rms": 0.21026347970505377
+            },
+            "independent_centred_derivative": {
+              "baseline_residual_rms": 0.10422071605107243,
+              "proposed_residual_rms": 0.16668711684031853,
+              "reference_residual_rms": 0.04133716460859511,
+              "reference_is_more_pde_consistent_than_either_model": true
+            }
+          },
+          {
+            "seed": 2,
+            "baseline_run": "burgers_fno1d_data_only_seed2",
+            "proposed_run": "burgers_fno1d_physics_seed2",
+            "primary_implicit_euler_improvement_percent": 70.96886030259981,
+            "independent_centred_derivative_improvement_percent": -63.36962190523596,
+            "primary_implicit_euler": {
+              "baseline_residual_rms": 0.22136900182754568,
+              "proposed_residual_rms": 0.06426594416729517,
+              "reference_residual_rms": 0.21026347970505377
+            },
+            "independent_centred_derivative": {
+              "baseline_residual_rms": 0.10111474108524442,
+              "proposed_residual_rms": 0.1651907702014221,
+              "reference_residual_rms": 0.04133716460859511,
+              "reference_is_more_pde_consistent_than_either_model": true
+            }
+          }
+        ],
+        "allen_cahn": [
+          {
+            "seed": 0,
+            "baseline_run": "allen_cahn_fno2d_data_only_seed0",
+            "proposed_run": "allen_cahn_fno2d_physics_seed0",
+            "primary_implicit_euler_improvement_percent": 21.266017003636318,
+            "independent_centred_derivative_improvement_percent": 19.458002742074797,
+            "primary_implicit_euler": {
+              "baseline_residual_rms": 0.0342970860909005,
+              "proposed_residual_rms": 0.027003461931057814,
+              "reference_residual_rms": 0.03240951216903391
+            },
+            "independent_centred_derivative": {
+              "baseline_residual_rms": 0.03225334778872818,
+              "proposed_residual_rms": 0.02597749049158653,
+              "reference_residual_rms": 0.03051822633207527,
+              "reference_is_more_pde_consistent_than_either_model": false
+            }
+          },
+          {
+            "seed": 1,
+            "baseline_run": "allen_cahn_fno2d_data_only_seed1",
+            "proposed_run": "allen_cahn_fno2d_physics_seed1",
+            "primary_implicit_euler_improvement_percent": 24.246925052006787,
+            "independent_centred_derivative_improvement_percent": 22.484334498254466,
+            "primary_implicit_euler": {
+              "baseline_residual_rms": 0.03441513525721496,
+              "proposed_residual_rms": 0.026070523204851283,
+              "reference_residual_rms": 0.03240951216903391
+            },
+            "independent_centred_derivative": {
+              "baseline_residual_rms": 0.03250542894356919,
+              "proposed_residual_rms": 0.02519679956980467,
+              "reference_residual_rms": 0.03051822633207527,
+              "reference_is_more_pde_consistent_than_either_model": false
+            }
+          },
+          {
+            "seed": 2,
+            "baseline_run": "allen_cahn_fno2d_data_only_seed2",
+            "proposed_run": "allen_cahn_fno2d_physics_seed2",
+            "primary_implicit_euler_improvement_percent": 22.347256259104057,
+            "independent_centred_derivative_improvement_percent": 20.632703104462138,
+            "primary_implicit_euler": {
+              "baseline_residual_rms": 0.033994495639379854,
+              "proposed_residual_rms": 0.026397658584857684,
+              "reference_residual_rms": 0.03240951216903391
+            },
+            "independent_centred_derivative": {
+              "baseline_residual_rms": 0.032136074559917155,
+              "proposed_residual_rms": 0.02550553370654086,
+              "reference_residual_rms": 0.03051822633207527,
+              "reference_is_more_pde_consistent_than_either_model": false
+            }
+          }
+        ]
+      },
+      "note": "the two evaluators are never mixed and are evaluated on the same support (the interior snapshot indices 1 .. T-2)."
+    },
+    "inference_memory_claim_is_peak_allocated_only": {
+      "statement": "The inference memory result is about PEAK ALLOCATED memory only. The peak allocated memory of the best variant falls by about 96% against the FP32 eager baseline, but the peak RESERVED memory rises by about 9% (the CUDA-graph private pool is larger than the eager allocator's working set), and the device-level free-memory reading is essentially unchanged. It is NOT a total device-memory saving and it is NOT a claim about the memory footprint of the model itself.",
+      "measured": {
+        "reference_run": "burgers_fno1d_data_only_seed0",
+        "artifact": "runs/burgers_fno1d_data_only_seed0/benchmark_matched.json",
+        "artifact_sha256": "dea5cd2536d28132e2dd64ce9a89b5136e0c2f2235965cce9e50f528644a6194",
+        "baseline_variant": "fp32_eager",
+        "best_memory_variant": "compile_reduce_overhead",
+        "peak_allocated_gib": {
+          "baseline_fp32_eager": 0.008346080780029297,
+          "variant_compile_reduce_overhead": 0.0003294944763183594,
+          "absolute_change": -0.008016586303710938,
+          "reduction_percent": 96.05210535336799
+        },
+        "peak_reserved_gib": {
+          "baseline_fp32_eager": 0.021484375,
+          "variant_compile_reduce_overhead": 0.0234375,
+          "absolute_change": 0.001953125,
+          "reduction_percent": -9.090909090909092
+        },
+        "allocated_before_reset_gib": {
+          "baseline_fp32_eager": 0.008072853088378906,
+          "variant_compile_reduce_overhead": 0.00013828277587890625,
+          "absolute_change": -0.0079345703125,
+          "reduction_percent": 98.2870643827525
+        },
+        "reserved_before_reset_gib": {
+          "baseline_fp32_eager": 0.021484375,
+          "variant_compile_reduce_overhead": 0.0234375,
+          "absolute_change": 0.001953125,
+          "reduction_percent": -9.090909090909092
+        },
+        "device_free_gib": {
+          "baseline_fp32_eager": 6.8798828125,
+          "variant_compile_reduce_overhead": 6.8662109375,
+          "absolute_change": -0.013671875,
+          "reduction_percent": 0.198722498225692
+        },
+        "device_total_gib": 7.99560546875,
+        "persistent_total_bytes": {
+          "baseline_fp32_eager": 196548,
+          "variant_compile_reduce_overhead": 196548,
+          "weights": 144836,
+          "input": 512,
+          "output": 51200
+        },
+        "reported_memory_reduction_percent": 96.05210535336799,
+        "reported_memory_reserved_reduction_percent": -9.090909090909092,
+        "per_variant_joint_pass": [
+          {
+            "variant": "autocast_fp16",
+            "accuracy_within_tolerance": true,
+            "throughput_ratio": 0.9721733499822725,
+            "memory_reduction_percent_allocated": 0.8969890875849854,
+            "memory_reduction_percent_reserved": 0.0,
+            "passes_throughput_target": false,
+            "passes_memory_target": false,
+            "joint_pass": false
+          },
+          {
+            "variant": "compile_default",
+            "accuracy_within_tolerance": true,
+            "throughput_ratio": 0.843046765412108,
+            "memory_reduction_percent_allocated": 0.5713306290350225,
+            "memory_reduction_percent_reserved": -145.45454545454547,
+            "passes_throughput_target": false,
+            "passes_memory_target": false,
+            "joint_pass": false
+          },
+          {
+            "variant": "compile_reduce_overhead",
+            "accuracy_within_tolerance": true,
+            "throughput_ratio": 5.7360995104050945,
+            "memory_reduction_percent_allocated": 96.05210535336799,
+            "memory_reduction_percent_reserved": -9.090909090909092,
+            "passes_throughput_target": true,
+            "passes_memory_target": true,
+            "joint_pass": true
+          }
+        ],
+        "joint_pass_variant": "compile_reduce_overhead",
+        "artifact_caveat": "memory_reduction_percent is the reduction in PEAK ALLOCATED memory during the measured steady-state region. It is NOT a reduction in total device memory: compare memory_reserved_reduction_percent, the persistent_* byte counts and the device-level free-memory observation for the two variants before drawing a device-memory conclusion."
+      },
+      "note": "the numbers are recomputed from the stored benchmark artifact of the declared inference reference run; the artifact itself carries the same caveat in its `memory_caveat` field."
+    },
+    "not_a_state_of_the_art_claim": "the cohort is a single machine, three seeds per condition and two self-defined periodic benchmarks; the numbers are not a comparison against published work."
+  },
+  "scope_statement": "This is a LOCAL release artifact of a research prototype. It is NOT a claim of public deployment, NOT a claim of production serving readiness, and NOT a claim of novel state-of-the-art research. The wheel contains the library only; the datasets, the checkpoints and the run artifacts are not part of the bundle and must be regenerated from the source tree."
+}

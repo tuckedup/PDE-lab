@@ -1,0 +1,33 @@
+{
+  "project_root": "/tmp/pdelab_clean_install_qqhfMX",
+  "python": "3.11.17",
+  "executable": "/tmp/pdelab_clean_install_qqhfMX/venv/bin/python",
+  "packages": {
+    "torch": "2.14.1+cu130",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "h5py": "3.16.0",
+    "yaml": "6.0.3",
+    "matplotlib": "3.11.2",
+    "pytest": "9.1.1"
+  },
+  "cuda": {
+    "available": false,
+    "version": "13.0",
+    "device": null
+  },
+  "layout": {
+    "configs": false,
+    "src/pdelab": false,
+    "tests": false,
+    "data": false,
+    "runs": false,
+    "results": false,
+    "docs": false
+  },
+  "git": {
+    "revision": null,
+    "dirty": null,
+    "branch": null
+  }
+}

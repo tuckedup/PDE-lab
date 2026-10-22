@@ -571,6 +571,65 @@ def run_benchmark(
                     100.0 * (base_mem - opt_mem) / base_mem
                 )
                 results["memory_best_variant"] = best_mem["variant"]
+            base_res = base_matched["memory"].get("peak_reserved_gib", 0.0)
+            opt_res = best_mem["memory"].get("peak_reserved_gib", 0.0)
+            if base_res > 0:
+                results["memory_reserved_reduction_percent"] = float(
+                    100.0 * (base_res - opt_res) / base_res
+                )
+            results["memory_reserved_best_variant"] = best_mem["variant"]
+            results["memory_caveat"] = (
+                "memory_reduction_percent is the reduction in PEAK ALLOCATED "
+                "memory during the measured steady-state region. It is NOT a "
+                "reduction in total device memory: compare "
+                "memory_reserved_reduction_percent, the persistent_* byte counts "
+                "and the device-level free-memory observation for the two "
+                "variants before drawing a device-memory conclusion."
+            )
+
+        # ---- per-variant joint pass --------------------------------
+        # A combined pipeline claim requires ONE variant to pass the
+        # correctness gate AND both declared performance targets. The
+        # best-speed and best-memory variants are never fused.
+        per_variant = []
+        for m in matched:
+            if m["variant"] == "fp32_eager":
+                continue
+            tp = (
+                m["throughput_samples_per_second"]
+                / base_matched["throughput_samples_per_second"]
+            ) if base_matched else None
+            mem_red = None
+            res_red = None
+            if base_matched and base_matched["memory"].get("peak_allocated_gib", 0) > 0:
+                mem_red = 100.0 * (
+                    base_matched["memory"]["peak_allocated_gib"]
+                    - m["memory"].get("peak_allocated_gib", 0.0)
+                ) / base_matched["memory"]["peak_allocated_gib"]
+            if base_matched and base_matched["memory"].get("peak_reserved_gib", 0) > 0:
+                res_red = 100.0 * (
+                    base_matched["memory"]["peak_reserved_gib"]
+                    - m["memory"].get("peak_reserved_gib", 0.0)
+                ) / base_matched["memory"]["peak_reserved_gib"]
+            correct = bool(m.get("accuracy_within_tolerance", False))
+            per_variant.append({
+                "variant": m["variant"],
+                "accuracy_within_tolerance": correct,
+                "throughput_ratio": tp,
+                "memory_reduction_percent_allocated": mem_red,
+                "memory_reduction_percent_reserved": res_red,
+                "passes_throughput_target": bool(tp is not None and tp >= 1.3),
+                "passes_memory_target": bool(mem_red is not None and mem_red >= 20.0),
+                "joint_pass": bool(
+                    correct
+                    and tp is not None and tp >= 1.3
+                    and mem_red is not None and mem_red >= 20.0
+                ),
+            })
+        results["per_variant_joint_pass"] = per_variant
+        results["joint_pass_variant"] = next(
+            (v["variant"] for v in per_variant if v["joint_pass"]), None
+        )
 
     results["workload"] = {
         "batch_size": matched_bs,

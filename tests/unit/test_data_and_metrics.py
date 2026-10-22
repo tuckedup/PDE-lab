@@ -18,8 +18,8 @@ from pdelab.data.dataset import (
 from pdelab.data.generate import restrict_1d, restrict_2d
 from pdelab.evaluation.evaluate import (
     residual_rms_for_trajectory,
-    residual_tensor_for_trajectory,
     residual_temporal_refinement_probe,
+    residual_tensor_for_trajectory,
 )
 from pdelab.evaluation.metrics import (
     aggregate_windows_per_trajectory,

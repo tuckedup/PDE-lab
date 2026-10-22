@@ -49,5 +49,5 @@ for cond in pairs:
         m = manifest(i)
         hist = (m.get("training") or {}).get("history") or []
         vals.append(min((h["val"].get("total", float("inf")) for h in hist), default=float("nan")))
-    print(f"{cond:36s} {str(same01):>20s} {str(same12):>20s} "
+    print(f"{cond:36s} {same01!s:>20s} {same12!s:>20s} "
           f"{vals[0]:.6g}/{vals[1]:.6g}/{vals[2]:.6g}")

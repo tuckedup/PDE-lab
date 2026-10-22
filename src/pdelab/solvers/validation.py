@@ -290,6 +290,24 @@ def _random_initial_conditions(system, count: int, seed: int):
 # ----------------------------------------------------------------------
 # Burgers
 # ----------------------------------------------------------------------
+def run_validation(system: str, verbose: bool = False) -> dict[str, Any]:
+    """Dispatch the numerical validation suite for one system.
+
+    This is the entry point used by the CLI (``pdelab solvers validate``)
+    and by the release verification. It is kept as a thin dispatcher so
+    that the CLI contract does not depend on the internals of either
+    per-system suite.
+    """
+    name = (system or "").lower()
+    if name == "burgers":
+        return validate_burgers(verbose=verbose)
+    if name in ("allen_cahn", "allen-cahn", "allencahn"):
+        return validate_allen_cahn(verbose=verbose)
+    raise ValueError(
+        f"unknown validation system {system!r}; expected 'burgers' or 'allen_cahn'"
+    )
+
+
 def validate_burgers(verbose: bool = False) -> dict[str, Any]:
     """Validation suite for the 1D Burgers reference solver.
 

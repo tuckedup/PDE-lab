@@ -2,15 +2,15 @@
   "campaign_id": "v2-recovery",
   "created_utc": "2026-10-21T22:18:35Z",
   "objective": "Repair the confirmed numerical/evidence defects, regenerate the data under a corrected protocol with a FRESH unseen test set, run the required 18-row main matrix, and produce an evidence-based report plus a local installable release.",
-  "phase": "gate2",
+  "phase": "gate6",
   "gates": {
     "gate0_inventory": "complete",
     "gate1_bug_reproduction_and_repair": "complete",
-    "gate2_full_horizon_validation_and_dataset": "in_progress",
-    "gate3_freeze_protocol_and_main_matrix": "pending",
-    "gate4_ablations": "pending",
-    "gate5_final_test_and_benchmark": "pending",
-    "gate6_report_and_release": "pending"
+    "gate2_full_horizon_validation_and_dataset": "complete",
+    "gate3_freeze_protocol_and_main_matrix": "complete",
+    "gate4_ablations": "partial - see NOT_EXECUTED",
+    "gate5_final_test_and_benchmark": "complete",
+    "gate6_report_and_release": "in_progress"
   },
   "git": {
     "revision": "96fd61cd5ebfc53b5f1be7e1272e3d39b53b7fab",
@@ -46,6 +46,18 @@
       "note": "first dispatch (ses_e9f99f0e7ffe7GS2Zmei3ogLAz) returned an empty result and made no changes"
     }
   ],
-  "last_accepted_result": "All three specialist repairs integrated; 179 tests pass; the observation-time, flux-splitting, residual-derivative, FNO2D coverage, report-selection, benchmark-correctness and lifecycle defects are repaired with before/after evidence.",
-  "blocker": null
+  "last_accepted_result": "The 18 required main-matrix rows are trained and evaluated once on the fresh, unseen test split (IC seeds 7001/7002, zero overlap with the development set). All six declared targets are met on the frozen cohort, with the Burgers residual improvement recorded as evaluator-specific.",
+  "blocker": null,
+  "matrix_rows": {
+    "total_runs": 20,
+    "required_main_matrix_rows": 18,
+    "required_rows_complete": 18,
+    "screening_rows": 2
+  },
+  "known_limitations": [
+    "The learned operators do NOT beat direct numerical stepping on either benchmark (Burgers 0.00054 vs 0.0099-0.0246; Allen-Cahn 0.0027 vs 0.0129-0.0514).",
+    "The Burgers residual improvement is evaluator-specific: the declared primary implicit-Euler residual improves ~70%, but the independent centred first-derivative residual is ~45-63% WORSE, and the reference solution is more PDE-consistent than either model under that evaluator.",
+    "The peak ALLOCATED memory reduction of ~96% is not a device-memory saving: peak RESERVED memory rises ~9% and total device memory is unchanged.",
+    "The physics arm costs rollout accuracy on both PDEs; the overall method recommendation under the global 5% accuracy constraint is data-only."
+  ]
 }

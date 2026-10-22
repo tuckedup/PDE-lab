@@ -1,0 +1,28 @@
+{
+  "system": "burgers",
+  "passed": true,
+  "n_checks": 19,
+  "failed_checks": [],
+  "check_names": [
+    "burgers.constant_state_stationary",
+    "burgers.time_integrator_consistency",
+    "burgers.spatial_operator_consistency",
+    "burgers.diffusion_operator_analytic",
+    "burgers.mean_conservation",
+    "burgers.energy_non_increasing",
+    "burgers.spatial_refinement_smooth",
+    "burgers.spatial_refinement_shock_regime",
+    "burgers.temporal_refinement",
+    "burgers.independent_solver_agreement",
+    "burgers.manufactured_solution",
+    "burgers.reference_solution_accuracy",
+    "burgers.flux_split_sign_aware",
+    "burgers.perturbation_decays_positive_background",
+    "burgers.perturbation_decays_negative_background",
+    "burgers.observation_times_exact",
+    "burgers.dataset_observation_times_exact",
+    "burgers.aliasing_error_quantified",
+    "burgers.sign_agreement_with_spectral_solver"
+  ],
+  "walltime_seconds": 22.14
+}

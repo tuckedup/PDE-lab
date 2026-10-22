@@ -2,6 +2,7 @@
 name = "pdelab"
 version = "0.1.0"
 description = "Physics-Constrained Neural Operator Research Prototype"
+readme = "README.md"
 authors = [{ name = "Atul Pandey" }]
 dependencies = [
     "torch",
@@ -18,12 +19,26 @@ dependencies = [
 ]
 requires-python = ">=3.11"
 
+# The release bundle ships the library and its command line entry point.
+# The entry point is what the clean-install verification drives, so that
+# the verification exercises the *installed* wheel and not
+# `python -m pdelab.cli` executed against the source tree.
+[project.scripts]
+pdelab = "pdelab.cli:main"
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+# The wheel is a *library* artifact.  No package data is shipped: the
+# datasets, the checkpoints, the plots and the run artifacts live outside
+# `src/` and must never end up inside the distribution.
+include-package-data = false
+
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["pdelab*"]
 
 [tool.ruff]
 line-length = 100

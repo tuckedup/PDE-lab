@@ -52,14 +52,14 @@ protocol:
 datasets:
   burgers:
     system: burgers
-    train_sha256: 10c74bcd0b15170a7b83aa631978e90e474d6256a621e5e58f60c5befb94f84f
-    val_sha256: cb226883b9663d863e085134b42f2091843a902bc2d4b81bb841c4a316cfae6c
-    test_sha256: b1ee09a87c905df335fa755dfd93aadb36a3c59c103c3cd3b943e290eb446e25
+    train_sha256: 12475d18b94db16fcc1448e96e10ae3cb136c86f8b9fc9347406186b9740bb28
+    val_sha256: 25422d2d66ee55bf5cc1c36499fc7ebafec3eeaa8b76a1a940cabf4ece3d1482
+    test_sha256: 32b7c134b2e86f7822946470d23e093e90e922efd6476eedea494e5180b199ae
   allen_cahn:
     system: allen_cahn
-    train_sha256: 3c764bfedbe4046e32add534e113103818333512be944c14c184c1ce3a8ef238
-    val_sha256: 814d109e87528a68398382ef644ee153953387e8e3cee33509da4be58f9810fb
-    test_sha256: 6ec8aca7f73021c9f0e17ccd9ba3a53799262c27a17cf636485f9a7abad5b3ae
+    train_sha256: a6723f34c07f17bc76a6765c4933e2a6ebcdfed5830164ee256641c7cacf2305
+    val_sha256: adc2912b5945c2ce0f505b6a77a9379aa25962e957e4fae622f4a80c159e1921
+    test_sha256: 8b07c868d265818b9b8dfc3a4ae43b60d82be59ba975694136f71523f6981fc6
 
 members:
   - id: burgers_fno1d_data_only
@@ -79,7 +79,7 @@ members:
     system: burgers
     architecture: fno1d
     condition: physics
-    lambda_pde: 0.01
+    lambda_pde: 0.1
     seeds: [0, 1, 2]
     run_ids:
       - burgers_fno1d_physics_seed0
@@ -120,18 +120,44 @@ members:
     run_ids:
       - burgers_fno1d_data_only_seed0
 
+  - id: burgers_unet1d_data_only
+    role: baseline
+    system: burgers
+    architecture: unet1d
+    condition: data_only
+    lambda_pde: 0.0
+    seeds: [0, 1, 2]
+    run_ids:
+      - burgers_unet1d_data_only_seed0
+      - burgers_unet1d_data_only_seed1
+      - burgers_unet1d_data_only_seed2
+
+  - id: allen_cahn_unet2d_data_only
+    role: baseline
+    system: allen_cahn
+    architecture: unet2d
+    condition: data_only
+    lambda_pde: 0.0
+    seeds: [0, 1, 2]
+    run_ids:
+      - allen_cahn_unet2d_data_only_seed0
+      - allen_cahn_unet2d_data_only_seed1
+      - allen_cahn_unet2d_data_only_seed2
+
 targets:
   - name: burgers_nrmse
     metric: nrmse
     members:
       - burgers_fno1d_data_only
       - burgers_fno1d_physics
+      - burgers_unet1d_data_only
 
   - name: allen_cahn_nrmse
     metric: nrmse
     members:
       - allen_cahn_fno2d_data_only
       - allen_cahn_fno2d_physics
+      - allen_cahn_unet2d_data_only
 
   - name: burgers_residual_improvement
     metric: relative_residual_improvement

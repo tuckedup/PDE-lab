@@ -1,0 +1,31 @@
+{
+  "schema": "pdelab-build-reproducibility/1",
+  "generated_utc": "2026-10-22T05:13:20Z",
+  "commit": "c73809950d1f5f902fd5f3b890f5abe0f9505649",
+  "source_date_epoch": 1792621523,
+  "source_date_epoch_utc": "2026-10-21T22:25:23Z",
+  "version": "0.1.0",
+  "builds": [
+    {
+      "index": 1,
+      "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+      "size_bytes": 135259
+    },
+    {
+      "index": 2,
+      "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+      "size_bytes": 135259
+    },
+    {
+      "index": 3,
+      "sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+      "size_bytes": 135259
+    }
+  ],
+  "three_consecutive_builds_identical": true,
+  "shipped_wheel_path": "/home/atulp/projects/pdelab/dist/pdelab-0.1.0-py3-none-any.whl",
+  "shipped_wheel_sha256": "0a09217af559d2261e008e05b1c5736b6772b99fedb236e33e7aa709e1ce76a3",
+  "shipped_wheel_size_bytes": 135259,
+  "shipped_wheel_matches_the_three_builds": true,
+  "method": "three consecutive `python -m build --wheel --no-isolation` runs of the same tree with SOURCE_DATE_EPOCH pinned to the commit date of HEAD and the setuptools build tree removed before each run"
+}

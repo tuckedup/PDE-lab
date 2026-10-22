@@ -4,7 +4,6 @@ __pycache__/
 *.egg-info/
 .eggs/
 build/
-dist/
 .venv/
 venv/
 
@@ -34,6 +33,15 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Local release output
+# scripts/linux/release_build.sh writes the release wheel, its SHA-256
+# sidecar and the build summary into dist/.  The wheel is a build output
+# and is never committed; RELEASE_MANIFEST.json and campaigns/release/
+# ARE committed on purpose, because they are the release evidence.
+dist/
+campaigns/release/*.whl
+campaigns/release/build/
 
 # Secrets
 .env

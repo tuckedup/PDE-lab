@@ -56,6 +56,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from ..config import load_yaml, project_root
 from ..evaluation.metrics import (
     evaluator_identity,
@@ -576,17 +578,58 @@ def _fill_metric(
     row["measured"] = measured
     row["status"] = "met" if verdict_ok else "missed"
     row["run_id"] = used[0] if len(used) == 1 else ", ".join(used)
+    # The cohort mean is a *cohort* statistic, not the performance of any
+    # one method. It is labelled as such and accompanied by the worst
+    # member, so it can never be read as a single model's score.
+    row["measured_kind"] = "cohort_mean_over_declared_members"
+    row["n_members"] = len(values)
+    if comparison.startswith("<"):
+        worst = max(values, key=lambda rv: rv[1])
+    else:
+        worst = min(values, key=lambda rv: rv[1])
+    row["worst_member_value"] = worst[1]
+    row["worst_member_run"] = worst[0]
     first = next((r for r in runs if r["run_id"] == used[0]), None)
     if first is not None:
         row["checkpoint"] = ((first["evaluation"] or {}).get("checkpoint"))
         row["test_dataset_sha256"] = ((first["evaluation"] or {}).get("test_dataset_sha256"))
         row["protocol"] = (first["evaluation"] or {}).get("protocol")
+    # Per condition and per seed, so a single method's numbers are
+    # always visible on their own.
+    by_condition: dict[str, list[float]] = {}
+    for r, v in values:
+        cond = _condition_of(r, runs)
+        by_condition.setdefault(cond, []).append(v)
+    row["per_condition"] = {
+        cond: {
+            "mean": sum(vs) / len(vs),
+            "n": len(vs),
+            "values": vs,
+        }
+        for cond, vs in sorted(by_condition.items())
+    }
     row["note"] = (
-        f"cohort mean over {len(values)} run(s): "
+        f"cohort mean over {len(values)} run(s) across "
+        f"{len(row['per_condition'])} condition(s) - this is a cohort "
+        f"statistic, NOT the score of any single method; the worst member is "
+        f"{row['worst_member_run']} at {row['worst_member_value']:.4g}. "
+        f"Per-member values: "
         + ", ".join(f"{r}={v:.4g}" for r, v in values)
         + f"; the verdict requires every declared member to satisfy "
         f"'{comparison} {threshold}'"
     )
+
+
+def _condition_of(run_id: str, runs: list[dict[str, Any]]) -> str:
+    """The (system, architecture, condition) label of a run."""
+    for r in runs:
+        if r.get("run_id") == run_id:
+            ev = r.get("evaluation") or {}
+            return (
+                f"{ev.get('system', '?')}/{ev.get('architecture', '?')}"
+                f"/{ev.get('condition', '?')}"
+            )
+    return "unknown"
 
 
 def _fill_improvement(
@@ -904,18 +947,93 @@ def build_report(
             "no target can be met.\n"
         )
     lines.append(
-        "| target | metric | threshold | status | measured | units | run_id |"
+        "| target | metric | threshold | status | measured (cohort) | worst member | units |"
     )
     lines.append("|---|---|---|---|---|---|---|")
     for t in target_rows:
         lines.append(
             f"| {t['target']} | {t['metric']} | {t['comparison']} {_fmt(t['threshold'])} "
-            f"| **{t['status']}** | {_fmt(t['measured'])} | {t['units']} "
-            f"| {t['run_id'] or '-'} |"
+            f"| **{t['status']}** | {_fmt(t['measured'])} | "
+            f"{_fmt(t.get('worst_member_value'))} | {t['units']} |"
         )
+    lines.append(
+        "\n`measured (cohort)` is the mean over the **declared cohort members**; "
+        "it is a cohort statistic and is **not** the score of any single "
+        "method. The per-condition and per-seed values are in the next "
+        "table, and the `worst member` column is the value the verdict "
+        "actually turns on.\n"
+    )
     for t in target_rows:
         if t.get("note"):
             lines.append(f"\n- `{t['target']}`: {t['note']}")
+
+    # ---- per condition and per seed --------------------------------
+    lines.append("\n\n## Per-condition and per-seed results (fresh test set)\n")
+    lines.append(
+        "Every declared cohort row, one line each. `nRMSE` is the free-rollout "
+        "metric on the held-out test split; the residual columns are the "
+        "declared primary (implicit-Euler first-order) residual and the "
+        "independent centred first-derivative residual.\n"
+    )
+    lines.append(
+        "| system | architecture | condition | seed | lambda | nRMSE (rollout) | "
+        "nRMSE (1-step) | persistence | numerical stepping | primary residual | "
+        "reference primary | centred residual | reference centred |"
+    )
+    lines.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for r in run_rows:
+        if r.get("status") != "completed" or r.get("rollout_nrmse_mean") is None:
+            continue
+        if r.get("evidence") not in (None, "valid"):
+            continue
+        lines.append(
+            f"| {r.get('system')} | {r.get('architecture')} | {r.get('condition')} "
+            f"| {r.get('seed')} | {_fmt(r.get('lambda_pde'))} "
+            f"| {_fmt(r.get('rollout_nrmse_mean'))} "
+            f"| {_fmt(r.get('one_step_nrmse_mean'))} "
+            f"| {_fmt(r.get('persistence_nrmse_mean'))} "
+            f"| {_fmt(r.get('numerical_stepping_nrmse_mean'))} "
+            f"| {_fmt(r.get('residual_rms_implicit_euler_first_order'))} "
+            f"| {_fmt(r.get('reference_residual_rms_implicit_euler_first_order'))} "
+            f"| {_fmt(r.get('residual_rms_centred_first_derivative'))} "
+            f"| {_fmt(r.get('reference_residual_rms_centred_first_derivative'))} |"
+        )
+
+    # ---- per-condition summary ------------------------------------
+    lines.append("\n\n### Per-condition summary (mean and sample SD over seeds)\n")
+    groups: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    for r in run_rows:
+        if r.get("status") != "completed" or r.get("rollout_nrmse_mean") is None:
+            continue
+        if r.get("evidence") not in (None, "valid"):
+            continue
+        key = (r.get("system"), r.get("architecture"), r.get("condition"))
+        groups.setdefault(key, []).append(r)
+    lines.append(
+        "| system | architecture | condition | seeds | nRMSE mean | nRMSE SD | "
+        "primary residual mean | centred residual mean |"
+    )
+    lines.append("|---|---|---|---|---|---|---|---|")
+    for key in sorted(groups):
+        rows_ = groups[key]
+        vals = [r["rollout_nrmse_mean"] for r in rows_]
+        sd = float(np.std(vals, ddof=1)) if len(vals) > 1 else 0.0
+        prim = [
+            r.get("residual_rms_implicit_euler_first_order")
+            for r in rows_
+            if r.get("residual_rms_implicit_euler_first_order") is not None
+        ]
+        cent = [
+            r.get("residual_rms_centred_first_derivative")
+            for r in rows_
+            if r.get("residual_rms_centred_first_derivative") is not None
+        ]
+        lines.append(
+            f"| {key[0]} | {key[1]} | {key[2]} | {len(vals)} "
+            f"| {sum(vals)/len(vals):.5g} | {sd:.3g} "
+            f"| {(sum(prim)/len(prim)) if prim else float('nan'):.5g} "
+            f"| {(sum(cent)/len(cent)) if cent else float('nan'):.5g} |"
+        )
 
     lines.append("\n\n## Runs\n")
     if run_rows:

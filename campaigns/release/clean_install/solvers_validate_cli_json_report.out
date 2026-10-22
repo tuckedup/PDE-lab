@@ -1,0 +1,16 @@
+{
+  "step": "solvers_validate_cli",
+  "system": "burgers",
+  "passed": true,
+  "n_checks": 19,
+  "failed_checks": [],
+  "walltime_seconds": 20.929
+}
+{
+  "step": "solvers_validate_cli_allen_cahn",
+  "system": "allen_cahn",
+  "passed": true,
+  "n_checks": 14,
+  "failed_checks": [],
+  "walltime_seconds": 105.518
+}

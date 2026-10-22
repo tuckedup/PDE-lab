@@ -1,11 +1,14 @@
-# allen_cahn / fno2d / data_only (seed 0)
+# allen_cahn / fno2d / data_only (seed 0, lambda=0.0)
+#
+# Frozen v2 main-matrix row. The physics weight is the Arm-A selection
+# from configs/lambda_selection.json (validation split only).
 name: allen_cahn_fno2d_data_only_seed0
 system: allen_cahn
 condition: data_only
 seed: 0
 observation_dt: 0.1
 lambda_pde: 0.0
-tags: [baseline,main]
+tags: [main,v2]
 
 model:
   architecture: fno2d
@@ -14,6 +17,9 @@ model:
   modes_y: 8
   width: 16
   n_layers: 4
+
+data:
+  dataset_dir: data/allen_cahn
 
 train:
   epochs: 40

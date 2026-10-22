@@ -16,7 +16,6 @@ from __future__ import annotations
 import importlib
 import json
 import os
-import sys
 import tempfile
 import time
 from pathlib import Path

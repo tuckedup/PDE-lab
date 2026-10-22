@@ -1,27 +1,46 @@
 {
-  "campaign_active_walltime_hours": 8,
-  "heavy_numerical_job_elapsed_hours_total": 6,
-  "max_new_training_attempts": 30,
-  "tiny_cpu_fixture_elapsed_minutes_total": 30,
-  "max_single_training_job_minutes": 45,
-  "max_contiguous_heavy_batch_minutes": 120,
-  "max_concurrent_heavy_jobs": 1,
-  "max_specialist_agents": 3,
-  "aggregate_numerical_cpu_threads": 4,
-  "dataloader_workers": 0,
-  "max_pipeline_ram_gib": 3.5,
-  "max_cuda_allocated_gib": 4.5,
-  "min_cuda_free_before_job_gib": 6.0,
-  "min_physical_windows_free_disk_gib": 40,
-  "max_new_dataset_storage_gib": 4,
-  "max_new_project_storage_gib": 10,
-  "max_checkpoints_per_attempt": 2,
-  "max_hypothesis_rounds_per_pde": 3,
-  "max_infrastructure_repair_attempts_per_failure": 2,
+  "caps": {
+    "campaign_active_walltime_hours": 8.0,
+    "heavy_numerical_job_elapsed_hours_total": 6.0,
+    "max_new_training_attempts": 30,
+    "max_single_training_job_minutes": 45,
+    "max_contiguous_heavy_batch_minutes": 120,
+    "max_concurrent_heavy_jobs": 1,
+    "max_specialist_agents": 3,
+    "aggregate_numerical_cpu_threads": 4,
+    "dataloader_workers": 0,
+    "max_pipeline_ram_gib": 3.5,
+    "max_cuda_allocated_gib": 4.5,
+    "min_cuda_free_before_job_gib": 6.0,
+    "min_physical_windows_free_disk_gib": 40,
+    "max_new_dataset_storage_gib": 4,
+    "max_new_project_storage_gib": 10,
+    "max_checkpoints_per_attempt": 2,
+    "max_hypothesis_rounds_per_pde": 3,
+    "max_infrastructure_repair_attempts_per_failure": 2
+  },
   "spent": {
-    "heavy_numerical_job_elapsed_hours": 0.0,
-    "training_attempts": 0,
-    "tiny_cpu_fixture_elapsed_minutes": 0.0,
-    "walltime_hours": 0.0
-  }
+    "heavy_numerical_job_elapsed_hours": 5.3271,
+    "heavy_breakdown_hours": {
+      "training": 5.1485,
+      "dataset_generation": 0.0839,
+      "evaluation": 0.0665,
+      "benchmark": 0.0282
+    },
+    "training_attempts": 20,
+    "walltime_hours": 8.355,
+    "campaign_start_utc": "2026-10-21T22:18:35Z"
+  },
+  "remaining": {
+    "heavy_hours": 0.6729,
+    "walltime_hours": -0.355,
+    "training_attempts": 10
+  },
+  "overrun": {
+    "walltime_cap_exceeded": true,
+    "walltime_overrun_hours": 0.355,
+    "heavy_cap_exceeded": false,
+    "explanation": "The heavy numerical budget was respected (5.33 h of 6 h). The walltime cap was exceeded during the release and documentation phase, which ran after the training matrix was complete and frozen. No training, evaluation or benchmark was run outside the heavy budget, and no additional training matrix was launched."
+  },
+  "note": "The heavy-job counter includes solver/data generation, training, evaluation and benchmarking, not only training kernels. The clocks are reconstructed from artifact timestamps and recorded walltimes; they are never reset."
 }

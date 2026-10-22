@@ -1,17 +1,23 @@
 # allen_cahn / unet2d / physics (seed 0, lambda=0.01)
+#
+# Frozen v2 main-matrix row. The physics weight is the Arm-A selection
+# from configs/lambda_selection.json (validation split only).
 name: allen_cahn_unet2d_physics_seed0
 system: allen_cahn
 condition: physics
 seed: 0
 observation_dt: 0.1
 lambda_pde: 0.01
-tags: [main,optional_extension]
+tags: [main,optional_extension,v2]
 
 model:
   architecture: unet2d
   history: 1
   width: 16
   n_levels: 3
+
+data:
+  dataset_dir: data/allen_cahn
 
 train:
   epochs: 40

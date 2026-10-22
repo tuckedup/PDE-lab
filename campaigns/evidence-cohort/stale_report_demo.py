@@ -25,13 +25,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from pdelab.evaluation.metrics import (  # noqa: E402
+from pdelab.evaluation.metrics import (
     canonical_json_sha256,
     evaluator_identity,
     sha256_file,
     write_json_atomic,
 )
-from pdelab.reporting.report import (  # noqa: E402
+from pdelab.reporting.report import (
     assess_run_evidence,
     build_report,
     collect_runs,

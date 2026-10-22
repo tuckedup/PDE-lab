@@ -1,0 +1,40 @@
+Archive:  /home/atulp/projects/pdelab/dist/pdelab-0.1.0-py3-none-any.whl
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      143  2026-10-21 22:25   pdelab/__init__.py
+    15163  2026-10-21 22:25   pdelab/cli.py
+     3674  2026-10-21 22:25   pdelab/config.py
+     5923  2026-10-21 22:25   pdelab/sweep.py
+     2148  2026-10-21 22:25   pdelab/utils.py
+    34083  2026-10-21 22:25   pdelab/benchmarks/inference.py
+    13044  2026-10-21 22:25   pdelab/benchmarks/variant_runner.py
+     4464  2026-10-21 22:25   pdelab/data/dataset.py
+    17620  2026-10-21 22:25   pdelab/data/generate.py
+     3991  2026-10-21 22:25   pdelab/data/initial_conditions.py
+    32469  2026-10-21 22:25   pdelab/evaluation/evaluate.py
+    21445  2026-10-21 22:25   pdelab/evaluation/metrics.py
+     5024  2026-10-21 22:25   pdelab/evaluation/rollout.py
+     2161  2026-10-21 22:25   pdelab/models/base.py
+    12303  2026-10-21 22:25   pdelab/models/fno.py
+     2357  2026-10-21 22:25   pdelab/models/registry.py
+     9247  2026-10-21 22:25   pdelab/models/unet.py
+     3117  2026-10-21 22:25   pdelab/physics/losses.py
+    16710  2026-10-21 22:25   pdelab/physics/operators.py
+    13764  2026-10-21 22:25   pdelab/reporting/plots.py
+    45272  2026-10-21 22:25   pdelab/reporting/report.py
+    17363  2026-10-21 22:25   pdelab/resources/preflight.py
+    13825  2026-10-21 22:25   pdelab/solvers/allen_cahn.py
+      192  2026-10-21 22:25   pdelab/solvers/base.py
+    20090  2026-10-21 22:25   pdelab/solvers/burgers.py
+    17081  2026-10-21 22:25   pdelab/solvers/burgers_weno.py
+     6496  2026-10-21 22:25   pdelab/solvers/observation.py
+    58917  2026-10-21 22:25   pdelab/solvers/validation.py
+    13502  2026-10-21 22:25   pdelab/training/experiment.py
+    30766  2026-10-21 22:25   pdelab/training/trainer.py
+     6604  2026-10-21 22:25   pdelab-0.1.0.dist-info/METADATA
+       91  2026-10-21 22:25   pdelab-0.1.0.dist-info/WHEEL
+       43  2026-10-21 22:25   pdelab-0.1.0.dist-info/entry_points.txt
+        7  2026-10-21 22:25   pdelab-0.1.0.dist-info/top_level.txt
+     2852  2026-10-21 22:25   pdelab-0.1.0.dist-info/RECORD
+---------                     -------
+   451951                     35 files

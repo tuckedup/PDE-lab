@@ -64,7 +64,7 @@ def run_case(name: str, solver, u0: np.ndarray) -> bool:
 
     err = np.abs(clocks - SAVE_TIMES)
     ok = bool(np.all(err <= 1e-12))
-    for i, (req, got, e) in enumerate(zip(SAVE_TIMES, clocks, err)):
+    for req, got, e in zip(SAVE_TIMES, clocks, err):
         flag = "ok " if e <= 1e-12 else "OFF"
         print(f"    [{flag}] requested {req:.6f} -> returned {got:.6f}  (err {e:.6f})")
     print(f"  frames match requested times: {ok}")
